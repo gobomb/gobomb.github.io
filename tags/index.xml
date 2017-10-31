@@ -2,13 +2,13 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Cym&#39;s Blog</title>
-    <link>http://sidddhatha.github.io/tags/</link>
+    <link>https://sidddhatha.github.io/tags/</link>
     <description>Recent content in Tags on Cym&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>2017 by Cym</copyright>
     
-	<atom:link href="http://sidddhatha.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://sidddhatha.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>
