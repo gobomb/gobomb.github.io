@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<title>如何用 Golang 写单元测试</title>
+	<link href="" rel="alternate" type="application/rss+xml" title="Cym&#39;s Blog" />
+	<base href="https://sidddhartha.github.io/">
+	<link href="https://sidddhartha.github.io/css/style.min.css" rel="stylesheet">
+</head>
+<body>
+<header class="site-header">
+	<div class="container">
+		<h1 class="site-title"><a href="https://sidddhartha.github.io/">Cym&#39;s Blog</a></h1>
+		<p class="lead blog-description">喵</p>
+	</div>
+</header>
+<nav class="main-nav">
+	<div class="container">
+		<ul class="main-menu">
+			<li><a href="https://sidddhartha.github.io//" title="首页">首页</a></li>
+			<li><a href="https://sidddhartha.github.io/essay/" title="文章">文章</a></li>
+			
+			
+			
+			
+			
+			<li><a href="https://sidddhartha.github.io/about/" title="关于">关于</a></li>
+		</ul>
+	</div>
+</nav>
+
+<div class="main-content container">
+	<div class="post">
+		<h1 class="post-title">如何用 Golang 写单元测试</h1>
+		<div class="post-meta">
+			<p>2017年11月6日</p>
+		</div>
+		
+
+<h2 id="为什么要写单元测试">为什么要写单元测试</h2>
+
+<p>以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息。实际上重复性的工作很多，这一部分是可以用单元测试来做的。</p>
+
+<p>另外，当项目比较大的时候，一般都是把项目分割成几个模块来写的。可以分别保证各个模块的正确性，最后再把各个项目组合起来。这时候也需要单元测试，增强可维护性。</p>
+
+<p>人的记忆力和思考能力毕竟是有限的，并不一定能马上想到边界条件和 bug 可能出现的地方，当代码发生更改，边界条件可能就改变了，程序可能会跑不通，这时跑一下测试代码，可以更快发现问题。</p>
+
+<p>测试保证程序是可运行的，运行结果是正确的，使问题及早暴露，便于问题的定位解决。而性能测试则关注程序在<strong>高并发</strong>的情况下的稳定性。</p>
+
+<p>单元测试也可以方便读代码的人读懂，通过测试代码可以更快了解这个项目到底是干嘛的、该如何用。</p>
+
+<h2 id="怎么写单元测试">怎么写单元测试</h2>
+
+<h4 id="单元测试">单元测试</h4>
+
+<ul>
+<li><p>go语言自己有一个轻量级的测试框架 <code>testing</code>和命令<code>go test</code>,可用来进行单元测试和性能测试。</p></li>
+
+<li><p>测试文件用 <code>xxx_test.go</code>命名，测试函数命名为<code>TestXxx</code>或<code>Test_Xxx</code></p></li>
+
+<li><p>在终端中输入 <code>go test</code>，将对当前目录下的所有<code>xxx_test.go</code>文件进行编译并自动运行测试。</p></li>
+
+<li><p>测试某个文件，要带上被测试的原文件</p></li>
+</ul>
+
+<p>&ensp;&emsp;&emsp;<code>go test xxx.go xxx_test.go
+</code></p>
+
+<ul>
+<li><p>测试某个方法:<code>go test -run='Test_Xxx'</code></p></li>
+
+<li><p><code>go  test -v</code> 则输出通过的测试函数信息</p></li>
+</ul>
+
+<p>如对以下代码进行测试：</p>
+
+<pre><code class="language-go">package test
+
+func Fibonacci(n int) int{
+	if n==1{
+		return 1
+	}else if n==0{
+		return 1
+	}
+	return Fibonacci(n-1)+Fibonacci(n-2)
+}
+
+</code></pre>
+
+<p>测试代码为：</p>
+
+<pre><code class="language-go">package test
+
+import &quot;testing&quot;
+
+func TestFibonacci5(t *testing.T) {
+	e:=Fibonacci(5)
+	if e!= 8{
+		t.Fail()
+	}else{
+		t.Log(&quot;ok&quot;)
+	}
+}
+
+func TestFibonacci8(t *testing.T) {
+	e:=Fibonacci(8)
+	if e!= 34{
+		t.Fail()
+	}else{
+		t.Log(&quot;ok&quot;)
+	}
+}
+
+</code></pre>
+
+<h4 id="性能-压力-测试">性能(压力)测试：</h4>
+
+<ul>
+<li><p>性能测试的函数命名为<code>BenchmarkXxx</code></p></li>
+
+<li><p>函数格式为<code>func BenchmarkXXX(b *testing.B) { ... }</code></p></li>
+
+<li><p><code>go test</code>默认不会执行压力测试的函数，要执行压力测试需要带上参数<code>-bench</code>指定测试函数，例如<code>go test -bench=.*</code>表示测试全部的压力测试函数。</p></li>
+
+<li><p>文件名也必须以<code>_test.go</code>结尾</p></li>
+</ul>
+
+<p>一个示例压测代码：</p>
+
+<pre><code class="language-go">package test
+
+import (
+	&quot;testing&quot;
+)
+
+func Benchmark_Fibonacci(b *testing.B) {
+	for i := 0; i &lt; b.N; i++ { //use b.N for looping
+		Fibonacci( 20)
+
+	}
+	//b.Log(b.N)
+
+}
+
+func Benchmark_TimeConsumingFunction(b *testing.B) {
+	b.StopTimer() //调用该函数停止压力测试的时间计数
+
+	//做一些初始化的工作,例如读取文件数据,数据库连接之类的,
+	//这样这些时间不影响我们测试函数本身的性能
+	num:=35
+
+	b.StartTimer() //重新开始时间
+	for i := 0; i &lt; b.N; i++ {
+		Fibonacci( num)
+	}
+}
+</code></pre>
+
+<pre><code>$test cym$ go test -test.bench=&quot;Benchmark_Fibonacci&quot;
+
+Benchmark_Fibonacci-4              30000             51647 ns/op
+PASS
+ok      projects/test   2.073s
+</code></pre>
+
+<p>以上输出说明<code>Benchmark_Fibonacci</code>执行了30000次，每次的执行平均时间是51647纳秒。</p>
+
+<h4 id="参考文章">参考文章</h4>
+
+<ul>
+<li><a href="https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/11.3.md">https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/11.3.md</a><br></li>
+<li><a href="https://getstream.io/blog/how-we-test-go-at-stream/">https://getstream.io/blog/how-we-test-go-at-stream/</a>
+<br></li>
+<li><a href="http://www.cnblogs.com/moxiaopeng/articles/4743365.html">http://www.cnblogs.com/moxiaopeng/articles/4743365.html</a><br></li>
+</ul>
+
+	</div>
+	<ul class="pager">
+		
+		 &nbsp;<li class="next"><a href="https://sidddhartha.github.io/essay/make-a-blog-by-hugo-and-github-page/">用 Hugo 和 GitHub Page 搭建博客»</a></li>
+	</ul>
+	
+</div>
+<footer class="site-footer">
+	<div class="container">
+		<p>使用 <a href="https://gohugo.io/">Hugo</a> 并基于 <a href="https://github.com/chingli/rockrock">RockRock</a> 主题构建.&nbsp;
+		</span></p>
+		<p class="text-muted small">&copy; 2017 by Cym</p>
+	</div>
+</footer>
+
+</body>
+</html>
+

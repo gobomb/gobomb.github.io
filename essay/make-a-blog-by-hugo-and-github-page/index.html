@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<title>用 Hugo 和 GitHub Page 搭建博客</title>
+	<link href="" rel="alternate" type="application/rss+xml" title="Cym&#39;s Blog" />
+	<base href="https://sidddhartha.github.io/">
+	<link href="https://sidddhartha.github.io/css/style.min.css" rel="stylesheet">
+</head>
+<body>
+<header class="site-header">
+	<div class="container">
+		<h1 class="site-title"><a href="https://sidddhartha.github.io/">Cym&#39;s Blog</a></h1>
+		<p class="lead blog-description">喵</p>
+	</div>
+</header>
+<nav class="main-nav">
+	<div class="container">
+		<ul class="main-menu">
+			<li><a href="https://sidddhartha.github.io//" title="首页">首页</a></li>
+			<li><a href="https://sidddhartha.github.io/essay/" title="文章">文章</a></li>
+			
+			
+			
+			
+			
+			<li><a href="https://sidddhartha.github.io/about/" title="关于">关于</a></li>
+		</ul>
+	</div>
+</nav>
+
+<div class="main-content container">
+	<div class="post">
+		<h1 class="post-title">用 Hugo 和 GitHub Page 搭建博客</h1>
+		<div class="post-meta">
+			<p>2017年10月31日</p>
+		</div>
+		
+
+<p>图省事，懒得花钱买域名和备案，就用 <a href="https://pages.github.com/">GitHub Page</a> 来搭博客了。</p>
+
+<p><a href="https://gohugo.io/">hugo</a> 是用 Golang 写的静态网站生成器。支持 Markdown 语法。
+另一个用js写的同类工具<a href="http://jekyll.com.cn/">jekyll</a>
+比较出名。<br /><br /></p>
+
+<h5 id="安装和使用-hugo"><em>安装和使用 Hugo：</em></h5>
+
+<ul>
+<li>如果有 Go 环境，直接在终端输入：</li>
+</ul>
+
+<p>&ensp;&emsp;&emsp;<code>go get -v github.com/spf13/hugo</code></p>
+
+<p>&ensp;&emsp;&emsp;<code>hugo new site /path/to/site</code></p>
+
+<ul>
+<li><p><code>path/to/site</code>是本地站点目录
+<br /></p></li>
+
+<li><p>创建 about 页面：</p></li>
+</ul>
+
+<p>&ensp;&emsp;&emsp;<code>hugo new about.md</code>
+<br /></p>
+
+<ul>
+<li>皮肤我用的是 <a href="https://github.com/chingli/rockrock">rockrock</a>：</li>
+</ul>
+
+<p>&ensp;&emsp;&emsp;<code>cd themes</code></p>
+
+<p>&ensp;&emsp;&emsp;<code>git clone https://github.com/chingli/rockrock</code>
+<br /><br/></p>
+
+<h5 id="在本地运行"><em>在本地运行：</em></h5>
+
+<ul>
+<li><p>在站点根目录下运行：
+<code>hugo server --theme=rockrock --buildDrafts</code>
+<br/></p></li>
+
+<li><p>在浏览器访问：
+<code>http://localhost:1313</code>
+<br/></p></li>
+
+<li><p>这里修改 Markdown 文件可以动态更新，很方便。
+<br/><br/></p></li>
+</ul>
+
+<h5 id="在-github-上部署"><em>在 GitHub 上部署：</em></h5>
+
+<p><br/></p>
+
+<p>1 在 GitHub 建一个 Repository，命名为 <code>sidddhartha.gitbub.io</code>,
+<code>sidddhartha</code> 为自己的用户名。
+<br/></p>
+
+<p>2 在站点根目录下执行：</p>
+
+<p>&ensp;<code>hugo --theme=rockrock --baseUrl=&quot;https://sidddhartha.github.io/&quot;</code></p>
+
+<p>3 将生成的 pubilc 目录里所有文件 push 到 <code>sidddhartha.gitbub.io</code> 的 master 分支</p>
+
+<p>&ensp;<code>cd public</code></p>
+
+<p>&ensp;<code>git init</code></p>
+
+<p>&ensp;<code>git remote add origin https://github.com/sidddhartha/sidddhartha.github.io.git</code></p>
+
+<p>&ensp;<code>git add -A</code></p>
+
+<p>&ensp;<code>git commit -m &quot;first commit&quot;</code></p>
+
+<p>&ensp;<code>git push -u origin master</code></p>
+
+<p><br/>
+4 浏览器访问：<a href="https://sidddhartha.github.io">https://sidddhartha.github.io</a>
+<br/><br/></p>
+
+<h5 id="参考">参考：</h5>
+
+<ul>
+<li><a href="http://www.gohugo.org/">http://www.gohugo.org/</a></li>
+</ul>
+
+	</div>
+	<ul class="pager">
+		 &nbsp;<li class="previous"><a href="https://sidddhartha.github.io/essay/how-to-write-unit-testing-in-golang/">«如何用 Golang 写单元测试</a></li>
+		 &nbsp;<li class="next"><a href="https://sidddhartha.github.io/about/">About»</a></li>
+	</ul>
+	
+</div>
+<footer class="site-footer">
+	<div class="container">
+		<p>使用 <a href="https://gohugo.io/">Hugo</a> 并基于 <a href="https://github.com/chingli/rockrock">RockRock</a> 主题构建.&nbsp;
+		</span></p>
+		<p class="text-muted small">&copy; 2017 by Cym</p>
+	</div>
+</footer>
+
+</body>
+</html>
+

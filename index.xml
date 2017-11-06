@@ -7,18 +7,27 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
     <copyright>2017 by Cym</copyright>
-    <lastBuildDate>Tue, 31 Oct 2017 16:02:19 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 06 Nov 2017 16:52:19 +0800</lastBuildDate>
     
 	<atom:link href="https://sidddhartha.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>用 hugo 和 GitHub Page 搭建博客</title>
-      <link>https://sidddhartha.github.io/essay/first/</link>
+      <title>如何用 Golang 写单元测试</title>
+      <link>https://sidddhartha.github.io/essay/how-to-write-unit-testing-in-golang/</link>
+      <pubDate>Mon, 06 Nov 2017 16:52:19 +0800</pubDate>
+      
+      <guid>https://sidddhartha.github.io/essay/how-to-write-unit-testing-in-golang/</guid>
+      <description>为什么要写单元测试 以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息</description>
+    </item>
+    
+    <item>
+      <title>用 Hugo 和 GitHub Page 搭建博客</title>
+      <link>https://sidddhartha.github.io/essay/make-a-blog-by-hugo-and-github-page/</link>
       <pubDate>Tue, 31 Oct 2017 16:02:19 +0800</pubDate>
       
-      <guid>https://sidddhartha.github.io/essay/first/</guid>
-      <description>图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。 hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。 如果</description>
+      <guid>https://sidddhartha.github.io/essay/make-a-blog-by-hugo-and-github-page/</guid>
+      <description>图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。 hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。 安装</description>
     </item>
     
     <item>
