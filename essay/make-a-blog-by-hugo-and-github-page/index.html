@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
+	 <script src="https://sidddhartha.github.io/js/highlight.pack.js"></script>
+	 <link rel="stylesheet" href="https://sidddhartha.github.io/css/github.css">
+	 <script>hljs.initHighlightingOnLoad();</script>
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -91,8 +95,6 @@
 
 <h5 id="在-github-上部署"><em>在 GitHub 上部署：</em></h5>
 
-<p><br/></p>
-
 <p>1 在 GitHub 建一个 Repository，命名为 <code>sidddhartha.gitbub.io</code>,
 <code>sidddhartha</code> 为自己的用户名。
 <br/></p>
@@ -119,10 +121,31 @@
 4 浏览器访问：<a href="https://sidddhartha.github.io">https://sidddhartha.github.io</a>
 <br/><br/></p>
 
+<h5 id="使用-highlight-js-https-highlightjs-org-进行对代码高亮的支持"><em>使用 <a href="https://highlightjs.org/">highlight.js</a>进行对代码高亮的支持：</em></h5>
+
+<p>1 将 highlight.js 下载到本地</p>
+
+<p>2 把 js 库文件<code>highlight.pack.js</code> 复制到 <code>.../themes/rockrock/static/css/</code>下面</p>
+
+<p>把 <code>github.css</code>复制到 <code>.../themes/rockrock/static/js/</code>下面</p>
+
+<p>有多种风格样式，我选择的是 github 风格</p>
+
+<p>3 在<code>.../themes/rockrock/layouts/partials/header.html</code>里添加以下代码：</p>
+
+<pre><code class="language-html">&lt;!-- Highlight.js and css --&gt;
+	 &lt;script src=&quot;{{ .Site.BaseURL }}js/highlight.pack.js&quot;&gt;&lt;/script&gt;
+	 &lt;link rel=&quot;stylesheet&quot; href=&quot;{{ .Site.BaseURL }}css/github.css&quot;&gt;
+	 &lt;script&gt;hljs.initHighlightingOnLoad();&lt;/script&gt;
+</code></pre>
+
+<p>highlight.js会自动检测语言类型，并使用github样式。</p>
+
 <h5 id="参考">参考：</h5>
 
 <ul>
 <li><a href="http://www.gohugo.org/">http://www.gohugo.org/</a></li>
+<li><a href="http://tonybai.com/2015/09/23/intro-of-gohugo/">http://tonybai.com/2015/09/23/intro-of-gohugo/</a></li>
 </ul>
 
 	</div>

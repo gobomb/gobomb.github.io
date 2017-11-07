@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
+	 <script src="https://sidddhartha.github.io/js/highlight.pack.js"></script>
+	 <link rel="stylesheet" href="https://sidddhartha.github.io/css/github.css">
+	 <script>hljs.initHighlightingOnLoad();</script>
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -158,7 +162,7 @@ func Benchmark_TimeConsumingFunction(b *testing.B) {
 }
 </code></pre>
 
-<pre><code>$test cym$ go test -test.bench=&quot;Benchmark_Fibonacci&quot;
+<pre><code>go test -test.bench=&quot;Benchmark_Fibonacci&quot;
 
 Benchmark_Fibonacci-4              30000             51647 ns/op
 PASS
