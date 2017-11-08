@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="olOwOlo" />
+<meta name="author" content="cym" />
   <meta name="description" content="图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。 hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。 安装" />
 
   <meta name="keywords" content="Hugo, theme, even" />
@@ -29,7 +29,7 @@
 <meta name="generator" content="Hugo 0.28-DEV" />
 
 
-<link rel="canonical" href="http://localhost:1313/essay/make-a-blog-by-hugo-and-github-page/" />
+<link rel="canonical" href="https://sidddhartha.github.io/post/make-a-blog-by-hugo-and-github-page/" />
 
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -47,7 +47,7 @@
 <meta property="og:title" content="用 Hugo 和 GitHub Page 搭建博客" />
 <meta property="og:description" content="图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。 hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。 安装" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/essay/make-a-blog-by-hugo-and-github-page/" />
+<meta property="og:url" content="https://sidddhartha.github.io/post/make-a-blog-by-hugo-and-github-page/" />
 
 
 
@@ -69,7 +69,7 @@
 
 
 <meta itemprop="dateModified" content="2017-10-31T16:02:19&#43;08:00" />
-<meta itemprop="wordCount" content="586">
+<meta itemprop="wordCount" content="574">
 
 
 
@@ -108,6 +108,8 @@
         <li class="mobile-menu-item">Tags</li>
       </a><a href="/categories/">
         <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">About</li>
       </a>
   </ul>
 </nav>
@@ -127,6 +129,8 @@
         <a class="menu-item-link" href="/tags/">Tags</a>
       </li><li class="menu-item">
         <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">About</a>
       </li>
   </ul>
 </nav>
@@ -136,7 +140,43 @@
       <div class="content-wrapper">
         <div id="content" class="content">
           <article class="post">
-  <div class="post-content">
+    
+    <header class="post-header">
+      <h1 class="post-title">用 Hugo 和 GitHub Page 搭建博客</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-10-31 </span>
+        
+        <span class="more-meta"> 约 574 字 </span>
+        <span class="more-meta"> 预计阅读 2 分钟 </span>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content">
+      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#安装和使用hugo">安装和使用Hugo</a></li>
+</ul></li>
+<li><a href="#在本地运行">在本地运行</a></li>
+<li><a href="#在-github-上部署">在 GitHub 上部署</a></li>
+<li><a href="#代码高亮">代码高亮</a></li>
+<li><a href="#参考文章">参考文章</a></li>
+</ul></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
       
 
 <p>图省事，懒得花钱买域名和备案，就用 <a href="https://pages.github.com/">GitHub Page</a> 来搭博客了。</p>
@@ -145,7 +185,7 @@
 另一个用js写的同类工具<a href="http://jekyll.com.cn/">jekyll</a>
 比较出名。<br /><br /></p>
 
-<h5 id="安装和使用-hugo"><em>安装和使用 Hugo：</em></h5>
+<h3 id="安装和使用hugo">安装和使用Hugo</h3>
 
 <ul>
 <li>如果有 Go 环境，直接在终端输入：</li>
@@ -174,7 +214,7 @@
 <p>&ensp;&emsp;&emsp;<code>git clone https://github.com/chingli/rockrock</code>
 <br /><br/></p>
 
-<h5 id="在本地运行"><em>在本地运行：</em></h5>
+<h2 id="在本地运行">在本地运行</h2>
 
 <ul>
 <li><p>在站点根目录下运行：
@@ -189,7 +229,7 @@
 <br/><br/></p></li>
 </ul>
 
-<h5 id="在-github-上部署"><em>在 GitHub 上部署：</em></h5>
+<h2 id="在-github-上部署">在 GitHub 上部署</h2>
 
 <p>1 在 GitHub 建一个 Repository，命名为 <code>sidddhartha.gitbub.io</code>,
 <code>sidddhartha</code> 为自己的用户名。
@@ -217,7 +257,9 @@
 4 浏览器访问：<a href="https://sidddhartha.github.io">https://sidddhartha.github.io</a>
 <br/><br/></p>
 
-<h5 id="使用-highlight-js-https-highlightjs-org-进行对代码高亮的支持"><em>使用 <a href="https://highlightjs.org/">highlight.js</a>进行对代码高亮的支持：</em></h5>
+<h2 id="代码高亮">代码高亮</h2>
+
+<p>使用 <a href="https://highlightjs.org/">highlight.js</a>：</p>
 
 <p>1 将 highlight.js 下载到本地</p>
 
@@ -237,15 +279,51 @@
 
 <p>highlight.js会自动检测语言类型，并使用github样式。</p>
 
-<h5 id="参考">参考：</h5>
+<h2 id="参考文章">参考文章</h2>
 
 <ul>
 <li><a href="http://www.gohugo.org/">http://www.gohugo.org/</a></li>
 <li><a href="http://tonybai.com/2015/09/23/intro-of-gohugo/">http://tonybai.com/2015/09/23/intro-of-gohugo/</a></li>
 </ul>
 
-  </div>
-</article>
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">cym</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">2017-10-31</span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+          <a class="prev" href="/post/how-to-write-unit-testing-in-golang/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">如何用 Golang 写单元测试</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
         </div>
         
   
@@ -256,16 +334,16 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
-  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+  <a href="https://sidddhartha.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
 <div class="copyright">
   <span class="power-by">
-    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+    Power by <a class="hexo-link" href="https://gohugo.io">Hugo</a> 
   </span>
   <span class="division">|</span>
   <span class="theme-info">
-    主题 - 
+    Theme - 
     <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
   </span>
 
@@ -275,7 +353,7 @@
     <span class="heart">
       <i class="iconfont icon-heart"></i>
     </span>
-    <span class="author">olOwOlo</span>
+    <span class="author">cym</span>
   </span>
 </div>
     </footer>

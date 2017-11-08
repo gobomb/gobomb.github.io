@@ -1,41 +1,65 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<?xml-stylesheet type="text/xsl" href="https://sidddhartha.github.io/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
     <loc>https://sidddhartha.github.io/essay/how-to-write-unit-testing-in-golang/</loc>
     <lastmod>2017-11-06T16:52:19+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://sidddhartha.github.io/essay/make-a-blog-by-hugo-and-github-page/</loc>
+    <loc>https://sidddhartha.github.io/post/how-to-write-unit-testing-in-golang/</loc>
+    <lastmod>2017-11-06T16:52:19+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://sidddhartha.github.io/post/make-a-blog-by-hugo-and-github-page/</loc>
     <lastmod>2017-10-31T16:02:19+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://sidddhartha.github.io/about/</loc>
     <lastmod>2017-10-31T14:37:01+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://sidddhartha.github.io/categories/</loc>
+    <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://sidddhartha.github.io/</loc>
     <lastmod>2017-11-06T16:52:19+08:00</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://sidddhartha.github.io/essay/</loc>
     <lastmod>2017-11-06T16:52:19+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://sidddhartha.github.io/post/</loc>
+    <lastmod>2017-11-06T16:52:19+08:00</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://sidddhartha.github.io/tags/</loc>
+    <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
