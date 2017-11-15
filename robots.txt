@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: https://sidddhartha.github.io/sitemap.xml
+Sitemap: https://gobomb.github.io/sitemap.xml

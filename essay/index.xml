@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Essays on Cym&#39;s blog</title>
-    <link>https://sidddhartha.github.io/essay/</link>
+    <link>https://gobomb.github.io/essay/</link>
     <description>Recent content in Essays on Cym&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <lastBuildDate>Mon, 06 Nov 2017 16:52:19 +0800</lastBuildDate>
     
-	<atom:link href="https://sidddhartha.github.io/essay/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://gobomb.github.io/essay/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>如何用 Golang 写单元测试</title>
-      <link>https://sidddhartha.github.io/essay/how-to-write-unit-testing-in-golang/</link>
+      <link>https://gobomb.github.io/essay/how-to-write-unit-testing-in-golang/</link>
       <pubDate>Mon, 06 Nov 2017 16:52:19 +0800</pubDate>
       
-      <guid>https://sidddhartha.github.io/essay/how-to-write-unit-testing-in-golang/</guid>
+      <guid>https://gobomb.github.io/essay/how-to-write-unit-testing-in-golang/</guid>
       <description>为什么要写单元测试 以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息</description>
     </item>
     
