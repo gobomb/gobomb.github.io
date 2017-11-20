@@ -69,7 +69,7 @@
 
 
 <meta itemprop="dateModified" content="2017-11-20T16:24:27&#43;08:00" />
-<meta itemprop="wordCount" content="1059">
+<meta itemprop="wordCount" content="1200">
 
 
 
@@ -147,7 +147,7 @@
       <div class="post-meta">
         <span class="post-time"> 2017-11-20 </span>
         
-        <span class="more-meta"> 约 1059 字 </span>
+        <span class="more-meta"> 约 1200 字 </span>
         <span class="more-meta"> 预计阅读 3 分钟 </span>
       </div>
     </header>
@@ -161,20 +161,20 @@
 <ul>
 <li>
 <ul>
-<li><a href="#c10k-问题-https-en-wikipedia-org-wiki-c10k-problem"><a href="https://en.wikipedia.org/wiki/C10k_problem">C10k 问题</a></a></li>
+<li><a href="#c10k-问题">C10k 问题</a></li>
 <li><a href="#同步-异步-阻塞-非阻塞">同步/异步、阻塞/非阻塞</a></li>
-<li><a href="#i-o-模型">I/O 模型</a></li>
-<li><a href="#操作系统背景知识">操作系统背景知识</a>
+<li><a href="#操作系统背景知识-待填">操作系统背景知识（待填）</a>
 <ul>
 <li><a href="#进程-线程-协程">进程、线程、协程</a></li>
 <li><a href="#用户态和内核态">用户态和内核态</a></li>
 </ul></li>
-<li><a href="#成熟的高并发方案">成熟的高并发方案</a>
+<li><a href="#成熟的高并发方案-待填">成熟的高并发方案（待填）</a>
 <ul>
 <li><a href="#node-js-nginx-事件循环-回调机制">Node.js/Nginx-事件循环、回调机制</a></li>
 <li><a href="#java-scala-akka-actor模型">Java/Scala:akka-Actor模型</a></li>
 <li><a href="#erlang-golang-协程-goroutine">Erlang/Golang:协程/goroutine</a></li>
 </ul></li>
+<li><a href="#高并发带来的其它问题-数据一致性-待填">高并发带来的其它问题：数据一致性（待填）</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -189,9 +189,9 @@
 
 <hr />
 
-<h2 id="c10k-问题-https-en-wikipedia-org-wiki-c10k-problem"><a href="https://en.wikipedia.org/wiki/C10k_problem">C10k 问题</a></h2>
+<h2 id="c10k-问题">C10k 问题</h2>
 
-<p>C10k 就是 Client 10000，服务器要同时处理1万个网络连接。当然，现在的业务面临的是 C100k、C1000k 了。早期的服务器是基于进程/线程模型，每新来一个连接，就分配一个进程（线程）去处理这个连接。而进程（线程）在操作系统中，占有一定的资源。由于硬件的限制，进程（线程）的创建是有瓶颈的。另外进程（线程）的上下文切换也有成本。每次调度器调度线程，操作系统都要把线程的各种必要的信息，如程序计数器、堆栈、寄存器、状态等保存起来。</p>
+<p><a href="https://en.wikipedia.org/wiki/C10k_problem">C10k</a> 就是 Client 10000，服务器要同时处理1万个网络连接。当然，现在的业务面临的是 C100k、C1000k 了。早期的服务器是基于进程/线程模型，每新来一个连接，就分配一个进程（线程）去处理这个连接。而进程（线程）在操作系统中，占有一定的资源。由于硬件的限制，进程（线程）的创建是有瓶颈的。另外进程（线程）的上下文切换也有成本。每次调度器调度线程，操作系统都要把线程的各种必要的信息，如程序计数器、堆栈、寄存器、状态等保存起来。</p>
 
 <p>在互联网应用里，快速的响应是必要的。你打开一个网站，它提供服务的延迟不能太高。当用户很多的时候，服务器要能<strong>同时</strong>提供稳定及时的服务。发送一个请求给服务器，服务器处理这个请求，然后把结果发送回给用户，这里有两个影响响应时间的因素，一个是服务器计算速度，另一个是网络的 I/O。</p>
 
@@ -207,15 +207,11 @@
 
 <p>阻塞和非阻塞的区别是调用后是否立即返回。 A 调完 B，就在调用处等待（阻塞），直到 B 方法返回才继续执行剩下的代码，这就是阻塞调用。而非阻塞是 A 方法调用 B 方法，B 方法立即返回，A 可以继续执行下面的代码，不会被该调用阻塞。当某个方法被阻塞了，该方法所在的线程会被挂起，被操作系统的调度器放到阻塞队列，直到 A 等待的事件发生，才从阻塞态转到就绪态。</p>
 
-<hr />
-
-<h2 id="i-o-模型">I/O 模型</h2>
-
-<p>参考：<a href="https://book.douban.com/subject/4859464/">UNIX网络编程卷1：套接字联网API（第3版）</a></p>
+<p>Unix 下的 I/O 模型也有同步/异步、阻塞/非阻塞的概念，可以查看 <a href="https://github.com/gobomb/myDoc/wiki/io-model">https://github.com/gobomb/myDoc/wiki/io-model</a></p>
 
 <hr />
 
-<h2 id="操作系统背景知识">操作系统背景知识</h2>
+<h2 id="操作系统背景知识-待填">操作系统背景知识（待填）</h2>
 
 <h3 id="进程-线程-协程">进程、线程、协程</h3>
 
@@ -223,13 +219,17 @@
 
 <hr />
 
-<h2 id="成熟的高并发方案">成熟的高并发方案</h2>
+<h2 id="成熟的高并发方案-待填">成熟的高并发方案（待填）</h2>
+
+<p>现在的高并发，不会再采用一个线程处理一个连接的模型，而是使用更轻量级的协程，实现更细粒度的调度，或者是使用单线程模型，通过注册回调事件来处理高并发。Erlang/Golang用的是前者，而Node.js/Nginx使用的是后者。</p>
 
 <h3 id="node-js-nginx-事件循环-回调机制">Node.js/Nginx-事件循环、回调机制</h3>
 
 <h3 id="java-scala-akka-actor模型">Java/Scala:akka-Actor模型</h3>
 
 <h3 id="erlang-golang-协程-goroutine">Erlang/Golang:协程/goroutine</h3>
+
+<h2 id="高并发带来的其它问题-数据一致性-待填">高并发带来的其它问题：数据一致性（待填）</h2>
 
     </div>
 
