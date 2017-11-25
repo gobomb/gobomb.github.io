@@ -2,58 +2,85 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Cym&#39;s blog</title>
-    <link>https://gobomb.github.io/</link>
+    <link>http://localhost:1313/</link>
     <description>Recent content on Cym&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 20 Nov 2017 16:24:27 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 25 Nov 2017 22:13:27 +0800</lastBuildDate>
     
-	<atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>高并发与网络 I/O 模型</title>
-      <link>https://gobomb.github.io/post/high-concurrency-and-network-io-model/</link>
-      <pubDate>Mon, 20 Nov 2017 16:24:27 +0800</pubDate>
+      <title>多种高并发模型比较</title>
+      <link>http://localhost:1313/post/high-concurrency-model/</link>
+      <pubDate>Sat, 25 Nov 2017 22:13:27 +0800</pubDate>
       
-      <guid>https://gobomb.github.io/post/high-concurrency-and-network-io-model/</guid>
+      <guid>http://localhost:1313/post/high-concurrency-model/</guid>
       <description>Golang 的特色之一就是 goroutine ，使得程序员进行并发编程更加方便，适合用来进行服务器编程。作为后端开发工程师，有必要了解并发编程面临的场景和常见的解决方案</description>
     </item>
     
     <item>
+      <title>Summary 2017 11 20</title>
+      <link>http://localhost:1313/post/summary-2017-11-20/</link>
+      <pubDate>Mon, 20 Nov 2017 16:03:37 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/summary-2017-11-20/</guid>
+      <description>最近接触了不少新的东西，对自己职业规划和技术发展有了一些新的想法。 很幸运，有位靠谱的师兄帮我看了简历，还转发了一位后端大佬给我提的不少十分中</description>
+    </item>
+    
+    <item>
+      <title>Design a Socket Server</title>
+      <link>http://localhost:1313/post/design-a-socket-server/</link>
+      <pubDate>Thu, 09 Nov 2017 16:10:12 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/design-a-socket-server/</guid>
+      <description>舍友去招银网络科技面试，二面遇到一道题目：设计一个服务器，统计公园进出人数，维护一个黑名单，有打印人数、黑名单等接口。这是一个很典型的消费者</description>
+    </item>
+    
+    <item>
       <title>如何用 Golang 写单元测试</title>
-      <link>https://gobomb.github.io/essay/how-to-write-unit-testing-in-golang/</link>
+      <link>http://localhost:1313/essay/how-to-write-unit-testing-in-golang/</link>
       <pubDate>Mon, 06 Nov 2017 16:52:19 +0800</pubDate>
       
-      <guid>https://gobomb.github.io/essay/how-to-write-unit-testing-in-golang/</guid>
+      <guid>http://localhost:1313/essay/how-to-write-unit-testing-in-golang/</guid>
       <description>为什么要写单元测试 以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息</description>
     </item>
     
     <item>
       <title>如何用 Golang 写单元测试</title>
-      <link>https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/</link>
+      <link>http://localhost:1313/post/how-to-write-unit-testing-in-golang/</link>
       <pubDate>Mon, 06 Nov 2017 16:52:19 +0800</pubDate>
       
-      <guid>https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/</guid>
+      <guid>http://localhost:1313/post/how-to-write-unit-testing-in-golang/</guid>
       <description>为什么要写单元测试 以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息</description>
     </item>
     
     <item>
       <title>用 Hugo 和 GitHub Page 搭建博客</title>
-      <link>https://gobomb.github.io/post/make-a-blog-by-hugo-and-github-page/</link>
+      <link>http://localhost:1313/post/make-a-blog-by-hugo-and-github-page/</link>
       <pubDate>Tue, 31 Oct 2017 16:02:19 +0800</pubDate>
       
-      <guid>https://gobomb.github.io/post/make-a-blog-by-hugo-and-github-page/</guid>
+      <guid>http://localhost:1313/post/make-a-blog-by-hugo-and-github-page/</guid>
       <description>图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。 hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。 安装</description>
     </item>
     
     <item>
       <title>About</title>
-      <link>https://gobomb.github.io/about/</link>
+      <link>http://localhost:1313/about/</link>
       <pubDate>Tue, 31 Oct 2017 14:37:01 +0800</pubDate>
       
-      <guid>https://gobomb.github.io/about/</guid>
-      <description>GitHub：https://github.com/gobomb E-mail：bombcoder@outlook.com 深圳大学 软件工程 大四</description>
+      <guid>http://localhost:1313/about/</guid>
+      <description>GitHub：https://github.com/gobomb E-mail：bombcoder@outlook.com 深圳大学 / 计算机与软</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>http://localhost:1313/post/why-nosql/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/why-nosql/</guid>
+      <description></description>
     </item>
     
   </channel>
