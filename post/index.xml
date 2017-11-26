@@ -38,14 +38,5 @@
       <description>图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。 hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。 安装</description>
     </item>
     
-    <item>
-      <title></title>
-      <link>https://gobomb.github.io/post/why-nosql/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://gobomb.github.io/post/why-nosql/</guid>
-      <description></description>
-    </item>
-    
   </channel>
 </rss>

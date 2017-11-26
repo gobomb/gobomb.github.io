@@ -69,7 +69,7 @@
 
 
 <meta itemprop="dateModified" content="2017-10-31T16:02:19&#43;08:00" />
-<meta itemprop="wordCount" content="574">
+<meta itemprop="wordCount" content="562">
 
 
 
@@ -102,14 +102,10 @@
   <ul class="mobile-menu-list">
     <a href="/">
         <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
       </a><a href="/about">
         <li class="mobile-menu-item">About</li>
+      </a><a href="/links">
+        <li class="mobile-menu-item">Links</li>
       </a>
   </ul>
 </nav>
@@ -124,13 +120,9 @@
     <li class="menu-item">
         <a class="menu-item-link" href="/">Home</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li><li class="menu-item">
         <a class="menu-item-link" href="/about">About</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/links">Links</a>
       </li>
   </ul>
 </nav>
@@ -147,7 +139,7 @@
       <div class="post-meta">
         <span class="post-time"> 2017-10-31 </span>
         
-        <span class="more-meta"> 约 574 字 </span>
+        <span class="more-meta"> 约 562 字 </span>
         <span class="more-meta"> 预计阅读 2 分钟 </span>
       </div>
     </header>
@@ -161,10 +153,7 @@
 <ul>
 <li>
 <ul>
-<li>
-<ul>
 <li><a href="#安装和使用hugo">安装和使用Hugo</a></li>
-</ul></li>
 <li><a href="#在本地运行">在本地运行</a></li>
 <li><a href="#在-github-上部署">在 GitHub 上部署</a></li>
 <li><a href="#代码高亮">代码高亮</a></li>
@@ -185,34 +174,34 @@
 另一个用js写的同类工具<a href="http://jekyll.com.cn/">jekyll</a>
 比较出名。<br /><br /></p>
 
-<h3 id="安装和使用hugo">安装和使用Hugo</h3>
+<h2 id="安装和使用hugo">安装和使用Hugo</h2>
 
 <ul>
 <li>如果有 Go 环境，直接在终端输入：</li>
 </ul>
 
-<p>&ensp;&emsp;&emsp;<code>go get -v github.com/spf13/hugo</code></p>
+<pre><code>go get -v github.com/spf13/hugo
 
-<p>&ensp;&emsp;&emsp;<code>hugo new site /path/to/site</code></p>
+hugo new site /path/to/site
+</code></pre>
 
 <ul>
-<li><p><code>path/to/site</code>是本地站点目录
-<br /></p></li>
+<li><p><code>path/to/site</code>是本地站点目录</p></li>
 
 <li><p>创建 about 页面：</p></li>
 </ul>
 
-<p>&ensp;&emsp;&emsp;<code>hugo new about.md</code>
-<br /></p>
+<pre><code>hugo new about.md
+</code></pre>
 
 <ul>
 <li>皮肤我用的是 <a href="https://github.com/chingli/rockrock">rockrock</a>：</li>
 </ul>
 
-<p>&ensp;&emsp;&emsp;<code>cd themes</code></p>
+<pre><code>cd themes
 
-<p>&ensp;&emsp;&emsp;<code>git clone https://github.com/chingli/rockrock</code>
-<br /><br/></p>
+git clone https://github.com/chingli/rockrock
+</code></pre>
 
 <h2 id="在本地运行">在本地运行</h2>
 
@@ -237,21 +226,23 @@
 
 <p>2 在站点根目录下执行：</p>
 
-<p>&ensp;<code>hugo --theme=rockrock --baseUrl=&quot;https://sidddhartha.github.io/&quot;</code></p>
+<pre><code>hugo --theme=rockrock --baseUrl=&quot;https://sidddhartha.github.io/&quot;
+</code></pre>
 
 <p>3 将生成的 pubilc 目录里所有文件 push 到 <code>sidddhartha.gitbub.io</code> 的 master 分支</p>
 
-<p>&ensp;<code>cd public</code></p>
+<pre><code>cd public
 
-<p>&ensp;<code>git init</code></p>
+git init
 
-<p>&ensp;<code>git remote add origin https://github.com/sidddhartha/sidddhartha.github.io.git</code></p>
+git remote add origin https://github.com/sidddhartha/sidddhartha.github.io.git
 
-<p>&ensp;<code>git add -A</code></p>
+git add -A
 
-<p>&ensp;<code>git commit -m &quot;first commit&quot;</code></p>
+git commit -m &quot;first commit&quot;
 
-<p>&ensp;<code>git push -u origin master</code></p>
+git push -u origin master
+</code></pre>
 
 <p><br/>
 4 浏览器访问：<a href="https://sidddhartha.github.io">https://sidddhartha.github.io</a>
@@ -261,15 +252,13 @@
 
 <p>使用 <a href="https://highlightjs.org/">highlight.js</a>：</p>
 
-<p>1 将 highlight.js 下载到本地</p>
+<ol>
+<li><p>将 highlight.js 下载到本地</p></li>
 
-<p>2 把 js 库文件<code>highlight.pack.js</code> 复制到 <code>.../themes/rockrock/static/css/</code>下面</p>
+<li><p>把 js 库文件<code>highlight.pack.js</code> 复制到 <code>.../themes/rockrock/static/css/</code>下面；把 <code>github.css</code>复制到 <code>.../themes/rockrock/static/js/</code>下面；有多种风格样式，我选择的是 <code>github</code> 风格</p></li>
 
-<p>把 <code>github.css</code>复制到 <code>.../themes/rockrock/static/js/</code>下面</p>
-
-<p>有多种风格样式，我选择的是 github 风格</p>
-
-<p>3 在<code>.../themes/rockrock/layouts/partials/header.html</code>里添加以下代码：</p>
+<li><p>在<code>.../themes/rockrock/layouts/partials/header.html</code>里添加以下代码：</p></li>
+</ol>
 
 <pre><code class="language-html">&lt;!-- Highlight.js and css --&gt;
 	 &lt;script src=&quot;{{ .Site.BaseURL }}js/highlight.pack.js&quot;&gt;&lt;/script&gt;
@@ -277,7 +266,7 @@
 	 &lt;script&gt;hljs.initHighlightingOnLoad();&lt;/script&gt;
 </code></pre>
 
-<p>highlight.js会自动检测语言类型，并使用github样式。</p>
+<p>highlight.js 会自动检测语言类型，并使用<code>github</code>样式。</p>
 
 <h2 id="参考文章">参考文章</h2>
 
@@ -321,11 +310,6 @@
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         
-          <a class="next" href="/post/why-nosql/">
-            <span class="next-text nav-default"></span>
-            <span class="prev-text nav-mobile">下一篇</span>
-            <i class="iconfont icon-right"></i>
-          </a>
       </nav>
     </footer>
   </article>
