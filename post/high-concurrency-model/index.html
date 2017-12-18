@@ -29,7 +29,7 @@
 <meta name="generator" content="Hugo 0.28-DEV" />
 
 
-<link rel="canonical" href="https://gobomb.github.io/post/high-concurrency-model/" />
+<link rel="canonical" href="https://gobomb.git.io/post/high-concurrency-model/" />
 
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -47,7 +47,7 @@
 <meta property="og:title" content="多种高并发模型比较" />
 <meta property="og:description" content="Golang 的特色之一就是 goroutine ，使得程序员进行并发编程更加方便，适合用来进行服务器编程。作为后端开发工程师，有必要了解并发编程面临的场景和常见的解决方案" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://gobomb.github.io/post/high-concurrency-model/" />
+<meta property="og:url" content="https://gobomb.git.io/post/high-concurrency-model/" />
 
 
 
@@ -215,11 +215,11 @@
 
 <p><em>进程</em> 是系统进行资源分配的一个独立单位。这些资源包括：用户的地址空间，实现进程（线程）间同步和通信的机制，已打开的文件和已申请到的I/O设备，以及一张由核心进程维护的地址映射表。内核通过 *进程控制块*（PCB，process control block）来感知进程。</p>
 
-<p><em>线程</em> 是调度和分派的基本单位。内核通过*线程控制块*（TCB，thread control block）来感知线程。</p>
+<p><em>线程</em> 是调度和分派的基本单位。内核通过 *线程控制块*（TCB，thread control block）来感知线程。</p>
 
 <p>线程本身不拥有系统资源，而是仅有一点必不可少的、能保证独立运行的资源，如TCB、程序计数器、局部变量、状态参数、返回地址等寄存器和堆栈。同一进程的所有线程具有相同的地址空间，线程可以访问进程拥有的资源。多个线程可并发执行，一个进程含有若干个相对独立的线程，但至少有一个线程。</p>
 
-<p>线程的有不同的实现方式，分*内核支持线程*（KST，Kernel Supported Threads）和<em>用户级线程</em>(UST, User Supported Threads)。内核级线程的 TCB 保存在内核空间，其创建、阻塞、撤销、切换等活动也都是在内核空间实现的。用户级线程则是内核无关的，用户级线程的实现在用户空间，内核感知不到用户线程的存在。用户线程的调度算法可以是进程专用的，不会被内核调度，但同时，用户线程也无法利用多处理机的并行执行。而一个拥有多个用户线程的进程，一旦有一个线程阻塞，该进程所有的线程都会被阻塞。内核的切换需要转换到内核空间，而用户线程不需要，所以前者开销会更大。但用户线程也需要内核的支持，一般是通过运行时系统或内核控制线程来连接一个内核线程，有 1:1、1:n、n:m 的不同实现。</p>
+<p>线程的有不同的实现方式，分 *内核支持线程*（KST，Kernel Supported Threads）和 <em>用户级线程</em>(UST, User Supported Threads)。内核级线程的 TCB 保存在内核空间，其创建、阻塞、撤销、切换等活动也都是在内核空间实现的。用户级线程则是内核无关的，用户级线程的实现在用户空间，内核感知不到用户线程的存在。用户线程的调度算法可以是进程专用的，不会被内核调度，但同时，用户线程也无法利用多处理机的并行执行。而一个拥有多个用户线程的进程，一旦有一个线程阻塞，该进程所有的线程都会被阻塞。内核的切换需要转换到内核空间，而用户线程不需要，所以前者开销会更大。但用户线程也需要内核的支持，一般是通过运行时系统或内核控制线程来连接一个内核线程，有 1:1、1:n、n:m 的不同实现。</p>
 
 <p>在分时操作系统中，处理机的调度一般基于时间片的轮转（RR, round robin)，多个就绪线程排成队列，轮流执行时间片。而为保证交互性和实时性，线程都是以抢占的方式（Preemptive Mode）来获得处理机。而抢占方式的开销是比较大的。有抢占方式就有非抢占方式（Nonpreemptiv Mode)，在非抢占式中，除非某正在运行的线程执行完毕、因系统调用（如 I/O 请求）发生阻塞或主动让出处理器，不会被调度或暂停。</p>
 
@@ -444,7 +444,7 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
-  <a href="https://gobomb.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+  <a href="https://gobomb.git.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
 <div class="copyright">
