@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: https://gobomb.git.io/sitemap.xml
+Sitemap: https://gobomb.github.io/sitemap.xml
