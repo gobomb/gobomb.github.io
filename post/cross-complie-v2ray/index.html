@@ -69,7 +69,7 @@
 
 
 <meta itemprop="dateModified" content="2017-12-29T17:17:27&#43;08:00" />
-<meta itemprop="wordCount" content="1917">
+<meta itemprop="wordCount" content="1910">
 
 
 
@@ -143,7 +143,7 @@
       <div class="post-meta">
         <span class="post-time"> 2017-12-29 </span>
         
-        <span class="more-meta"> 约 1917 字 </span>
+        <span class="more-meta"> 约 1910 字 </span>
         <span class="more-meta"> 预计阅读 4 分钟 </span>
       </div>
     </header>
@@ -161,7 +161,12 @@
 <li><a href="#环境">环境</a></li>
 </ul></li>
 <li><a href="#解决过程">解决过程</a></li>
-<li><a href="#其他问题">其他问题</a></li>
+<li><a href="#其他问题">其他问题</a>
+<ul>
+<li><a href="#upx-大致原理">upx 大致原理</a></li>
+<li><a href="#下载安装-upx">下载安装 upx</a></li>
+<li><a href="#压缩前后对比">压缩前后对比：</a></li>
+</ul></li>
 <li><a href="#总结">总结</a></li>
 <li><a href="#参考链接">参考链接</a></li>
 </ul>
@@ -296,64 +301,70 @@ $ upx v2ctl
 <li>编译出来的可执行文件有点大，动辄10几M，不利于网络传输，而在路由器这种外存空间有限的硬件上，文件也当然越小越好。<a href="https://github.com/upx/upx">upx</a>是一个 C++ 写的开源加壳压缩工具，能满足这个需求。</li>
 </ol>
 
-<p>## upx 大致原理
-  通过 upx 压缩过的程序和程序库完全没有功能损失和压缩之前一样可正常地运行。upx 利用特殊的算法压缩了二进制，并在文件加了解压缩的指令，cpu 读到这些指令可以自己解压缩。cpu 在执行加壳过的二进制时，相当于先执行了外壳，再通过外壳在内存中把原来的程序解开并执行。</p>
+<h2 id="upx-大致原理">upx 大致原理</h2>
+
+<p>通过 upx 压缩过的程序和程序库完全没有功能损失和压缩之前一样可正常地运行。upx 利用特殊的算法压缩了二进制，并在文件加了解压缩的指令，cpu 读到这些指令可以自己解压缩。cpu 在执行加壳过的二进制时，相当于先执行了外壳，再通过外壳在内存中把原来的程序解开并执行。</p>
 
 <p>upx 能实现两个需求，一个是压缩，另一个是加密程序，防止程序被别人静态分析。很方便。</p>
 
-<p>## 下载安装 upx
-  1. 下载 upx：</p>
-
-<pre><code>  wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
-  ````
-  2. 解压缩：
-</code></pre>
-
-<p>$ tar -Jxf upx-3.94-amd64_linux.tar.xz</p>
-
-<pre><code>  3. 把upx放到环境变量能访问到的地方：
-</code></pre>
-
-<p>$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
-  ```</p>
-
-<p>## 压缩前后对比：</p>
+<h2 id="下载安装-upx">下载安装 upx</h2>
 
 <ol>
-<li><p>普通编译，大小为14M：</p>
-
-<pre><code>$ go1.10beta1 build
-
-$ ls -lh
--rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
-</code></pre></li>
-
-<li><p>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：</p>
-
-<pre><code>$ go1.10beta1 build -ldflags '-w -s'
-
-$ ls -lh
--rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
-</code></pre></li>
-
-<li><p>用 upx 加壳压缩，大小为3.7M：</p>
-
-<pre><code>$ upx main
-Ultimate Packer for eXecutables
-   Copyright (C) 1996 - 2017
-UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017
-
-File size         Ratio      Format      Name
---------------------   ------   -----------   -----------
-11110408 -&gt;   3861696   34.76%   linux/amd64   main
-
-Packed 1 file.
-
-$ ls -lh
--rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
-
-</code></pre></li>
+<li>下载 upx：
+<code>
+wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+</code>`</li>
+<li>解压缩：
+<code>
+$ tar -Jxf upx-3.94-amd64_linux.tar.xz
+</code></li>
+<li>把upx放到环境变量能访问到的地方：
+<code>
+$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
+</code></li>
 </ol>
+
+<h2 id="压缩前后对比">压缩前后对比：</h2>
+
+<ol>
+<li>普通编译，大小为14M：</li>
+</ol>
+
+<pre><code>  $ go1.10beta1 build
+
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
+</code></pre>
+
+<ol>
+<li>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：</li>
+</ol>
+
+<pre><code>  $ go1.10beta1 build -ldflags '-w -s'
+
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
+</code></pre>
+
+<ol>
+<li>用 upx 加壳压缩，大小为3.7M：</li>
+</ol>
+
+<pre><code>  $ upx main
+  Ultimate Packer for eXecutables
+     Copyright (C) 1996 - 2017
+  UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017
+
+  File size         Ratio      Format      Name
+  --------------------   ------   -----------   -----------
+  11110408 -&gt;   3861696   34.76%   linux/amd64   main
+
+  Packed 1 file.
+
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
+
+</code></pre>
 
 <p>可以看到压缩比能达到（3.7M/14M）26%，很可观了，传输和存储该文件会方便许多，且压缩后的二进制文件可正常执行。</p>
 

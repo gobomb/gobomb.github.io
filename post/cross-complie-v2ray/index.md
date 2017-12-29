@@ -99,65 +99,65 @@ go 是跨平台的，之前没有试过交叉编译，理所当然地以为修�
 
 2. 编译出来的可执行文件有点大，动辄10几M，不利于网络传输，而在路由器这种外存空间有限的硬件上，文件也当然越小越好。[upx](https://github.com/upx/upx)是一个 C++ 写的开源加壳压缩工具，能满足这个需求。
 
-  ## upx 大致原理
-  通过 upx 压缩过的程序和程序库完全没有功能损失和压缩之前一样可正常地运行。upx 利用特殊的算法压缩了二进制，并在文件加了解压缩的指令，cpu 读到这些指令可以自己解压缩。cpu 在执行加壳过的二进制时，相当于先执行了外壳，再通过外壳在内存中把原来的程序解开并执行。
+## upx 大致原理
+通过 upx 压缩过的程序和程序库完全没有功能损失和压缩之前一样可正常地运行。upx 利用特殊的算法压缩了二进制，并在文件加了解压缩的指令，cpu 读到这些指令可以自己解压缩。cpu 在执行加壳过的二进制时，相当于先执行了外壳，再通过外壳在内存中把原来的程序解开并执行。
 
-  upx 能实现两个需求，一个是压缩，另一个是加密程序，防止程序被别人静态分析。很方便。
+upx 能实现两个需求，一个是压缩，另一个是加密程序，防止程序被别人静态分析。很方便。
 
-  ## 下载安装 upx
-  1. 下载 upx：
+## 下载安装 upx
+1. 下载 upx：
+```
+wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+````
+2. 解压缩：
+```
+$ tar -Jxf upx-3.94-amd64_linux.tar.xz
+```
+3. 把upx放到环境变量能访问到的地方：
+```
+$ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
+```
+
+## 压缩前后对比：
+
+1. 普通编译，大小为14M：
+
   ```
-  wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
-  ````
-  2. 解压缩：
-  ```
-  $ tar -Jxf upx-3.94-amd64_linux.tar.xz
-  ```
-  3. 把upx放到环境变量能访问到的地方：
-  ```
-  $ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
+  $ go1.10beta1 build
+
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
   ```
 
-  ## 压缩前后对比：
+2. go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：
 
-  1. 普通编译，大小为14M：
+  ```
+  $ go1.10beta1 build -ldflags '-w -s'
 
-    ```
-    $ go1.10beta1 build
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
+  ```
 
-    $ ls -lh
-    -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
-    ```
+3. 用 upx 加壳压缩，大小为3.7M：
 
-  2. go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：
+  ```
+  $ upx main
+  Ultimate Packer for eXecutables
+     Copyright (C) 1996 - 2017
+  UPX 3.94        Markus Oberhumer, Laszlo Molnar & John Reiser   May 12th 2017
 
-    ```
-    $ go1.10beta1 build -ldflags '-w -s'
+  File size         Ratio      Format      Name
+  --------------------   ------   -----------   -----------
+  11110408 ->   3861696   34.76%   linux/amd64   main
 
-    $ ls -lh
-    -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
-    ```
+  Packed 1 file.
 
-  3. 用 upx 加壳压缩，大小为3.7M：
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
 
-    ```
-    $ upx main
-    Ultimate Packer for eXecutables
-       Copyright (C) 1996 - 2017
-    UPX 3.94        Markus Oberhumer, Laszlo Molnar & John Reiser   May 12th 2017
+  ```
 
-    File size         Ratio      Format      Name
-    --------------------   ------   -----------   -----------
-    11110408 ->   3861696   34.76%   linux/amd64   main
-
-    Packed 1 file.
-
-    $ ls -lh
-    -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
-
-    ```
-
-  可以看到压缩比能达到（3.7M/14M）26%，很可观了，传输和存储该文件会方便许多，且压缩后的二进制文件可正常执行。
+可以看到压缩比能达到（3.7M/14M）26%，很可观了，传输和存储该文件会方便许多，且压缩后的二进制文件可正常执行。
 
 # 总结
 编译型的语言优点是执行效率高，毕竟翻译成机器码，免去了很多中间环节，但缺点就是要针对跨平台进行优化。不同平台操作系统、指令集架构、硬件都不一样，要求程序员对体系结构有所了解。特别是 go 程序的编写，了解不同平台和底层模型有助于写出高性能的程序。另网络应用经常有跨平台的使用场景，如路由器、物联网设备，这些设备跟普通 pc 机和服务器的硬件和体系结构会有差别，在用高层次语言写网络应用也要有这个意识。
