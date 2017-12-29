@@ -112,60 +112,60 @@ upx 能实现两个需求，一个是压缩，另一个是加密程序，防止�
 ## 下载安装 upx
 1. 下载 upx：
 
-```
-wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
-```
+  ```
+  wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+  ```
 
 2. 解压缩：
 
-```
-$ tar -Jxf upx-3.94-amd64_linux.tar.xz
-```
+  ```
+  $ tar -Jxf upx-3.94-amd64_linux.tar.xz
+  ```
 
 3. 把upx放到环境变量能访问到的地方：
 
-```
-$ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
-```
+  ```
+  $ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
+  ```
 
 ## 压缩前后对比
 
 1. 普通编译，大小为14M：
 
-  ```
-  $ go1.10beta1 build
+    ```
+    $ go1.10beta1 build
 
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
-  ```
+    $ ls -lh
+    -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
+    ```
 
 2. go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：
 
-  ```
-  $ go1.10beta1 build -ldflags '-w -s'
+    ```
+    $ go1.10beta1 build -ldflags '-w -s'
 
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
-  ```
+    $ ls -lh
+    -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
+    ```
 
 3. 用 upx 加壳压缩，大小为3.7M
 
-  ```
-  $ upx main
-  Ultimate Packer for eXecutables
-     Copyright (C) 1996 - 2017
-  UPX 3.94        Markus Oberhumer, Laszlo Molnar & John Reiser   May 12th 2017
+    ```
+    $ upx main
+    Ultimate Packer for eXecutables
+       Copyright (C) 1996 - 2017
+    UPX 3.94        Markus Oberhumer, Laszlo Molnar & John Reiser   May 12th 2017
 
-  File size         Ratio      Format      Name
-  --------------------   ------   -----------   -----------
-  11110408 ->   3861696   34.76%   linux/amd64   main
+    File size         Ratio      Format      Name
+    --------------------   ------   -----------   -----------
+    11110408 ->   3861696   34.76%   linux/amd64   main
 
-  Packed 1 file.
+    Packed 1 file.
 
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
+    $ ls -lh
+    -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
 
-  ```
+    ```
 
 可以看到压缩比能达到（3.7M/14M）26%，很可观了，传输和存储该文件会方便许多，且压缩后的二进制文件可正常执行。
 

@@ -308,64 +308,60 @@ $ upx v2ctl
 <li>下载 upx：</li>
 </ol>
 
-<pre><code>wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+<pre><code>  wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
 </code></pre>
 
 <ol>
 <li>解压缩：</li>
 </ol>
 
-<pre><code>$ tar -Jxf upx-3.94-amd64_linux.tar.xz
+<pre><code>  $ tar -Jxf upx-3.94-amd64_linux.tar.xz
 </code></pre>
 
 <ol>
 <li>把upx放到环境变量能访问到的地方：</li>
 </ol>
 
-<pre><code>$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
+<pre><code>  $ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
 </code></pre>
 
 <h2 id="压缩前后对比">压缩前后对比</h2>
 
 <ol>
-<li>普通编译，大小为14M：</li>
+<li><p>普通编译，大小为14M：</p>
+
+<pre><code>$ go1.10beta1 build
+
+$ ls -lh
+-rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
+</code></pre></li>
+
+<li><p>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：</p>
+
+<pre><code>$ go1.10beta1 build -ldflags '-w -s'
+
+$ ls -lh
+-rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
+</code></pre></li>
+
+<li><p>用 upx 加壳压缩，大小为3.7M</p>
+
+<pre><code>$ upx main
+Ultimate Packer for eXecutables
+   Copyright (C) 1996 - 2017
+UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017
+
+File size         Ratio      Format      Name
+--------------------   ------   -----------   -----------
+11110408 -&gt;   3861696   34.76%   linux/amd64   main
+
+Packed 1 file.
+
+$ ls -lh
+-rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
+
+</code></pre></li>
 </ol>
-
-<pre><code>  $ go1.10beta1 build
-
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
-</code></pre>
-
-<ol>
-<li>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：</li>
-</ol>
-
-<pre><code>  $ go1.10beta1 build -ldflags '-w -s'
-
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
-</code></pre>
-
-<ol>
-<li>用 upx 加壳压缩，大小为3.7M</li>
-</ol>
-
-<pre><code>  $ upx main
-  Ultimate Packer for eXecutables
-     Copyright (C) 1996 - 2017
-  UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017
-
-  File size         Ratio      Format      Name
-  --------------------   ------   -----------   -----------
-  11110408 -&gt;   3861696   34.76%   linux/amd64   main
-
-  Packed 1 file.
-
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
-
-</code></pre>
 
 <p>可以看到压缩比能达到（3.7M/14M）26%，很可观了，传输和存储该文件会方便许多，且压缩后的二进制文件可正常执行。</p>
 
