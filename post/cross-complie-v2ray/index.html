@@ -69,7 +69,7 @@
 
 
 <meta itemprop="dateModified" content="2017-12-29T17:17:27&#43;08:00" />
-<meta itemprop="wordCount" content="1912">
+<meta itemprop="wordCount" content="1886">
 
 
 
@@ -143,7 +143,7 @@
       <div class="post-meta">
         <span class="post-time"> 2017-12-29 </span>
         
-        <span class="more-meta"> 约 1912 字 </span>
+        <span class="more-meta"> 约 1886 字 </span>
         <span class="more-meta"> 预计阅读 4 分钟 </span>
       </div>
     </header>
@@ -163,8 +163,9 @@
 <li><a href="#解决过程">解决过程</a></li>
 <li><a href="#其他问题">其他问题</a>
 <ul>
-<li><a href="#upx-大致原理">upx 大致原理</a></li>
+<li><a href="#upx-原理">upx 原理</a></li>
 <li><a href="#下载安装-upx">下载安装 upx</a></li>
+<li><a href="#压缩前后对比">压缩前后对比</a></li>
 </ul></li>
 <li><a href="#总结">总结</a></li>
 <li><a href="#参考链接">参考链接</a></li>
@@ -207,7 +208,10 @@
 </blockquote>
 
 <ol>
-<li><p>最新的 v2ray 源码是 go1.9 实现的，如果用 go1.8 进行编译会提示找不到“math/bits”标准库文件<code>unrecognized import path &quot;math/bits&quot; (import path does not begin with hostname)</code>（<a href="https://github.com/v2ray/v2ray-core/issues/633）。所以编译">https://github.com/v2ray/v2ray-core/issues/633）。所以编译</a> V2Ray 至少要 go1.9 以上的版本。</p></li>
+<li><p>编译 V2Ray 至少要 go1.9 以上的版本
+最新的 v2ray 源码是 go1.9 实现的，如果用 go1.8 进行编译会提示找不到“math/bits”标准库文件
+<code>unrecognized import path &quot;math/bits&quot; (import path does not begin with hostname)</code>
+（<a href="https://github.com/v2ray/v2ray-core/issues/633）">https://github.com/v2ray/v2ray-core/issues/633）</a></p></li>
 
 <li><p>目标机器没有 FPU，指令集缺乏相关的指令，所以只能用软件模拟浮点数运算。go 的 beta 版本已经修复了这个问题：<a href="https://github.com/golang/go/issues/18162">runtime: mips32 soft float point support</a></p></li>
 
@@ -222,93 +226,77 @@ $ go1.10beta1 download
 <pre><code>$ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 install v2ray.com/ext/tools/build/vbuild
 </code></pre>
 
-<p>GOARCH 指定目标机器的指令集，GOMIPS 指定 mipsle 机器处理浮点数的方式（分 softfloat和hardfloat，默认为hardfloat，所以需显示指定）</p></li>
-</ol>
+<p>GOARCH 指定目标机器的指令集，GOMIPS 指定 mipsle 机器处理浮点数的方式（分 softfloat和hardfloat，默认为hardfloat，所以需显示指定）</p>
 
-<p>go1.10beta1 指明使用 beta 版本进行编译</p>
+<p>go1.10beta1 指明使用 beta 版本进行编译</p></li>
 
-<ol>
-<li>将 vbuild 传到目标机器，执行：</li>
-</ol>
+<li><p>将 vbuild 传到目标机器，执行：</p>
 
-<pre><code>  $ ./vbuild
-  Building V2Ray (custom) for linux mipsle
-  Unable to build V2Ray: exec: &quot;go&quot;: executable file not found in $PATH
+<pre><code>$ ./vbuild
+Building V2Ray (custom) for linux mipsle
+Unable to build V2Ray: exec: &quot;go&quot;: executable file not found in $PATH
 </code></pre>
 
 <p>这里我理解错误，以为 vbuild 已经是可执行文件，不需要依赖 go 环境。实际上这只是编译脚本，仍然依赖于 go 环境和 v2ray 的依赖包，而目标机器没有 go 环境和 v2ray 的依赖库（install的过程会把需要的依赖库安装到同级别目录下的 pkg 下）。所以按照官方的编译方式达不到交叉编译的目的。</p>
-
-<p>查看 vbuild 源码，有类似语句：</p>
-
-<pre><code class="language-go">  ...
-  // 读取依赖库路径
-    targetFile := getTargetFile(&quot;v2ray&quot;, v2rayOS)
-    targetFileFull := filepath.Join(targetDir, targetFile)
-    	if err := build.BuildV2RayCore(targetFileFull, v2rayOS, v2rayArch, false); err != nil {
-    		fmt.Println(&quot;Unable to build V2Ray: &quot; + err.Error())
-    		return
-    	}
-  ...
-
-  ...
-  // 执行外部命令
-  cmd := exec.Command(&quot;go&quot;, args...)
-  ...
-</code></pre>
 
 <p>如果要用 vbuild 达到交叉编译的目的，需要把 GOARCH=mipsle GOMIPS=softfloat 环境变量传给 vbuild，并将所有外部命令中的“go”修改为“go1.10beta1”。</p>
 
 <p>或者自己手动编译。我选择手动编译，比较灵活可控。</p>
 
-<ol>
-<li>手动编译 v2ray 主程序和 v2ctl。主程序需通过 v2ctl 读取配置文件。
+<p>查看 vbuild 源码，有类似语句：</p>
 
-<ul>
-<li>编译 V2Ray 主程序</li>
-</ul></li>
-</ol>
+<pre><code class="language-go">...
+// 读取依赖库路径
+  targetFile := getTargetFile(&quot;v2ray&quot;, v2rayOS)
+  targetFileFull := filepath.Join(targetDir, targetFile)
+    if err := build.BuildV2RayCore(targetFileFull, v2rayOS, v2rayArch, false); err != nil {
+        fmt.Println(&quot;Unable to build V2Ray: &quot; + err.Error())
+        return
+    }
+...
 
-<pre><code>  $ cd $GOPATH/src/v2ray/core/main
-  $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ray
-</code></pre>
+...
+// 执行外部命令
+cmd := exec.Command(&quot;go&quot;, args...)
+...
+</code></pre></li>
 
-<ul>
-<li>编译 v2ctl</li>
-</ul>
+<li><p>手动编译 v2ray 主程序和 v2ctl。主程序需通过 v2ctl 读取配置文件。</p>
 
-<pre><code>  $ cd $GOPATH/src/v2ray.com/ext/tools/control/main
-  $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ctl
-</code></pre>
+<pre><code>//编译 V2Ray 主程序
 
-<ul>
-<li>编译出来的二进制文件可用 upx 进行压缩</li>
-</ul>
+$ cd $GOPATH/src/v2ray/core/main
+$ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ray
 
-<pre><code>  $ upx v2ray
-  $ upx v2ctl
-</code></pre>
+// 编译 v2ctl
 
-<ol>
-<li>将 v2ray 和 v2ctl 放到目标机器可正常运行。问题解决！</li>
+$ cd $GOPATH/src/v2ray.com/ext/tools/control/main
+$ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ctl
+
+// 编译出来的二进制文件可用 upx 进行压缩
+
+$ upx v2ray
+$ upx v2ctl
+</code></pre></li>
+
+<li><p>将 v2ray 和 v2ctl 放到目标机器可正常运行。问题解决！</p></li>
 </ol>
 
 <h1 id="其他问题">其他问题</h1>
 
 <ol>
-<li>输错编译参数 GOARCH=mips，在目标机器运行报错：</li>
-</ol>
+<li><p>输错编译参数 GOARCH=mips，在目标机器运行报错：</p>
 
-<pre><code>  $ ./vbuild
-  ./vbuild: line 1: syntax error: unterminated quoted string
+<pre><code>$ ./vbuild
+./vbuild: line 1: syntax error: unterminated quoted string
 </code></pre>
 
-<p>实际上 mips 为大端序，mipsle 是小端序，两者不等同。</p>
+<p>实际上 mips 为大端序，mipsle 是小端序，两者不等同。</p></li>
 
-<ol>
-<li>编译出来的可执行文件有点大，动辄10几M，不利于网络传输，而在路由器这种外存空间有限的硬件上，文件也当然越小越好。<a href="https://github.com/upx/upx">upx</a>是一个 C++ 写的开源加壳压缩工具，能满足这个需求。</li>
+<li><p>编译出来的可执行文件有点大，动辄10几M，不利于网络传输，而在路由器这种外存空间有限的硬件上，文件也当然越小越好。<a href="https://github.com/upx/upx">upx</a>是一个 C++ 写的开源加壳压缩工具，能满足这个需求。</p></li>
 </ol>
 
-<h2 id="upx-大致原理">upx 大致原理</h2>
+<h2 id="upx-原理">upx 原理</h2>
 
 <p>通过 upx 压缩过的程序和程序库完全没有功能损失和压缩之前一样可正常地运行。upx 利用特殊的算法压缩了二进制，并在文件加了解压缩的指令，cpu 读到这些指令可以自己解压缩。cpu 在执行加壳过的二进制时，相当于先执行了外壳，再通过外壳在内存中把原来的程序解开并执行。</p>
 
@@ -321,65 +309,63 @@ $ go1.10beta1 download
 </ol>
 
 <pre><code>wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
-````
-
-2. 解压缩：
-
 </code></pre>
 
-<p>$ tar -Jxf upx-3.94-amd64_linux.tar.xz</p>
+<ol>
+<li>解压缩：</li>
+</ol>
 
-<pre><code>
-3. 把upx放到环境变量能访问到的地方：
-
+<pre><code>$ tar -Jxf upx-3.94-amd64_linux.tar.xz
 </code></pre>
 
-<p>$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin</p>
+<ol>
+<li>把upx放到环境变量能访问到的地方：</li>
+</ol>
 
-<pre><code>
-## 压缩前后对比：
-
-1. 普通编译，大小为14M：
-
+<pre><code>$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
 </code></pre>
 
-<p>$ go1.10beta1 build</p>
+<h2 id="压缩前后对比">压缩前后对比</h2>
 
-<p>$ ls -lh
-  -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main</p>
+<ol>
+<li>普通编译，大小为14M：</li>
+</ol>
 
-<pre><code>
-2. go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：
+<pre><code>  $ go1.10beta1 build
 
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
 </code></pre>
 
-<p>$ go1.10beta1 build -ldflags &lsquo;-w -s&rsquo;</p>
+<ol>
+<li>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：</li>
+</ol>
 
-<p>$ ls -lh
-  -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main</p>
+<pre><code>  $ go1.10beta1 build -ldflags '-w -s'
 
-<pre><code>
-3. 用 upx 加壳压缩，大小为3.7M
-
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
 </code></pre>
 
-<p>$ upx main
+<ol>
+<li>用 upx 加壳压缩，大小为3.7M</li>
+</ol>
+
+<pre><code>  $ upx main
   Ultimate Packer for eXecutables
-     Copyright &copy; 1996 - 2017
-  UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017</p>
+     Copyright (C) 1996 - 2017
+  UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017
 
-<p>File size         Ratio      Format      Name</p>
+  File size         Ratio      Format      Name
+  --------------------   ------   -----------   -----------
+  11110408 -&gt;   3861696   34.76%   linux/amd64   main
 
-<hr />
+  Packed 1 file.
 
-<p>11110408 -&gt;   3861696   34.76%   linux/amd64   main</p>
+  $ ls -lh
+  -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
 
-<p>Packed 1 file.</p>
-
-<p>$ ls -lh
-  -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main</p>
-
-<p>```</p>
+</code></pre>
 
 <p>可以看到压缩比能达到（3.7M/14M）26%，很可观了，传输和存储该文件会方便许多，且压缩后的二进制文件可正常执行。</p>
 

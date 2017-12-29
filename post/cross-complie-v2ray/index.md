@@ -18,7 +18,10 @@ go 是跨平台的，之前没有试过交叉编译，理所当然地以为修�
 >6. 编译 `V2Ray：$GOPATH/bin/vbuild`
 >7. V2Ray 程序及配置文件会被放在 `$GOPATH/bin/v2ray-XXX` 文件夹下（XXX 视平台不同而不同）
 
-1. 最新的 v2ray 源码是 go1.9 实现的，如果用 go1.8 进行编译会提示找不到“math/bits”标准库文件`unrecognized import path "math/bits" (import path does not begin with hostname)`（https://github.com/v2ray/v2ray-core/issues/633）。所以编译 V2Ray 至少要 go1.9 以上的版本。
+1. 编译 V2Ray 至少要 go1.9 以上的版本
+  最新的 v2ray 源码是 go1.9 实现的，如果用 go1.8 进行编译会提示找不到“math/bits”标准库文件
+  `unrecognized import path "math/bits" (import path does not begin with hostname)`
+  （https://github.com/v2ray/v2ray-core/issues/633）
 
 2. 目标机器没有 FPU，指令集缺乏相关的指令，所以只能用软件模拟浮点数运算。go 的 beta 版本已经修复了这个问题：[runtime: mips32 soft float point support](https://github.com/golang/go/issues/18162)
 
@@ -34,79 +37,74 @@ go 是跨平台的，之前没有试过交叉编译，理所当然地以为修�
   ```
   GOARCH 指定目标机器的指令集，GOMIPS 指定 mipsle 机器处理浮点数的方式（分 softfloat和hardfloat，默认为hardfloat，所以需显示指定）
 
-  go1.10beta1 指明使用 beta 版本进行编译
+    go1.10beta1 指明使用 beta 版本进行编译
 
 5. 将 vbuild 传到目标机器，执行：
-
   ```
   $ ./vbuild
   Building V2Ray (custom) for linux mipsle
   Unable to build V2Ray: exec: "go": executable file not found in $PATH
   ```
-
   这里我理解错误，以为 vbuild 已经是可执行文件，不需要依赖 go 环境。实际上这只是编译脚本，仍然依赖于 go 环境和 v2ray 的依赖包，而目标机器没有 go 环境和 v2ray 的依赖库（install的过程会把需要的依赖库安装到同级别目录下的 pkg 下）。所以按照官方的编译方式达不到交叉编译的目的。
 
-  查看 vbuild 源码，有类似语句：
+    如果要用 vbuild 达到交叉编译的目的，需要把 GOARCH=mipsle GOMIPS=softfloat 环境变量传给 vbuild，并将所有外部命令中的“go”修改为“go1.10beta1”。
 
-  ```go
-  ...
-  // 读取依赖库路径
-    targetFile := getTargetFile("v2ray", v2rayOS)
-    targetFileFull := filepath.Join(targetDir, targetFile)
-    	if err := build.BuildV2RayCore(targetFileFull, v2rayOS, v2rayArch, false); err != nil {
-    		fmt.Println("Unable to build V2Ray: " + err.Error())
-    		return
-    	}
-  ...
+    或者自己手动编译。我选择手动编译，比较灵活可控。
 
-  ...
-  // 执行外部命令
-  cmd := exec.Command("go", args...)
-  ...
-  ```
+    查看 vbuild 源码，有类似语句：
 
-  如果要用 vbuild 达到交叉编译的目的，需要把 GOARCH=mipsle GOMIPS=softfloat 环境变量传给 vbuild，并将所有外部命令中的“go”修改为“go1.10beta1”。
+    ```go
+    ...
+    // 读取依赖库路径
+      targetFile := getTargetFile("v2ray", v2rayOS)
+      targetFileFull := filepath.Join(targetDir, targetFile)
+      	if err := build.BuildV2RayCore(targetFileFull, v2rayOS, v2rayArch, false); err != nil {
+      		fmt.Println("Unable to build V2Ray: " + err.Error())
+      		return
+      	}
+    ...
 
-  或者自己手动编译。我选择手动编译，比较灵活可控。  
+    ...
+    // 执行外部命令
+    cmd := exec.Command("go", args...)
+    ...
+    ```
 
 6. 手动编译 v2ray 主程序和 v2ctl。主程序需通过 v2ctl 读取配置文件。
-  * 编译 V2Ray 主程序
 
-  ```
-  $ cd $GOPATH/src/v2ray/core/main
-  $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ray
-  ```
+    ```
+    //编译 V2Ray 主程序
 
-  * 编译 v2ctl
+    $ cd $GOPATH/src/v2ray/core/main
+    $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ray
 
-  ```
-  $ cd $GOPATH/src/v2ray.com/ext/tools/control/main
-  $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ctl
-  ```
+    // 编译 v2ctl
 
-  * 编译出来的二进制文件可用 upx 进行压缩
+    $ cd $GOPATH/src/v2ray.com/ext/tools/control/main
+    $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ctl
 
-  ```
-  $ upx v2ray
-  $ upx v2ctl
-  ```
+    // 编译出来的二进制文件可用 upx 进行压缩
 
-8. 将 v2ray 和 v2ctl 放到目标机器可正常运行。问题解决！
+    $ upx v2ray
+    $ upx v2ctl
+    ```
+
+7. 将 v2ray 和 v2ctl 放到目标机器可正常运行。问题解决！
 
 # 其他问题
 
 1. 输错编译参数 GOARCH=mips，在目标机器运行报错：
 
-  ```
-  $ ./vbuild
-  ./vbuild: line 1: syntax error: unterminated quoted string
-  ```
+    ```
+    $ ./vbuild
+    ./vbuild: line 1: syntax error: unterminated quoted string
+    ```
 
-  实际上 mips 为大端序，mipsle 是小端序，两者不等同。
+    实际上 mips 为大端序，mipsle 是小端序，两者不等同。
 
 2. 编译出来的可执行文件有点大，动辄10几M，不利于网络传输，而在路由器这种外存空间有限的硬件上，文件也当然越小越好。[upx](https://github.com/upx/upx)是一个 C++ 写的开源加壳压缩工具，能满足这个需求。
 
-## upx 大致原理
+## upx 原理
 通过 upx 压缩过的程序和程序库完全没有功能损失和压缩之前一样可正常地运行。upx 利用特殊的算法压缩了二进制，并在文件加了解压缩的指令，cpu 读到这些指令可以自己解压缩。cpu 在执行加壳过的二进制时，相当于先执行了外壳，再通过外壳在内存中把原来的程序解开并执行。
 
 upx 能实现两个需求，一个是压缩，另一个是加密程序，防止程序被别人静态分析。很方便。
@@ -116,7 +114,7 @@ upx 能实现两个需求，一个是压缩，另一个是加密程序，防止�
 
 ```
 wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
-````
+```
 
 2. 解压缩：
 
@@ -130,7 +128,7 @@ $ tar -Jxf upx-3.94-amd64_linux.tar.xz
 $ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
 ```
 
-## 压缩前后对比：
+## 压缩前后对比
 
 1. 普通编译，大小为14M：
 
