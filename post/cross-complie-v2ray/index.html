@@ -305,25 +305,21 @@ $ upx v2ctl
 <h2 id="下载安装-upx">下载安装 upx</h2>
 
 <ol>
-<li>下载 upx：</li>
+<li><p>下载 upx：</p>
+
+<pre><code>wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+</code></pre></li>
+
+<li><p>解压缩：</p>
+
+<pre><code>$ tar -Jxf upx-3.94-amd64_linux.tar.xz
+</code></pre></li>
+
+<li><p>把upx放到环境变量能访问到的地方：</p>
+
+<pre><code>$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
+</code></pre></li>
 </ol>
-
-<pre><code>  wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
-</code></pre>
-
-<ol>
-<li>解压缩：</li>
-</ol>
-
-<pre><code>  $ tar -Jxf upx-3.94-amd64_linux.tar.xz
-</code></pre>
-
-<ol>
-<li>把upx放到环境变量能访问到的地方：</li>
-</ol>
-
-<pre><code>  $ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
-</code></pre>
 
 <h2 id="压缩前后对比">压缩前后对比</h2>
 

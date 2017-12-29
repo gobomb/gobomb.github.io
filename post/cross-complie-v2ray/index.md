@@ -112,21 +112,21 @@ upx 能实现两个需求，一个是压缩，另一个是加密程序，防止�
 ## 下载安装 upx
 1. 下载 upx：
 
-  ```
-  wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
-  ```
+    ```
+    wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+    ```
 
 2. 解压缩：
 
-  ```
-  $ tar -Jxf upx-3.94-amd64_linux.tar.xz
-  ```
+    ```
+    $ tar -Jxf upx-3.94-amd64_linux.tar.xz
+    ```
 
 3. 把upx放到环境变量能访问到的地方：
 
-  ```
-  $ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
-  ```
+    ```
+    $ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
+    ```
 
 ## 压缩前后对比
 
