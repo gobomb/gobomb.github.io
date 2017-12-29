@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>交叉编译 V2Ray - Cym&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="cym" />
+  <meta name="description" content="问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算" />
+
+  <meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.28-DEV" />
+
+
+<link rel="canonical" href="https://gobomb.github.io/post/cross-complie-v2ray/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" href="/favicon.ico" />
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+<link href="/dist/even.min.css?v=2.7.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="交叉编译 V2Ray" />
+<meta property="og:description" content="问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://gobomb.github.io/post/cross-complie-v2ray/" />
+
+
+
+<meta property="article:published_time" content="2017-12-29T17:17:27&#43;08:00"/>
+<meta property="article:modified_time" content="2017-12-29T17:17:27&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="交叉编译 V2Ray">
+<meta itemprop="description" content="问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算">
+
+
+<meta itemprop="dateModified" content="2017-12-29T17:17:27&#43;08:00" />
+<meta itemprop="wordCount" content="1917">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="交叉编译 V2Ray"/>
+<meta name="twitter:description" content="问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Cym</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">About</li>
+      </a><a href="/links">
+        <li class="mobile-menu-item">Links</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Cym</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">About</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/links">Links</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">交叉编译 V2Ray</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-12-29 </span>
+        
+        <span class="more-meta"> 约 1917 字 </span>
+        <span class="more-meta"> 预计阅读 4 分钟 </span>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#问题和背景">问题和背景</a>
+<ul>
+<li><a href="#环境">环境</a></li>
+</ul></li>
+<li><a href="#解决过程">解决过程</a></li>
+<li><a href="#其他问题">其他问题</a></li>
+<li><a href="#总结">总结</a></li>
+<li><a href="#参考链接">参考链接</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      
+
+<h1 id="问题和背景">问题和背景</h1>
+
+<p>朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算单元，专用于浮点运算的处理器)，官方 Mips 版本并不支持软解浮点数运算，无法顺利运行。</p>
+
+<p>go 是跨平台的，之前没有试过交叉编译，理所当然地以为修改 GOARCH（指令集架构） 和 GOOS（操作系统） 参数就行了。实际上是有不少坑。</p>
+
+<h2 id="环境">环境</h2>
+
+<ul>
+<li>目标机器：OpenWRT mipsle（32位机器，小端序）</li>
+<li>本地机器：CentOS amd64 golang1.9</li>
+</ul>
+
+<h1 id="解决过程">解决过程</h1>
+
+<p>参考官方提供的<a href="https://www.v2ray.com/eng/intro/compile.html">编译步骤</a>：</p>
+
+<blockquote>
+<ol>
+<li>（安装 git 和 golang 环境的步骤略去）</li>
+<li>下载 V2Ray 源文件：<code>go get -u v2ray.com/core/...</code></li>
+<li>下载 V2Ray 扩展包：<code>go get -u v2ray.com/ext/...</code></li>
+<li>生成编译脚本：
+<code>go install v2ray.com/ext/tools/build/vbuild</code></li>
+<li>编译 <code>V2Ray：$GOPATH/bin/vbuild</code></li>
+<li>V2Ray 程序及配置文件会被放在 <code>$GOPATH/bin/v2ray-XXX</code> 文件夹下（XXX 视平台不同而不同）</li>
+</ol>
+</blockquote>
+
+<ol>
+<li><p>最新的 v2ray 源码是 go1.9 实现的，如果用 go1.8 进行编译会提示找不到“math/bits”标准库文件<code>unrecognized import path &quot;math/bits&quot; (import path does not begin with hostname)</code>（<a href="https://github.com/v2ray/v2ray-core/issues/633）。所以编译">https://github.com/v2ray/v2ray-core/issues/633）。所以编译</a> V2Ray 至少要 go1.9 以上的版本。</p></li>
+
+<li><p>目标机器没有 FPU，指令集缺乏相关的指令，所以只能用软件模拟浮点数运算。go 的 beta 版本已经修复了这个问题：<a href="https://github.com/golang/go/issues/18162">runtime: mips32 soft float point support</a></p></li>
+
+<li><p>下载 go1.10beta1</p>
+
+<pre><code>$ go get golang.org/x/build/version/go1.10beta1
+$ go1.10beta1 download
+</code></pre></li>
+
+<li><p>则生成编译脚本的命令为</p>
+
+<pre><code>$ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 install v2ray.com/ext/tools/build/vbuild
+</code></pre>
+
+<p>GOARCH 指定目标机器的指令集，GOMIPS 指定 mipsle 机器处理浮点数的方式（分 softfloat和hardfloat，默认为hardfloat，所以需显示指定）</p></li>
+</ol>
+
+<p>go1.10beta1 指明使用 beta 版本进行编译</p>
+
+<ol>
+<li>将 vbuild 传到目标机器，执行：
+<code>
+$ ./vbuild
+Building V2Ray (custom) for linux mipsle
+Unable to build V2Ray: exec: &quot;go&quot;: executable file not found in $PATH
+</code></li>
+</ol>
+
+<p>这里我理解错误，以为 vbuild 已经是可执行文件，不需要依赖 go 环境。实际上这只是编译脚本，仍然依赖于 go 环境和 v2ray 的依赖包，而目标机器没有 go 环境和 v2ray 的依赖库（install的过程会把需要的依赖库安装到同级别目录下的 pkg 下）。所以按照官方的编译方式达不到交叉编译的目的。</p>
+
+<p>查看 vbuild 源码，有类似语句：</p>
+
+<pre><code class="language-go">  ...
+  // 读取依赖库路径
+    targetFile := getTargetFile(&quot;v2ray&quot;, v2rayOS)
+    targetFileFull := filepath.Join(targetDir, targetFile)
+    	if err := build.BuildV2RayCore(targetFileFull, v2rayOS, v2rayArch, false); err != nil {
+    		fmt.Println(&quot;Unable to build V2Ray: &quot; + err.Error())
+    		return
+    	}
+  ...
+
+  ...
+  // 执行外部命令
+  cmd := exec.Command(&quot;go&quot;, args...)
+  ...
+</code></pre>
+
+<p>如果要用 vbuild 达到交叉编译的目的，需要把 GOARCH=mipsle GOMIPS=softfloat 环境变量传给 vbuild，并将所有外部命令中的“go”修改为“go1.10beta1”。</p>
+
+<p>或者自己手动编译。我选择手动编译，比较灵活可控。</p>
+
+<ol>
+<li><p>手动编译 v2ray 主程序和 v2ctl。主程序需通过 v2ctl 读取配置文件。</p>
+
+<ol>
+<li>编译 V2Ray 主程序
+<code>
+$ cd $GOPATH/src/v2ray/core/main
+$ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ray
+</code></li>
+<li>编译 v2ctl
+<code>
+$ cd $GOPATH/src/v2ray.com/ext/tools/control/main
+$ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ctl
+</code></li>
+<li>编译出来的二进制文件可用 upx 进行压缩
+<code>
+$ upx v2ray
+$ upx v2ctl
+</code></li>
+</ol></li>
+
+<li><p>将 v2ray 和 v2ctl 放到目标机器可正常运行。问题解决！</p></li>
+</ol>
+
+<h1 id="其他问题">其他问题</h1>
+
+<ol>
+<li>输错编译参数 GOARCH=mips，在目标机器运行报错：</li>
+</ol>
+
+<pre><code>  $ ./vbuild
+  ./vbuild: line 1: syntax error: unterminated quoted string
+</code></pre>
+
+<p>实际上 mips 为大端序，mipsle 是小端序，两者不等同。</p>
+
+<ol>
+<li>编译出来的可执行文件有点大，动辄10几M，不利于网络传输，而在路由器这种外存空间有限的硬件上，文件也当然越小越好。<a href="https://github.com/upx/upx">upx</a>是一个 C++ 写的开源加壳压缩工具，能满足这个需求。</li>
+</ol>
+
+<p>## upx 大致原理
+  通过 upx 压缩过的程序和程序库完全没有功能损失和压缩之前一样可正常地运行。upx 利用特殊的算法压缩了二进制，并在文件加了解压缩的指令，cpu 读到这些指令可以自己解压缩。cpu 在执行加壳过的二进制时，相当于先执行了外壳，再通过外壳在内存中把原来的程序解开并执行。</p>
+
+<p>upx 能实现两个需求，一个是压缩，另一个是加密程序，防止程序被别人静态分析。很方便。</p>
+
+<p>## 下载安装 upx
+  1. 下载 upx：</p>
+
+<pre><code>  wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+  ````
+  2. 解压缩：
+</code></pre>
+
+<p>$ tar -Jxf upx-3.94-amd64_linux.tar.xz</p>
+
+<pre><code>  3. 把upx放到环境变量能访问到的地方：
+</code></pre>
+
+<p>$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
+  ```</p>
+
+<p>## 压缩前后对比：</p>
+
+<ol>
+<li><p>普通编译，大小为14M：</p>
+
+<pre><code>$ go1.10beta1 build
+
+$ ls -lh
+-rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
+</code></pre></li>
+
+<li><p>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：</p>
+
+<pre><code>$ go1.10beta1 build -ldflags '-w -s'
+
+$ ls -lh
+-rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
+</code></pre></li>
+
+<li><p>用 upx 加壳压缩，大小为3.7M：</p>
+
+<pre><code>$ upx main
+Ultimate Packer for eXecutables
+   Copyright (C) 1996 - 2017
+UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017
+
+File size         Ratio      Format      Name
+--------------------   ------   -----------   -----------
+11110408 -&gt;   3861696   34.76%   linux/amd64   main
+
+Packed 1 file.
+
+$ ls -lh
+-rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
+
+</code></pre></li>
+</ol>
+
+<p>可以看到压缩比能达到（3.7M/14M）26%，很可观了，传输和存储该文件会方便许多，且压缩后的二进制文件可正常执行。</p>
+
+<h1 id="总结">总结</h1>
+
+<p>编译型的语言优点是执行效率高，毕竟翻译成机器码，免去了很多中间环节，但缺点就是要针对跨平台进行优化。不同平台操作系统、指令集架构、硬件都不一样，要求程序员对体系结构有所了解。特别是 go 程序的编写，了解不同平台和底层模型有助于写出高性能的程序。另网络应用经常有跨平台的使用场景，如路由器、物联网设备，这些设备跟普通 pc 机和服务器的硬件和体系结构会有差别，在用高层次语言写网络应用也要有这个意识。</p>
+
+<h1 id="参考链接">参考链接</h1>
+
+<ol>
+<li><a href="https://stray.love/wen-ti-jie-jue-fang-an/jie-jue-goyu-yan-bian-yi-cheng-xu-wu-fa-zai-openwrtshang-yun-xing-de-wen-ti">解决GO语言编译程序无法在openwrt上运行的问题</a></li>
+<li><a href="https://github.com/golang/go/issues/18162">runtime: mips32 soft float point support</a></li>
+<li><a href="https://github.com/xtaci/kcptun/issues/79">go-mips32 交叉编译go程序 编译kcptun例子</a></li>
+</ol>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">cym</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">2017-12-29</span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/high-concurrency-model/">
+            <span class="next-text nav-default">多种高并发模型比较</span>
+            <span class="prev-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  
+
+  
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bombcoder@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/gobomb" class="iconfont icon-github" title="github"></a>
+  <a href="https://gobomb.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy; 
+    2017
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">cym</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script>
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.min.js?v=2.7.0"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+
+
+
+</body>
+</html>
