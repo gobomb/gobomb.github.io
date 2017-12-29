@@ -37,6 +37,7 @@ go 是跨平台的，之前没有试过交叉编译，理所当然地以为修�
   go1.10beta1 指明使用 beta 版本进行编译
 
 5. 将 vbuild 传到目标机器，执行：
+
   ```
   $ ./vbuild
   Building V2Ray (custom) for linux mipsle
@@ -46,6 +47,7 @@ go 是跨平台的，之前没有试过交叉编译，理所当然地以为修�
   这里我理解错误，以为 vbuild 已经是可执行文件，不需要依赖 go 环境。实际上这只是编译脚本，仍然依赖于 go 环境和 v2ray 的依赖包，而目标机器没有 go 环境和 v2ray 的依赖库（install的过程会把需要的依赖库安装到同级别目录下的 pkg 下）。所以按照官方的编译方式达不到交叉编译的目的。
 
   查看 vbuild 源码，有类似语句：
+
   ```go
   ...
   // 读取依赖库路径
@@ -68,17 +70,22 @@ go 是跨平台的，之前没有试过交叉编译，理所当然地以为修�
   或者自己手动编译。我选择手动编译，比较灵活可控。  
 
 6. 手动编译 v2ray 主程序和 v2ctl。主程序需通过 v2ctl 读取配置文件。
-  1. 编译 V2Ray 主程序
+  * 编译 V2Ray 主程序
+
   ```
   $ cd $GOPATH/src/v2ray/core/main
   $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ray
   ```
-  2. 编译 v2ctl
+
+  * 编译 v2ctl
+
   ```
   $ cd $GOPATH/src/v2ray.com/ext/tools/control/main
   $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ctl
   ```
-  3. 编译出来的二进制文件可用 upx 进行压缩
+
+  * 编译出来的二进制文件可用 upx 进行压缩
+
   ```
   $ upx v2ray
   $ upx v2ctl
@@ -106,14 +113,19 @@ upx 能实现两个需求，一个是压缩，另一个是加密程序，防止�
 
 ## 下载安装 upx
 1. 下载 upx：
+
 ```
 wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
 ````
+
 2. 解压缩：
+
 ```
 $ tar -Jxf upx-3.94-amd64_linux.tar.xz
 ```
+
 3. 把upx放到环境变量能访问到的地方：
+
 ```
 $ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
 ```
@@ -138,7 +150,7 @@ $ cd upx-3.94-amd64_linux && mv upx $GOPATH/bin
   -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
   ```
 
-3. 用 upx 加壳压缩，大小为3.7M：
+3. 用 upx 加壳压缩，大小为3.7M
 
   ```
   $ upx main

@@ -69,7 +69,7 @@
 
 
 <meta itemprop="dateModified" content="2017-12-29T17:17:27&#43;08:00" />
-<meta itemprop="wordCount" content="1910">
+<meta itemprop="wordCount" content="1912">
 
 
 
@@ -143,7 +143,7 @@
       <div class="post-meta">
         <span class="post-time"> 2017-12-29 </span>
         
-        <span class="more-meta"> 约 1910 字 </span>
+        <span class="more-meta"> 约 1912 字 </span>
         <span class="more-meta"> 预计阅读 4 分钟 </span>
       </div>
     </header>
@@ -165,7 +165,6 @@
 <ul>
 <li><a href="#upx-大致原理">upx 大致原理</a></li>
 <li><a href="#下载安装-upx">下载安装 upx</a></li>
-<li><a href="#压缩前后对比">压缩前后对比：</a></li>
 </ul></li>
 <li><a href="#总结">总结</a></li>
 <li><a href="#参考链接">参考链接</a></li>
@@ -229,13 +228,13 @@ $ go1.10beta1 download
 <p>go1.10beta1 指明使用 beta 版本进行编译</p>
 
 <ol>
-<li>将 vbuild 传到目标机器，执行：
-<code>
-$ ./vbuild
-Building V2Ray (custom) for linux mipsle
-Unable to build V2Ray: exec: &quot;go&quot;: executable file not found in $PATH
-</code></li>
+<li>将 vbuild 传到目标机器，执行：</li>
 </ol>
+
+<pre><code>  $ ./vbuild
+  Building V2Ray (custom) for linux mipsle
+  Unable to build V2Ray: exec: &quot;go&quot;: executable file not found in $PATH
+</code></pre>
 
 <p>这里我理解错误，以为 vbuild 已经是可执行文件，不需要依赖 go 环境。实际上这只是编译脚本，仍然依赖于 go 环境和 v2ray 的依赖包，而目标机器没有 go 环境和 v2ray 的依赖库（install的过程会把需要的依赖库安装到同级别目录下的 pkg 下）。所以按照官方的编译方式达不到交叉编译的目的。</p>
 
@@ -262,27 +261,35 @@ Unable to build V2Ray: exec: &quot;go&quot;: executable file not found in $PATH
 <p>或者自己手动编译。我选择手动编译，比较灵活可控。</p>
 
 <ol>
-<li><p>手动编译 v2ray 主程序和 v2ctl。主程序需通过 v2ctl 读取配置文件。</p>
+<li>手动编译 v2ray 主程序和 v2ctl。主程序需通过 v2ctl 读取配置文件。
+
+<ul>
+<li>编译 V2Ray 主程序</li>
+</ul></li>
+</ol>
+
+<pre><code>  $ cd $GOPATH/src/v2ray/core/main
+  $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ray
+</code></pre>
+
+<ul>
+<li>编译 v2ctl</li>
+</ul>
+
+<pre><code>  $ cd $GOPATH/src/v2ray.com/ext/tools/control/main
+  $ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ctl
+</code></pre>
+
+<ul>
+<li>编译出来的二进制文件可用 upx 进行压缩</li>
+</ul>
+
+<pre><code>  $ upx v2ray
+  $ upx v2ctl
+</code></pre>
 
 <ol>
-<li>编译 V2Ray 主程序
-<code>
-$ cd $GOPATH/src/v2ray/core/main
-$ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ray
-</code></li>
-<li>编译 v2ctl
-<code>
-$ cd $GOPATH/src/v2ray.com/ext/tools/control/main
-$ env GOARCH=mipsle GOMIPS=softfloat go1.10beta1 build -ldflags '-w -s' -o v2ctl
-</code></li>
-<li>编译出来的二进制文件可用 upx 进行压缩
-<code>
-$ upx v2ray
-$ upx v2ctl
-</code></li>
-</ol></li>
-
-<li><p>将 v2ray 和 v2ctl 放到目标机器可正常运行。问题解决！</p></li>
+<li>将 v2ray 和 v2ctl 放到目标机器可正常运行。问题解决！</li>
 </ol>
 
 <h1 id="其他问题">其他问题</h1>
@@ -310,61 +317,69 @@ $ upx v2ctl
 <h2 id="下载安装-upx">下载安装 upx</h2>
 
 <ol>
-<li>下载 upx：
-<code>
-wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
-</code>`</li>
-<li>解压缩：
-<code>
-$ tar -Jxf upx-3.94-amd64_linux.tar.xz
-</code></li>
-<li>把upx放到环境变量能访问到的地方：
-<code>
-$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin
-</code></li>
+<li>下载 upx：</li>
 </ol>
 
-<h2 id="压缩前后对比">压缩前后对比：</h2>
+<pre><code>wget -c https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+````
 
-<ol>
-<li>普通编译，大小为14M：</li>
-</ol>
+2. 解压缩：
 
-<pre><code>  $ go1.10beta1 build
-
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
 </code></pre>
 
-<ol>
-<li>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：</li>
-</ol>
+<p>$ tar -Jxf upx-3.94-amd64_linux.tar.xz</p>
 
-<pre><code>  $ go1.10beta1 build -ldflags '-w -s'
+<pre><code>
+3. 把upx放到环境变量能访问到的地方：
 
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main
 </code></pre>
 
-<ol>
-<li>用 upx 加壳压缩，大小为3.7M：</li>
-</ol>
+<p>$ cd upx-3.94-amd64_linux &amp;&amp; mv upx $GOPATH/bin</p>
 
-<pre><code>  $ upx main
+<pre><code>
+## 压缩前后对比：
+
+1. 普通编译，大小为14M：
+
+</code></pre>
+
+<p>$ go1.10beta1 build</p>
+
+<p>$ ls -lh
+  -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main</p>
+
+<pre><code>
+2. go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：
+
+</code></pre>
+
+<p>$ go1.10beta1 build -ldflags &lsquo;-w -s&rsquo;</p>
+
+<p>$ ls -lh
+  -rwxr-xr-x. 1 root root 11M Dec 29 14:38 main</p>
+
+<pre><code>
+3. 用 upx 加壳压缩，大小为3.7M
+
+</code></pre>
+
+<p>$ upx main
   Ultimate Packer for eXecutables
-     Copyright (C) 1996 - 2017
-  UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017
+     Copyright &copy; 1996 - 2017
+  UPX 3.94        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   May 12th 2017</p>
 
-  File size         Ratio      Format      Name
-  --------------------   ------   -----------   -----------
-  11110408 -&gt;   3861696   34.76%   linux/amd64   main
+<p>File size         Ratio      Format      Name</p>
 
-  Packed 1 file.
+<hr />
 
-  $ ls -lh
-  -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main
+<p>11110408 -&gt;   3861696   34.76%   linux/amd64   main</p>
 
-</code></pre>
+<p>Packed 1 file.</p>
+
+<p>$ ls -lh
+  -rwxr-xr-x. 1 root root 3.7M Dec 29 14:38 main</p>
+
+<p>```</p>
 
 <p>可以看到压缩比能达到（3.7M/14M）26%，很可观了，传输和存储该文件会方便许多，且压缩后的二进制文件可正常执行。</p>
 
