@@ -1,3 +1,0 @@
-#!/bin/sh
-sass style.scss > style.min.css --style compressed
-sass style.scss > style.css
