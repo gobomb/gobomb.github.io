@@ -6,10 +6,19 @@
     <description>Recent content on Cym&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 29 Dec 2017 17:17:27 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 31 Dec 2017 20:48:34 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>2017 年终总结</title>
+      <link>https://gobomb.github.io/post/2017-summarize/</link>
+      <pubDate>Sun, 31 Dec 2017 20:48:34 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/2017-summarize/</guid>
+      <description>一晃眼一年又过去了。再过半年我就要毕业了。 教训 今年找到第一份实习，学一门新的编程语言。实习的时候几乎是零基础，遇到什么问题就问上网查、问同事</description>
+    </item>
     
     <item>
       <title>交叉编译 V2Ray</title>
@@ -30,7 +39,7 @@
     </item>
     
     <item>
-      <title>多种高并发模型比较</title>
+      <title>并发模型比较</title>
       <link>https://gobomb.github.io/post/high-concurrency-model/</link>
       <pubDate>Sat, 25 Nov 2017 22:13:27 +0800</pubDate>
       
@@ -39,7 +48,7 @@
     </item>
     
     <item>
-      <title>如何用 Golang 写单元测试</title>
+      <title>Golang 自带的单元测试</title>
       <link>https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/</link>
       <pubDate>Mon, 06 Nov 2017 16:52:19 +0800</pubDate>
       

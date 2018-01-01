@@ -3,6 +3,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://gobomb.github.io/post/2017-summarize/</loc>
+    <lastmod>2017-12-31T20:48:34+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://gobomb.github.io/post/cross-complie-v2ray/</loc>
     <lastmod>2017-12-29T17:17:27+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -52,14 +59,14 @@
   
   <url>
     <loc>https://gobomb.github.io/</loc>
-    <lastmod>2017-12-29T17:17:27+08:00</lastmod>
+    <lastmod>2017-12-31T20:48:34+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://gobomb.github.io/post/</loc>
-    <lastmod>2017-12-29T17:17:27+08:00</lastmod>
+    <lastmod>2017-12-31T20:48:34+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
