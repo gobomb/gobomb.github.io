@@ -20,6 +20,6 @@ E-mail：bombcoder@outlook.com
 
 # Present Day, Present Time
 
-![lisp](/about/p1985002631.webg)
+![lisp](/about/lisp.webg)
 
 vai 《玲音》Serial Experiments: Lain (1998)
