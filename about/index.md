@@ -15,3 +15,11 @@ GitHub：https://github.com/gobomb
 E-mail：bombcoder@outlook.com
 
 欢迎邮件交流～
+
+---
+
+# Present Day, Present Time
+
+![lisp](/about/lain.jpg)
+
+vai 《玲音》Serial Experiments: Lain (1998)

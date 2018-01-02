@@ -16,10 +16,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="cym" />
-  <meta name="description" content="问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算" />
+<meta name="author" content="cym" /><meta name="description" content="一次交叉编译的踩坑过程" />
+<meta name="keywords" content="golang" />
 
-  <meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -45,14 +44,14 @@
 <link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 
 <meta property="og:title" content="交叉编译 V2Ray" />
-<meta property="og:description" content="问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算" />
+<meta property="og:description" content="一次交叉编译的踩坑过程" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://gobomb.github.io/post/cross-complie-v2ray/" />
 
 
 
 <meta property="article:published_time" content="2017-12-29T17:17:27&#43;08:00"/>
-<meta property="article:modified_time" content="2017-12-29T17:17:27&#43;08:00"/>
+<meta property="article:modified_time" content="2018-01-01T00:00:00&#43;00:00"/>
 
 
 
@@ -65,17 +64,17 @@
 
 
 <meta itemprop="name" content="交叉编译 V2Ray">
-<meta itemprop="description" content="问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算">
+<meta itemprop="description" content="一次交叉编译的踩坑过程">
 
 
 <meta itemprop="dateModified" content="2017-12-29T17:17:27&#43;08:00" />
-<meta itemprop="wordCount" content="1886">
+<meta itemprop="wordCount" content="1820">
 
 
 
-<meta itemprop="keywords" content="" />
+<meta itemprop="keywords" content="交叉编译,golang,v2ray," />
 <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="交叉编译 V2Ray"/>
-<meta name="twitter:description" content="问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算"/>
+<meta name="twitter:description" content="一次交叉编译的踩坑过程"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -104,6 +103,10 @@
         <li class="mobile-menu-item">Home</li>
       </a><a href="/post/">
         <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
       </a><a href="/about">
         <li class="mobile-menu-item">About</li>
       </a><a href="/links">
@@ -124,6 +127,10 @@
       </li><li class="menu-item">
         <a class="menu-item-link" href="/post/">Archives</a>
       </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
         <a class="menu-item-link" href="/about">About</a>
       </li><li class="menu-item">
         <a class="menu-item-link" href="/links">Links</a>
@@ -142,8 +149,12 @@
 
       <div class="post-meta">
         <span class="post-time"> 2017-12-29 </span>
-        
-        <span class="more-meta"> 约 1886 字 </span>
+        <div class="post-category">
+            
+              <a href="/categories/%E8%AE%B0%E5%BD%95/"> 记录 </a>
+            
+          </div>
+        <span class="more-meta"> 约 1820 字 </span>
         <span class="more-meta"> 预计阅读 4 分钟 </span>
       </div>
     </header>
@@ -181,8 +192,6 @@
 <h1 id="问题和背景">问题和背景</h1>
 
 <p>朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算单元，专用于浮点运算的处理器)，官方 Mips 版本并不支持软解浮点数运算，无法顺利运行。</p>
-
-<p>go 是跨平台的，之前没有试过交叉编译，理所当然地以为修改 GOARCH（指令集架构） 和 GOOS（操作系统） 参数就行了。实际上是有不少坑。</p>
 
 <h2 id="环境">环境</h2>
 
@@ -384,7 +393,7 @@ $ ls -lh
   </p>
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
-    <span class="item-content">2017-12-29</span>
+    <span class="item-content">2018-01-01</span>
   </p>
   
   <p class="copyright-item">
@@ -397,7 +406,15 @@ $ ls -lh
     
 
     <footer class="post-footer">
-      
+      <div class="post-tags">
+          
+          <a href="/tags/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/">交叉编译</a>
+          
+          <a href="/tags/golang/">golang</a>
+          
+          <a href="/tags/v2ray/">v2ray</a>
+          
+        </div>
 
       
       <nav class="post-nav">
@@ -408,8 +425,8 @@ $ ls -lh
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         
-          <a class="next" href="/post/high-concurrency-model/">
-            <span class="next-text nav-default">并发模型比较</span>
+          <a class="next" href="/post/how-to-write-unit-testing-in-golang/">
+            <span class="next-text nav-default">Golang 自带的单元测试</span>
             <span class="prev-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>记录 on Present Day, Present Time</title>
+    <link>https://gobomb.github.io/categories/%E8%AE%B0%E5%BD%95/</link>
+    <description>Recent content in 记录 on Present Day, Present Time</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 29 Dec 2017 17:17:27 +0800</lastBuildDate>
+    
+	<atom:link href="https://gobomb.github.io/categories/%E8%AE%B0%E5%BD%95/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>交叉编译 V2Ray</title>
+      <link>https://gobomb.github.io/post/cross-complie-v2ray/</link>
+      <pubDate>Fri, 29 Dec 2017 17:17:27 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/cross-complie-v2ray/</guid>
+      <description>问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算</description>
+    </item>
+    
+    <item>
+      <title>Golang 自带的单元测试</title>
+      <link>https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/</link>
+      <pubDate>Mon, 06 Nov 2017 16:52:19 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/</guid>
+      <description>为什么要写单元测试 以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息</description>
+    </item>
+    
+    <item>
+      <title>用 Hugo 和 GitHub Page 搭建博客</title>
+      <link>https://gobomb.github.io/post/make-a-blog-by-hugo-and-github-page/</link>
+      <pubDate>Tue, 31 Oct 2017 16:02:19 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/make-a-blog-by-hugo-and-github-page/</guid>
+      <description>图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。 hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。 安装</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -17,8 +17,8 @@
 
 
 <meta name="author" content="cym" />
-  <meta name="description" content="Hugo theme even example site." />
-  <meta name="keywords" content="Hugo, theme, even" />
+  <meta name="description" content="The road to DevOps." />
+  <meta name="keywords" content="Golang, backend, DevOps" />
 
 
 
@@ -46,7 +46,7 @@
 <link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 
 <meta property="og:title" content="Present Day, Present Time" />
-<meta property="og:description" content="Hugo theme even example site." />
+<meta property="og:description" content="The road to DevOps." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://gobomb.github.io/" />
 
@@ -64,10 +64,10 @@
 
 
 <meta itemprop="name" content="Present Day, Present Time">
-<meta itemprop="description" content="Hugo theme even example site.">
+<meta itemprop="description" content="The road to DevOps.">
 
 <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Present Day, Present Time"/>
-<meta name="twitter:description" content="Hugo theme even example site."/>
+<meta name="twitter:description" content="The road to DevOps."/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -96,6 +96,10 @@
         <li class="mobile-menu-item">Home</li>
       </a><a href="/post/">
         <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
       </a><a href="/about">
         <li class="mobile-menu-item">About</li>
       </a><a href="/links">
@@ -115,6 +119,10 @@
         <a class="menu-item-link" href="/">Home</a>
       </li><li class="menu-item">
         <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
       </li><li class="menu-item">
         <a class="menu-item-link" href="/about">About</a>
       </li><li class="menu-item">
@@ -137,7 +145,11 @@
     <h1 class="post-title"><a class="post-link" href="/post/2017-summarize/">2017 年终总结</a></h1>
     <div class="post-meta">
       <span class="post-time"> 2017-12-31 </span>
-      
+      <div class="post-category">
+          
+            <a href="/categories/%E6%80%BB%E7%BB%93/"> 总结 </a>
+          
+        </div>
       <span class="more-meta"> 约 1970 字 </span>
       <span class="more-meta"> 预计阅读 4 分钟 </span>
     </div>
@@ -145,7 +157,8 @@
   
   <div class="post-content">
     <div class="post-summary">
-      一晃眼一年又过去了。再过半年我就要毕业了。 教训 今年找到第一份实习，学一门新的编程语言。实习的时候几乎是零基础，遇到什么问题就问上网查、问同事
+      
+一些教训和流水账
     </div>
     <div class="read-more">
       <a href="/post/2017-summarize/" class="read-more-link">阅读更多</a>
@@ -159,15 +172,20 @@
     <h1 class="post-title"><a class="post-link" href="/post/cross-complie-v2ray/">交叉编译 V2Ray</a></h1>
     <div class="post-meta">
       <span class="post-time"> 2017-12-29 </span>
-      
-      <span class="more-meta"> 约 1886 字 </span>
+      <div class="post-category">
+          
+            <a href="/categories/%E8%AE%B0%E5%BD%95/"> 记录 </a>
+          
+        </div>
+      <span class="more-meta"> 约 1820 字 </span>
       <span class="more-meta"> 预计阅读 4 分钟 </span>
     </div>
   </header>
   
   <div class="post-content">
     <div class="post-summary">
-      问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算
+      
+一次交叉编译的踩坑过程
     </div>
     <div class="read-more">
       <a href="/post/cross-complie-v2ray/" class="read-more-link">阅读更多</a>
@@ -178,32 +196,14 @@
     
       <article class="post">
   <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/high-concurrency-model/">并发模型比较</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2017-11-25 </span>
-      
-      <span class="more-meta"> 约 6695 字 </span>
-      <span class="more-meta"> 预计阅读 14 分钟 </span>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      Golang 的特色之一就是 goroutine ，使得程序员进行并发编程更加方便，适合用来进行服务器编程。作为后端开发工程师，有必要了解并发编程面临的场景和常见的解决方案
-    </div>
-    <div class="read-more">
-      <a href="/post/high-concurrency-model/" class="read-more-link">阅读更多</a>
-    </div>
-  </div>
-</article>
-
-    
-      <article class="post">
-  <header class="post-header">
     <h1 class="post-title"><a class="post-link" href="/post/how-to-write-unit-testing-in-golang/">Golang 自带的单元测试</a></h1>
     <div class="post-meta">
       <span class="post-time"> 2017-11-06 </span>
-      
+      <div class="post-category">
+          
+            <a href="/categories/%E8%AE%B0%E5%BD%95/"> 记录 </a>
+          
+        </div>
       <span class="more-meta"> 约 943 字 </span>
       <span class="more-meta"> 预计阅读 2 分钟 </span>
     </div>
@@ -211,10 +211,38 @@
   
   <div class="post-content">
     <div class="post-summary">
-      为什么要写单元测试 以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息
+      
+了解一下 Goalng 的测试
     </div>
     <div class="read-more">
       <a href="/post/how-to-write-unit-testing-in-golang/" class="read-more-link">阅读更多</a>
+    </div>
+  </div>
+</article>
+
+    
+      <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/make-a-blog-by-hugo-and-github-page/">用 Hugo 和 GitHub Page 搭建博客</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2017-10-31 </span>
+      <div class="post-category">
+          
+            <a href="/categories/%E8%AE%B0%E5%BD%95/"> 记录 </a>
+          
+        </div>
+      <span class="more-meta"> 约 562 字 </span>
+      <span class="more-meta"> 预计阅读 2 分钟 </span>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      
+搭建博客的过程
+    </div>
+    <div class="read-more">
+      <a href="/post/make-a-blog-by-hugo-and-github-page/" class="read-more-link">阅读更多</a>
     </div>
   </div>
 </article>
@@ -224,10 +252,6 @@
   
   <nav class="pagination">
     
-      <a class="next" href="/page/2/">
-        <span class="next-text">下一页</span>
-        <i class="iconfont icon-right"></i>
-      </a>
   </nav>
 
         </div>
