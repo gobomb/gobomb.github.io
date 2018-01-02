@@ -24,6 +24,13 @@
   </url>
   
   <url>
+    <loc>https://gobomb.github.io/post/high-concurrency-model/</loc>
+    <lastmod>2018-01-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/</loc>
     <lastmod>2018-01-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -52,6 +59,13 @@
   </url>
   
   <url>
+    <loc>https://gobomb.github.io/tags/c10k/</loc>
+    <lastmod>2018-01-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://gobomb.github.io/categories/</loc>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
@@ -59,6 +73,13 @@
   
   <url>
     <loc>https://gobomb.github.io/tags/golang/</loc>
+    <lastmod>2018-01-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://gobomb.github.io/tags/goroutine/</loc>
     <lastmod>2018-01-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
@@ -107,6 +128,20 @@
   </url>
   
   <url>
+    <loc>https://gobomb.github.io/tags/%E5%8D%8F%E7%A8%8B/</loc>
+    <lastmod>2018-01-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://gobomb.github.io/tags/%E5%B9%B6%E5%8F%91%E6%A8%A1%E5%9E%8B/</loc>
+    <lastmod>2018-01-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://gobomb.github.io/tags/%E6%80%BB%E7%BB%93/</loc>
     <lastmod>2018-01-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -115,6 +150,13 @@
   
   <url>
     <loc>https://gobomb.github.io/categories/%E6%80%BB%E7%BB%93/</loc>
+    <lastmod>2018-01-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://gobomb.github.io/categories/%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/</loc>
     <lastmod>2018-01-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
