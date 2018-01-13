@@ -22,4 +22,4 @@ E-mail：bombcoder@outlook.com
 
 ![lisp](/about/lisp.jpg)
 
-vai 《玲音》Serial Experiments: Lain (1998)
+图片出自《玲音》Serial Experiments: Lain (1998)
