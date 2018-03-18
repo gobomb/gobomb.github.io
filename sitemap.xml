@@ -3,6 +3,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://gobomb.github.io/cheatsheet/</loc>
+    <lastmod>2018-03-18T14:02:01+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>https://gobomb.github.io/post/evaluation_strategy/</loc>
     <lastmod>2018-01-25T17:09:03+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -108,7 +115,7 @@
   
   <url>
     <loc>https://gobomb.github.io/</loc>
-    <lastmod>2018-01-25T17:09:03+08:00</lastmod>
+    <lastmod>2018-03-18T14:02:01+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Cheatsheet - Present Day, Present Time</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="cym" />
+  <meta name="description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &amp;quot;*.log&amp;quot; -print ubuntu（桌" />
+
+  <meta name="keywords" content="Golang, backend, DevOps" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.28-DEV" />
+
+
+<link rel="canonical" href="https://gobomb.github.io/cheatsheet/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" href="/favicon.ico" />
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=2.7.2" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="Cheatsheet" />
+<meta property="og:description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &quot;*.log&quot; -print ubuntu（桌" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://gobomb.github.io/cheatsheet/" />
+
+
+
+<meta property="article:published_time" content="2018-03-18T14:02:01&#43;08:00"/>
+<meta property="article:modified_time" content="2018-03-18T14:02:01&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Cheatsheet">
+<meta itemprop="description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &quot;*.log&quot; -print ubuntu（桌">
+
+
+<meta itemprop="dateModified" content="2018-03-18T14:02:01&#43;08:00" />
+<meta itemprop="wordCount" content="755">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Cheatsheet"/>
+<meta name="twitter:description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &quot;*.log&quot; -print ubuntu（桌"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Present Day, Present Time</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">About</li>
+      </a><a href="/links">
+        <li class="mobile-menu-item">Links</li>
+      </a><a href="/cheatsheet">
+        <li class="mobile-menu-item">Cheatsheet</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Present Day, Present Time</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">About</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/links">Links</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/cheatsheet">Cheatsheet</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+  <div class="post-content">
+      
+
+<h1 id="cheatsheet">Cheatsheet</h1>
+
+<hr />
+
+<h2 id="go">Go</h2>
+
+<ol>
+<li><p>可以使用 <code>go tool vet -shadow you_file.go</code> 检查幽灵变量</p></li>
+
+<li><p>go get 只下载不安装：</p>
+
+<p><code>go get -d</code></p></li>
+</ol>
+
+<h2 id="linux">Linux</h2>
+
+<ol>
+<li><p>安装 deb 文件：</p>
+
+<p><code>sudo dpkg -i [name].deb</code></p>
+
+<p><code>sudo apt-get install -f</code> （修复依赖关系）</p></li>
+
+<li><p>linux 查找文件</p>
+
+<p><code>find [path] -name &quot;*.log&quot; -print</code></p></li>
+
+<li><p>ubuntu（桌面版） 在终端输入<code>xkill</code>，鼠标变成<code>x</code>，点击 GUI 程序，可强制关闭之</p></li>
+
+<li><p>调用自己定义的编辑器来编辑当前命令行:</p>
+
+<p><code>ctrl-x ctrl-e</code></p></li>
+
+<li><p>shell 脚本报错：<code>... /bin/sh^M: bad interpreter: No such file or directory</code></p>
+
+<p>解决：</p>
+
+<p><code>vim [name.sh]</code></p>
+
+<p><code>:set ff</code> 查看文件格式，若看到输出<code>fileformat=dos</code>，可<code>:set ff=unix</code>修改为 unix 格式</p></li>
+
+<li><p>本地文件传输到远程机器</p>
+
+<p><code>scp -P [port] /path/to/source [user]@[ip]:/path/to/target</code></p></li>
+</ol>
+
+<h2 id="数据库">数据库</h2>
+
+<ol>
+<li><p>mongo shell 查询 collections</p>
+
+<p><code>db.[collection].find();</code></p>
+
+<p>删除某一条文档：</p>
+
+<p><code>db.[collection].remove({&quot;[key]&quot;:&quot;[value]&quot;});</code></p></li>
+
+<li><p>cockroachDB 导入 sql 脚本：</p>
+
+<p><code>cat /path/to/schema.sql | cockroach sql -d [db] -u [user] --insecure</code></p></li>
+</ol>
+
+<h2 id="git">Git</h2>
+
+<ol>
+<li><p>改变最近一次提交：</p>
+
+<p>修改并<code>git add/rm [file]</code>后，<code>git commit --amend</code>，也可以修改 commit 说明</p></li>
+
+<li><p>落后远程分支几个版本，强行回退：</p>
+
+<ol>
+<li><code>git reset [commitID]</code>，到上个版本</li>
+<li><code>git stash</code>，暂存修改</li>
+<li><code>git push --force</code>, 强制push,远程的最新的一次commit被删除</li>
+<li><code>git stash pop</code>，释放暂存的修改，开始修改代码</li>
+<li><code>git add .</code>-&gt; <code>git commit -m &quot;massage&quot;</code> -&gt; <code>git push</code></li>
+</ol></li>
+
+<li><p>从某个 commit 中复制某个文件到暂存区:</p>
+
+<p><code>git reset [commit-hash] file.txt</code></p>
+
+<p><code>git add file.txt</code> 的逆操作，可用来取消暂存：</p>
+
+<p><code>git reset (HEAD) file.txt</code></p></li>
+
+<li><p>git 的三棵树：</p>
+
+<table>
+<thead>
+<tr>
+<th>树</th>
+<th>用途</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>HEAD</td>
+<td>上一次提交的快照，下一次提交的父结点</td>
+</tr>
+
+<tr>
+<td>Index</td>
+<td>预期的下一次提交的快照（也就是暂存区）</td>
+</tr>
+
+<tr>
+<td>Working Directory</td>
+<td>沙盒</td>
+</tr>
+</tbody>
+</table></li>
+
+<li><p><code>git reset</code> 命令会以特定的顺序重写这三棵树，在你指定以下选项时停止：</p>
+
+<ol>
+<li>移动 HEAD 分支的指向 （若指定了 <code>--soft</code>，则到此停止）</li>
+<li>使索引看起来像 HEAD （若未指定 <code>--hard</code>，则到此停止；即指定 <code>--mixed</code> 或默认情况）</li>
+<li>使工作目录看起来像索引 (指定<code>--hard</code>，危险操作)</li>
+</ol></li>
+
+<li><p>查看 git 远程仓库 URL：</p>
+
+<p><code>git remote -v</code></p></li>
+
+<li><p>git 查看某个文件的修改历史</p>
+
+<ol>
+<li><p><code>git log -p [filename]</code>
+查看文件的每一个详细的历史修改</p></li>
+
+<li><p><code>git log --pretty=oneline [filename]</code>
+每一行显示一个提交，先显示哈希码，再显示提交说明。</p></li>
+
+<li><p><code>git blame [filename]</code>
+查看文件的每一行是哪个提交最后修改的。</p></li>
+</ol></li>
+
+<li><p><code>git reflog</code>:</p>
+
+<p>当你 (在一个仓库下) 工作时，Git 会在你每次修改了 HEAD 时悄悄地将改动记录下来。当你提交或修改分支时，reflog 就会更新。</p></li>
+</ol>
+
+  </div>
+</article>
+        </div>
+        
+  
+
+  
+
+  
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bombcoder@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/gobomb" class="iconfont icon-github" title="github"></a>
+  <a href="https://gobomb.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2017 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">cym</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script>
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.min.js?v=2.7.2"></script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    });
+  </script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-112443219-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
