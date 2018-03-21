@@ -72,7 +72,7 @@
 
 
 <meta itemprop="dateModified" content="2018-03-18T14:02:01&#43;08:00" />
-<meta itemprop="wordCount" content="755">
+<meta itemprop="wordCount" content="799">
 
 
 
@@ -198,6 +198,12 @@
 <li><p>本地文件传输到远程机器</p>
 
 <p><code>scp -P [port] /path/to/source [user]@[ip]:/path/to/target</code></p></li>
+
+<li><p>不挂断地运行命令</p>
+
+<p><code>nohup [command] [arg..] [&amp;]</code></p>
+
+<p>无论是否将 nohup 的命令重定向到终端，输出都将附加到当前目录的 nohup.out 文件中</p></li>
 </ol>
 
 <h2 id="数据库">数据库</h2>
