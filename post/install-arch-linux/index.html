@@ -71,7 +71,7 @@
 
 
 <meta itemprop="dateModified" content="2018-09-09T16:22:20&#43;08:00" />
-<meta itemprop="wordCount" content="2617">
+<meta itemprop="wordCount" content="2620">
 
 
 
@@ -161,7 +161,7 @@
               <a href="/categories/%E8%AE%B0%E5%BD%95/"> 记录 </a>
             
           </div>
-        <span class="more-meta"> 约 2617 字 </span>
+        <span class="more-meta"> 约 2620 字 </span>
         <span class="more-meta"> 预计阅读 6 分钟 </span>
         
       </div>
@@ -199,10 +199,10 @@
 <ul>
 <li><a href="#1-命令行下弹出usb设备">1. 命令行下弹出usb设备：</a></li>
 <li><a href="#2-挂载iso">2. 挂载iso</a></li>
-<li><a href="#3-通过特定网卡搜索-wi-fi">3. 通过特定网卡搜索 Wi-Fi</a></li>
-<li><a href="#4-设置笔记本合盖不休眠">4. 设置笔记本合盖不休眠</a></li>
-<li><a href="#5-调整屏幕亮度">5. 调整屏幕亮度</a></li>
-<li><a href="#6-设置开机自动连接-wi-fi">6. 设置开机自动连接 Wi-Fi</a></li>
+<li><a href="#3-设置笔记本合盖不休眠">3. 设置笔记本合盖不休眠</a></li>
+<li><a href="#4-调整屏幕亮度">4. 调整屏幕亮度</a></li>
+<li><a href="#5-设置开机自动连接-wi-fi">5. 设置开机自动连接 Wi-Fi</a></li>
+<li><a href="#6-通过特定网卡搜索-wi-fi">6. 通过特定网卡搜索 Wi-Fi</a></li>
 </ul></li>
 <li><a href="#一点总结">一点总结</a></li>
 </ul>
@@ -611,6 +611,7 @@ reboot
 <h2 id="1-命令行下弹出usb设备">1. 命令行下弹出usb设备：</h2>
 
 <pre><code>```
+pacman -S udisks2
 udisksctl unmount -b /dev/sdb1
 udisksctl power-off -b /dev/sdb
 ```
@@ -620,11 +621,7 @@ udisksctl power-off -b /dev/sdb
 
 <p><code>sudo mount -o loop sth.iso /mnt/iso</code></p>
 
-<h2 id="3-通过特定网卡搜索-wi-fi">3. 通过特定网卡搜索 Wi-Fi</h2>
-
-<p><code>iwlist [interface] scan | less</code></p>
-
-<h2 id="4-设置笔记本合盖不休眠">4. 设置笔记本合盖不休眠</h2>
+<h2 id="3-设置笔记本合盖不休眠">3. 设置笔记本合盖不休眠</h2>
 
 <p><code>vim /etc/systemd/logind.conf</code></p>
 
@@ -634,11 +631,11 @@ udisksctl power-off -b /dev/sdb
 
 <p><code>systemctl restart systemd-logind</code></p>
 
-<h2 id="5-调整屏幕亮度">5. 调整屏幕亮度</h2>
+<h2 id="4-调整屏幕亮度">4. 调整屏幕亮度</h2>
 
 <p><code>echo 100 &gt; /sys/class/backlight/intel_backlight/brightness</code></p>
 
-<h2 id="6-设置开机自动连接-wi-fi">6. 设置开机自动连接 Wi-Fi</h2>
+<h2 id="5-设置开机自动连接-wi-fi">5. 设置开机自动连接 Wi-Fi</h2>
 
 <p>安装<code>netctl</code> Wi-Fi 管理工具：</p>
 
@@ -651,6 +648,10 @@ udisksctl power-off -b /dev/sdb
 <p>设置开机启动服务：</p>
 
 <p><code>netctl enable wlp2s0-303</code></p>
+
+<h2 id="6-通过特定网卡搜索-wi-fi">6. 通过特定网卡搜索 Wi-Fi</h2>
+
+<p><code>iwlist [interface] scan | less</code></p>
 
 <h1 id="一点总结">一点总结</h1>
 
