@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Arch Linux 安装记录 - Present Day, Present Time</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="cym" /><meta name="description" content="以及一些常用命令的记录" />
+<meta name="keywords" content="Linux" />
+
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.28-DEV" />
+
+
+<link rel="canonical" href="https://gobomb.github.io/post/install-arch-linux/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" href="/favicon.ico" />
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+<link href="/dist/even.min.css?v=2.7.2" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="Arch Linux 安装记录" />
+<meta property="og:description" content="以及一些常用命令的记录" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://gobomb.github.io/post/install-arch-linux/" />
+
+
+
+<meta property="article:published_time" content="2018-09-09T16:22:20&#43;08:00"/>
+<meta property="article:modified_time" content="2018-09-09T16:22:20&#43;08:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Arch Linux 安装记录">
+<meta itemprop="description" content="以及一些常用命令的记录">
+
+
+<meta itemprop="dateModified" content="2018-09-09T16:22:20&#43;08:00" />
+<meta itemprop="wordCount" content="2617">
+
+
+
+<meta itemprop="keywords" content="Linux,运维,CLI," />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Arch Linux 安装记录"/>
+<meta name="twitter:description" content="以及一些常用命令的记录"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Present Day, Present Time</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">About</li>
+      </a><a href="/links">
+        <li class="mobile-menu-item">Links</li>
+      </a><a href="/cheatsheet">
+        <li class="mobile-menu-item">Cheatsheet</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Present Day, Present Time</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">About</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/links">Links</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/cheatsheet">Cheatsheet</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Arch Linux 安装记录</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2018-09-09 </span>
+        <div class="post-category">
+            
+              <a href="/categories/%E8%AE%B0%E5%BD%95/"> 记录 </a>
+            
+          </div>
+        <span class="more-meta"> 约 2617 字 </span>
+        <span class="more-meta"> 预计阅读 6 分钟 </span>
+        
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#安装准备">安装准备</a></li>
+<li><a href="#启动">启动</a></li>
+<li><a href="#分区">分区</a></li>
+<li><a href="#挂载分区">挂载分区</a></li>
+<li><a href="#选择镜像源">选择镜像源</a></li>
+<li><a href="#安装基本包">安装基本包</a></li>
+<li><a href="#检查挂载情况">检查挂载情况</a></li>
+<li><a href="#切换到新的系统中">切换到新的系统中</a>
+<ul>
+<li><a href="#1-设置时区">1. 设置时区</a></li>
+<li><a href="#2-安装常用包">2. 安装常用包</a></li>
+<li><a href="#3-设置语言">3. 设置语言</a></li>
+<li><a href="#4-设置主机名">4. 设置主机名</a></li>
+<li><a href="#5-设置-root-密码">5. 设置 root 密码</a></li>
+<li><a href="#6-安装-intel-ucode">6. 安装 Intel-ucode</a></li>
+<li><a href="#7-配置-sshd">7. 配置 sshd</a></li>
+<li><a href="#8-安装bootloader">8. 安装Bootloader</a></li>
+</ul></li>
+<li><a href="#重启">重启</a></li>
+<li><a href="#参考链接">参考链接</a></li>
+<li><a href="#一些常用到的命令">一些常用到的命令</a>
+<ul>
+<li><a href="#1-命令行下弹出usb设备">1. 命令行下弹出usb设备：</a></li>
+<li><a href="#2-挂载iso">2. 挂载iso</a></li>
+<li><a href="#3-通过特定网卡搜索-wi-fi">3. 通过特定网卡搜索 Wi-Fi</a></li>
+<li><a href="#4-设置笔记本合盖不休眠">4. 设置笔记本合盖不休眠</a></li>
+<li><a href="#5-调整屏幕亮度">5. 调整屏幕亮度</a></li>
+<li><a href="#6-设置开机自动连接-wi-fi">6. 设置开机自动连接 Wi-Fi</a></li>
+</ul></li>
+<li><a href="#一点总结">一点总结</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      
+
+<p>旧笔记本之前是安装着 Windows 10 的，自从工作开始使用 rMBP 之后，就闲置着。我想不如重装成 Linux 系统，当作一个私人服务器用，也可以加深一下对操作系统的理解。很早就听说滚动发行的 Arch Linux 的大名，就想趁机试一试。跟着官方 Wiki 走，大概花了6、7个小时才装好，中间也遇到了一些问题，但那时没有记录下来。用了一段时间后，<code>/boot</code>分区不小心被我覆盖了（估计是我使用 lvm 创建物理卷的时候把引导分区给格式化了），导致系统启动不了，一时半会也不会修。</p>
+
+<p><img src="grub_rescue.jpeg" alt="启动找不到`/boot`目录" /></p>
+
+<p>放着有半个月，今天有空干脆格盘重装，再过一遍安装过程，把过程和问题记录下来，下一次遇到问题就不用再去 google。覆盖引导的问题，也是因为我没有把分区规划的信息留下来，后面自己也乱了。而且实际上90%的问题都会重复遇到，做好记录能极大提高效率。</p>
+
+<p>Arch 官方 Wiki 做得真是很好，基本上遇到问题耐心读一读 Wiki 就能够解决。用来学习 Linux 相关知识也特别有用。</p>
+
+<p>整个安装过程的大体步骤</p>
+
+<ol>
+<li>制作安装介质</li>
+<li>从安装介质启动</li>
+<li>分区和挂载磁盘</li>
+<li>下载安装基本包到系统分区中</li>
+<li>从安装介质切换到系统</li>
+<li>完成基本的设置，并安装引导</li>
+</ol>
+
+<p>分区和安装引导的部分是比较容易出错的，但大部分情况都可以从 Arch Wiki 中找到答案。</p>
+
+<h1 id="安装准备">安装准备</h1>
+
+<ol>
+<li><p>下载 ArchLinux iso 文件</p>
+
+<p><code>https://www.archlinux.org/download/</code></p></li>
+
+<li><p>制作安装介质</p>
+
+<ol>
+<li><p>在 Mac 下安装<code>pv</code> （用来查看<code>dd</code>的进度）</p>
+
+<p><code>brew install pv</code></p></li>
+
+<li><p>找到 U 盘对应的设备</p>
+
+<p><code>diskutil list</code></p>
+
+<p>我这里是<code>/dev/disk2</code></p></li>
+
+<li><p>查看 U 盘挂载的目录</p>
+
+<p><code>df -h</code></p></li>
+
+<li><p>解除挂载</p>
+
+<p><code>diskutil unmountDisk /dev/disk2</code></p></li>
+
+<li><p>将 ISO 文件写入 U 盘</p>
+
+<p><code>sudo pv -cN source &lt; /Users/cym/Downloads/archlinux-2018.09.01-x86_64.iso | sudo dd of=/dev/rdisk2 bs=4m</code></p></li>
+</ol></li>
+</ol>
+
+<h1 id="启动">启动</h1>
+
+<ol>
+<li><p>将 U 盘插到想要安装的电脑，启动，并按<code>F2</code>设置启动顺序</p>
+
+<p>检查引导方式</p>
+
+<p><code>ls /sys/firmware/efi/efivars</code></p>
+
+<p>如果提示<code>ls: cannot access '/sys/firmware/efi/efivars': No such file or directory</code>表明是以<code>BIOS</code>方式引导，否则为以<code>EFI</code>方式引导。我是以<code>EFI</code>方式引导。以下的步骤都是以此为前提。</p></li>
+
+<li><p>更新系统时间</p>
+
+<p><code>timedatectl set-ntp true</code></p></li>
+</ol>
+
+<h1 id="分区">分区</h1>
+
+<ol>
+<li><p>查看分区情况</p>
+
+<p><code>fdisk -l</code></p>
+
+<p>可以看到输出：</p>
+
+<pre><code>root@archiso ~ # fdisk -l
+    
+Disk /dev/sda: 465.8 GiB, 500107862016 bytes, 976773168 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+Disklabel type: dos
+Disk identifier: 0x5a192013
+    
+Device     Boot     Start       End   Sectors   Size Id Type
+/dev/sda1            2048 209729535 209727488   100G  5 Extended
+/dev/sda2       209729536 500000000 290270465 138.4G  0 Empty
+/dev/sda3       500000768 976773167 476772400 227.4G 83 Linux
+    
+    
+Disk /dev/sdb: 7.5 GiB, 7990149120 bytes, 15605760 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x7e0d49cf
+    
+Device     Boot Start     End Sectors  Size Id Type
+/dev/sdb1  *        0 1169407 1169408  571M  0 Empty
+/dev/sdb2         164  131235  131072   64M ef EFI (FAT-12/16/32)
+    
+...
+    
+</code></pre>
+
+<p>这里<code>/dev/sda</code>是我的硬盘，<code>/dev/sdb</code>是我的 U 盘</p></li>
+
+<li><p>进行分区</p>
+
+<p>我是这么规划的:前 512M 用来放引导和<code>/boot</code>，再分两个区用<code>lvm</code>进行管理，方便以后平滑扩容。</p>
+
+<p>因为有旧的<code>lvm</code>的数据，我索性把整个盘都格式化了：</p>
+
+<pre><code>dd if=/dev/zero of=/dev/sdb bs=512 count=1
+</code></pre>
+
+<p>然后分区：</p>
+
+<p>a. 创建引导分区</p>
+
+<pre><code>```
+Welcome to fdisk (util-linux 2.32.1).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+# 输入 g 创建一个全新的gpt分区表
+Command (m for help): g
+Created a new GPT disklabel (GUID: 947BAFD8-FEC4-9C4C-AB6D-FA8B9CFCBC2F).
+The old dos signature will be removed by a write command.
+
+# 输入 n 创建一个新的分区
+Command (m for help): n
+# 回车使用默认值
+Partition number (1-128, default 1):
+
+# 回车使用默认值
+First sector (2048-976773134, default 2048):
+# 结束扇区填 +512M
+Last sector, +sectors or +size{K,M,G,T,P} (2048-976773134, default 976773134): +512M
+
+# 输入 p 查看分区信息
+Command (m for help): p
+Disk /dev/sda: 465.8 GiB, 500107862016 bytes, 976773168 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+Disklabel type: gpt
+Disk identifier: 947BAFD8-FEC4-9C4C-AB6D-FA8B9CFCBC2F
+
+Device     Start     End Sectors  Size Type
+/dev/sda1   2048 1050623 1048576  512M Linux filesystem
+
+Filesystem/RAID signature on partition 1 will be wiped.
+
+# 输入 t 更改分区的文件系统
+Command (m for help): t
+Selected partition 1
+# 输入 1 更改分区的类型为EFI
+Partition type (type L to list all types): 1
+Changed type of partition 'Linux filesystem' to 'EFI System'.
+
+# 输入 p 查看已生效
+Command (m for help): p
+Disk /dev/sda: 465.8 GiB, 500107862016 bytes, 976773168 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+Disklabel type: gpt
+Disk identifier: 947BAFD8-FEC4-9C4C-AB6D-FA8B9CFCBC2F
+
+Device     Start     End Sectors  Size Type
+/dev/sda1   2048 1050623 1048576  512M EFI System
+
+Filesystem/RAID signature on partition 1 will be wiped.
+
+# 输入 w 确认修改（在输入 w 之前前面所有的修改都不会真正写入磁盘，输入 w 后操作就生效且不可逆）
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+# 查看分区信息
+root@archiso ~ # fdisk -l
+Disk /dev/sda: 465.8 GiB, 500107862016 bytes, 976773168 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+Disklabel type: gpt
+Disk identifier: 947BAFD8-FEC4-9C4C-AB6D-FA8B9CFCBC2F
+
+Device     Start     End Sectors  Size Type
+/dev/sda1   2048 1050623 1048576  512M EFI System
+
+...
+
+# 格式化
+root@archiso ~ # mkfs.fat -F32 /dev/sda1
+mkfs.fat 4.1 (2017-01-24)
+
+```
+</code></pre>
+
+<p>b. 创建根分区</p>
+
+<pre><code>我这里用了`lvm`,按照上述类似的步骤（输入 p）创建两个分区（`/dev/sda2`和`/dev/sda3`),然后创建物理卷（`pv`),卷组（`vg`),逻辑卷（`lv`),然后格式化逻辑卷，把根分区(`/`)挂载到逻辑卷上面
+
+```
+# 创建分区 /dev/sda2 和 /dev/sda3
+# 参考上一步
+
+# 创建物理卷
+pvcreate /dev/sda2 
+
+# 卷组名是 root
+vgcreate root /dev/sda2
+
+# 逻辑卷名是 root
+lvcreate -L 45G root -n root
+
+# 创建物理卷
+pvcreate /dev/sda3
+
+# 物理卷加入卷组
+vgextend root /dev/sda3
+
+# 格式化逻辑卷
+mkfs.ext4 /dev/mapper/root-root
+
+```
+</code></pre></li>
+</ol>
+
+<h1 id="挂载分区">挂载分区</h1>
+
+<pre><code>mount /dev/mapper/root-root /mnt`
+
+
+# 因为我是 EFI/GPT 引导方式，所以需要以下步骤
+mkdir /mnt/boot
+
+mount /dev/sda1 /mnt/boot
+</code></pre>
+
+<p>此时<code>df -h</code>可以看到：</p>
+
+<pre><code>...
+/dev/mapper/root-root   45G   53M   42G   1% /mnt
+/dev/sda1              511M  4.0K  511M   1% /mnt/boot
+...
+</code></pre>
+
+<p><code>/dev/mapper/root-root</code>是根目录</p>
+
+<p><code>/dev/sda1</code>是启动目录</p>
+
+<h1 id="选择镜像源">选择镜像源</h1>
+
+<p><code>vim /etc/pacman.d/mirrorlist</code></p>
+
+<p>在第一行加入中国的镜像源，我加的是浙大的源</p>
+
+<p><code>Server = http://mirrors.zju.edu.cn/archlinux/$repo/os/$arch</code></p>
+
+<h1 id="安装基本包">安装基本包</h1>
+
+<p><code>pacstrap /mnt base base-devel</code></p>
+
+<p>等待下载完成</p>
+
+<h1 id="检查挂载情况">检查挂载情况</h1>
+
+<p><code>cat /mnt/etc/fstab</code></p>
+
+<pre><code># Static information about the filesystems.
+# See fstab(5) for details.
+
+# &lt;file system&gt; &lt;dir&gt; &lt;type&gt; &lt;options&gt; &lt;dump&gt; &lt;pass&gt;
+# /dev/mapper/root-root UUID=82c37f98-81dc-4c34-9107-4108f6302a3b
+/dev/mapper/root-root   /           ext4        rw,relatime 0 1
+
+# /dev/sda1 UUID=BF94-56F2
+/dev/sda1               /boot       vfat        rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro   0 2
+</code></pre>
+
+<h1 id="切换到新的系统中">切换到新的系统中</h1>
+
+<p><code>arch-chroot /mnt</code></p>
+
+<h2 id="1-设置时区">1. 设置时区</h2>
+
+<pre><code>ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+hwclock --systohc
+</code></pre>
+
+<h2 id="2-安装常用包">2. 安装常用包</h2>
+
+<p><code>pacman -S vim dialog wpa_supplicant ntfs-3g networkmanager</code></p>
+
+<h2 id="3-设置语言">3. 设置语言</h2>
+
+<p><code>vim /etc/locale.gen</code></p>
+
+<p>在文件中找到<code>zh_CN.UTF-8 UTF-8</code> <code>zh_HK.UTF-8 UTF-8</code> <code>zh_TW.UTF-8 UTF-8</code> <code>en_US.UTF-8 UTF-8</code>这四行，去掉行首的<code>#</code>号，保存并退出。</p>
+
+<p><code>locale-gen</code></p>
+
+<p><code>vim /etc/locale.conf</code></p>
+
+<p>添加 <code>LANG=en_US.UTF-8</code></p>
+
+<h2 id="4-设置主机名">4. 设置主机名</h2>
+
+<p><code>vim /etc/hostname</code></p>
+
+<pre><code>127.0.0.1   localhost.localdomain   localhost
+::1     localhost.localdomain   localhost
+127.0.1.1   myhostname.localdomain  myhostname
+</code></pre>
+
+<p><code>myhostname</code>替换为自己想要的主机名</p>
+
+<h2 id="5-设置-root-密码">5. 设置 root 密码</h2>
+
+<p><code>passwd root</code></p>
+
+<h2 id="6-安装-intel-ucode">6. 安装 Intel-ucode</h2>
+
+<p><code>pacman -S intel-ucode</code></p>
+
+<h2 id="7-配置-sshd">7. 配置 sshd</h2>
+
+<p><code>pacman -S sshd</code></p>
+
+<p><code>vim /etc/ssh/sshd_conf</code></p>
+
+<p>修改<code>PermitRootLogin yes</code>项允许 root 登录</p>
+
+<p><code>systemctl restart sshd</code></p>
+
+<p>设置 sshd 开启启动</p>
+
+<p><code>systemctl enable sshd</code></p>
+
+<h2 id="8-安装bootloader">8. 安装Bootloader</h2>
+
+<p>安装相关的包：</p>
+
+<pre><code>pacman -S os-prober
+pacman -S grub efibootmgr
+</code></pre>
+
+<p>因为我把根分区挂在逻辑卷上，需要修改相关的设置，不然引导无法识别逻辑卷：</p>
+
+<p><code>vim /etc/mkinitcpio.conf</code></p>
+
+<pre><code># 在 MODULES 加入 dm_mod
+MODULES=(dm_mod ...)
+
+# 在 mkinitcpio.conf 中加入lvm的钩子扩展（hook）
+# 在 HOOKS 中 block 与 filesystem 这两项中间插入 lvm2
+HOOKS=&quot;base udev ... block lvm2 filesystems&quot;
+</code></pre>
+
+<p>部署grub,生成配置文件：</p>
+
+<pre><code>grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=grub
+grub-mkconfig -o /boot/grub/grub.cfg
+</code></pre>
+
+<h1 id="重启">重启</h1>
+
+<pre><code>exit
+reboot
+</code></pre>
+
+<p>到这里就安装完成了,第二次安装其实已经很熟练了，大概半个小时就完事。</p>
+
+<p>再装个 docker，常见的软件都可以用 docker 来跑，这里就先不详细展开了。</p>
+
+<h1 id="参考链接">参考链接</h1>
+
+<p><a href="https://www.viseator.com/2017/05/17/arch_install/">https://www.viseator.com/2017/05/17/arch_install/</a></p>
+
+<p><a href="http://wiki.archlinux.org/">http://wiki.archlinux.org/</a></p>
+
+<p><a href="https://wiki.archlinux.org/index.php/Netctl_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#.E5.90.AF.E5.8A.A8.E9.85.8D.E7.BD.AE.E6.96.87.E4.BB.B6">https://wiki.archlinux.org/index.php/Netctl_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#.E5.90.AF.E5.8A.A8.E9.85.8D.E7.BD.AE.E6.96.87.E4.BB.B6</a></p>
+
+<h1 id="一些常用到的命令">一些常用到的命令</h1>
+
+<h2 id="1-命令行下弹出usb设备">1. 命令行下弹出usb设备：</h2>
+
+<pre><code>```
+udisksctl unmount -b /dev/sdb1
+udisksctl power-off -b /dev/sdb
+```
+</code></pre>
+
+<h2 id="2-挂载iso">2. 挂载iso</h2>
+
+<p><code>sudo mount -o loop sth.iso /mnt/iso</code></p>
+
+<h2 id="3-通过特定网卡搜索-wi-fi">3. 通过特定网卡搜索 Wi-Fi</h2>
+
+<p><code>iwlist [interface] scan | less</code></p>
+
+<h2 id="4-设置笔记本合盖不休眠">4. 设置笔记本合盖不休眠</h2>
+
+<p><code>vim /etc/systemd/logind.conf</code></p>
+
+<p>将<code>#HandleLidSwitch=suspend</code>改成<code>HandleLidSwitch=ignore</code></p>
+
+<p>重启<code>systemd-logind</code>服务：</p>
+
+<p><code>systemctl restart systemd-logind</code></p>
+
+<h2 id="5-调整屏幕亮度">5. 调整屏幕亮度</h2>
+
+<p><code>echo 100 &gt; /sys/class/backlight/intel_backlight/brightness</code></p>
+
+<h2 id="6-设置开机自动连接-wi-fi">6. 设置开机自动连接 Wi-Fi</h2>
+
+<p>安装<code>netctl</code> Wi-Fi 管理工具：</p>
+
+<p><code>pacman -S dialog wpa_supplicant netctl wireless_tools wpa_actiond</code></p>
+
+<p>找到当前 Wi-Fi 的配置文件，我这里是<code>wlp2s0-303</code></p>
+
+<p><code>ls /etc/netctl</code></p>
+
+<p>设置开机启动服务：</p>
+
+<p><code>netctl enable wlp2s0-303</code></p>
+
+<h1 id="一点总结">一点总结</h1>
+
+<ol>
+<li><p>Linux 是很自由的，基本上你想到的问题都会有相关的文档和软件包。（如果找不到解决方案，理论上也可以自己写代码解决，只不过 Linux 社区发展这么久的，常见的问题都有前人做好，只需要你学会使用搜索引擎主动寻求）</p></li>
+
+<li><p>磁盘分区还是有一定风险的，不熟练的话总是不敢下手，很多操作实际上是不可逆的。必须得清楚知道自己在干嘛，敲起命令来才放心。</p></li>
+
+<li><p>“一切皆文件”的 UNIX 思想很有意思。</p></li>
+</ol>
+
+    </div>
+
+    
+    
+<div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">cym</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">2018-09-09</span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">许可协议</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></span>
+  </p>
+</div>
+
+    
+    
+
+    <footer class="post-footer">
+      <div class="post-tags">
+          
+          <a href="/tags/linux/">Linux</a>
+          
+          <a href="/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+          
+          <a href="/tags/cli/">CLI</a>
+          
+        </div>
+
+      
+      <nav class="post-nav">
+        
+        
+          <a class="next" href="/post/evaluation_strategy/">
+            <span class="next-text nav-default">编程语言的求值策略</span>
+            <span class="prev-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  
+
+  
+
+  
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bombcoder@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/gobomb" class="iconfont icon-github" title="github"></a>
+  <a href="https://gobomb.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    
+      2017 - 
+    2018
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">cym</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script>
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.min.js?v=2.7.2"></script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    });
+  </script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-112443219-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>

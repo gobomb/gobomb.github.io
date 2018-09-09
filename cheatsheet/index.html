@@ -17,7 +17,7 @@
 
 
 <meta name="author" content="cym" />
-  <meta name="description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &amp;quot;*.log&amp;quot; -print ubuntu（桌" />
+  <meta name="description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d string 和 int 转换 //string到int int,err:=strconv.Atoi(string) //string到int64 int64, err := strconv.ParseInt(string, 10, 64) //i" />
 
   <meta name="keywords" content="Golang, backend, DevOps" />
 
@@ -48,7 +48,7 @@
 <link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
 
 <meta property="og:title" content="Cheatsheet" />
-<meta property="og:description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &quot;*.log&quot; -print ubuntu（桌" />
+<meta property="og:description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d string 和 int 转换 //string到int int,err:=strconv.Atoi(string) //string到int64 int64, err := strconv.ParseInt(string, 10, 64) //i" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://gobomb.github.io/cheatsheet/" />
 
@@ -68,17 +68,17 @@
 
 
 <meta itemprop="name" content="Cheatsheet">
-<meta itemprop="description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &quot;*.log&quot; -print ubuntu（桌">
+<meta itemprop="description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d string 和 int 转换 //string到int int,err:=strconv.Atoi(string) //string到int64 int64, err := strconv.ParseInt(string, 10, 64) //i">
 
 
 <meta itemprop="dateModified" content="2018-03-18T14:02:01&#43;08:00" />
-<meta itemprop="wordCount" content="799">
+<meta itemprop="wordCount" content="857">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Cheatsheet"/>
-<meta name="twitter:description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &quot;*.log&quot; -print ubuntu（桌"/>
+<meta name="twitter:description" content="Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d string 和 int 转换 //string到int int,err:=strconv.Atoi(string) //string到int64 int64, err := strconv.ParseInt(string, 10, 64) //i"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -166,6 +166,18 @@
 <li><p>go get 只下载不安装：</p>
 
 <p><code>go get -d</code></p></li>
+
+<li><p>string 和 int 转换</p>
+
+<pre><code class="language-go">//string到int  
+int,err:=strconv.Atoi(string)  
+//string到int64  
+int64, err := strconv.ParseInt(string, 10, 64)  
+//int到string  
+string:=strconv.Itoa(int)  
+//int64到string  
+string:=strconv.FormatInt(int64,10)  
+</code></pre></li>
 </ol>
 
 <h2 id="linux">Linux</h2>
