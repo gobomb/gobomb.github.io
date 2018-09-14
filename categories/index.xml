@@ -1,14 +1,41 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on Cym&#39;s blog</title>
+    <title>Categories on Present Day, Present Time</title>
     <link>https://gobomb.github.io/categories/</link>
-    <description>Recent content in Categories on Cym&#39;s blog</description>
+    <description>Recent content in Categories on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     
 	<atom:link href="https://gobomb.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>总结</title>
+      <link>https://gobomb.github.io/categories/%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Sun, 31 Dec 2017 20:48:34 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/categories/%E6%80%BB%E7%BB%93/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>技术文章</title>
+      <link>https://gobomb.github.io/categories/%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/</link>
+      <pubDate>Thu, 25 Jan 2018 17:09:03 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/categories/%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>记录</title>
+      <link>https://gobomb.github.io/categories/%E8%AE%B0%E5%BD%95/</link>
+      <pubDate>Sun, 09 Sep 2018 16:22:20 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/categories/%E8%AE%B0%E5%BD%95/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>
