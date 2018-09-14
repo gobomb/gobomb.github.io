@@ -196,7 +196,7 @@
 
 h1=location.href;
 h2=id.substr(h1.lastIndexOf('/', h1.lastIndexOf('/') - 1)+1 );
-h3=h2.substr(0,h2.length-1);
+const h3=h2.substr(0,h2.length-1);
 
 var gitment = new Gitment({
   id: h3, // 可选。默认为 location.href
