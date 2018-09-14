@@ -193,8 +193,13 @@
 <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
 <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
 <script>
+
+h1=location.href;
+h2=id.substr(h1.lastIndexOf('/', h1.lastIndexOf('/') - 1)+1 );
+h3=h2.substr(0,h2.length-1);
+
 var gitment = new Gitment({
-  id: 'location.href', // 可选。默认为 location.href
+  id: h3, // 可选。默认为 location.href
   owner: 'gobomb',
   repo: 'gobomb.github.io',
   oauth: {
