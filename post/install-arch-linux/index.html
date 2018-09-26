@@ -52,14 +52,14 @@
 <meta property="og:description" content="以及一些常用命令的记录" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://gobomb.github.io/post/install-arch-linux/" /><meta property="article:published_time" content="2018-09-09T16:22:20&#43;08:00"/>
-<meta property="article:modified_time" content="2018-09-09T16:22:20&#43;08:00"/>
+<meta property="article:modified_time" content="2018-09-26T00:00:00&#43;00:00"/>
 <meta itemprop="name" content="Arch Linux 安装记录">
 <meta itemprop="description" content="以及一些常用命令的记录">
 
 
 <meta itemprop="datePublished" content="2018-09-09T16:22:20&#43;08:00" />
 <meta itemprop="dateModified" content="2018-09-09T16:22:20&#43;08:00" />
-<meta itemprop="wordCount" content="2629">
+<meta itemprop="wordCount" content="2859">
 
 
 
@@ -150,7 +150,8 @@
               <a href="/categories/%E8%AE%B0%E5%BD%95/"> 记录 </a>
             
           </div>
-        
+        <span class="more-meta"> 2859 words </span>
+        <span class="more-meta"> 6 mins read </span>
         
       </div>
     </header>
@@ -330,8 +331,7 @@ Device     Boot Start     End Sectors  Size Id Type
 
 <p>a. 创建引导分区</p>
 
-<pre><code>```
-Welcome to fdisk (util-linux 2.32.1).
+<pre><code>Welcome to fdisk (util-linux 2.32.1).
 Changes will remain in memory only, until you decide to write them.
 Be careful before using the write command.
 
@@ -408,17 +408,37 @@ Device     Start     End Sectors  Size Type
 # 格式化
 root@archiso ~ # mkfs.fat -F32 /dev/sda1
 mkfs.fat 4.1 (2017-01-24)
-
-```
 </code></pre>
 
 <p>b. 创建根分区</p>
 
-<pre><code>我这里用了`lvm`,按照上述类似的步骤（输入 p）创建两个分区（`/dev/sda2`和`/dev/sda3`),然后创建物理卷（`pv`),卷组（`vg`),逻辑卷（`lv`),然后格式化逻辑卷，把根分区(`/`)挂载到逻辑卷上面
+<p>我这里用了<code>lvm</code>,按照上述类似的步骤（输入 p）创建两个分区（<code>/dev/sda2</code>和<code>/dev/sda3</code>),然后创建物理卷（<code>pv</code>),卷组（<code>vg</code>),逻辑卷（<code>lv</code>),然后格式化逻辑卷，把根分区(<code>/</code>)挂载到逻辑卷上面</p>
 
-```
-# 创建分区 /dev/sda2 和 /dev/sda3
-# 参考上一步
+<pre><code># 创建分区 /dev/sda2 和 /dev/sda3
+# 以创建 /dev/sda2 为例：
+fdisk /dev/sda
+# 输入 n
+# 回车（分区号使用默认值2）
+# 回车（起始扇区使用默认值）
+# 输入 +50G （结束扇区设置 +50G）
+# 输入 w 确认生效
+# 输入 q 退出
+
+# /dev/sda3 同理，分200G
+
+# 此时分区信息如下：
+$ fdisk -l
+Disk /dev/sda: 465.8 GiB, 500107862016 bytes, 976773168 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+Disklabel type: gpt
+Disk identifier: 726CADDE-3C28-F747-BAF1-F91A0F82934B
+
+Device         Start       End   Sectors  Size Type
+/dev/sda1       2048   1050623   1048576  512M EFI System
+/dev/sda2    1050624 105908223 104857600   50G Linux filesystem
+/dev/sda3  105908224 525338623 419430400  200G Linux filesystem
 
 # 创建物理卷
 pvcreate /dev/sda2 
@@ -438,7 +458,25 @@ vgextend root /dev/sda3
 # 格式化逻辑卷
 mkfs.ext4 /dev/mapper/root-root
 
-```
+# 现在分区信息如下
+$ fdisk -l
+Disk /dev/sda: 465.8 GiB, 500107862016 bytes, 976773168 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+Disklabel type: gpt
+Disk identifier: 726CADDE-3C28-F747-BAF1-F91A0F82934B
+
+Device         Start       End   Sectors  Size Type
+/dev/sda1       2048   1050623   1048576  512M EFI System
+/dev/sda2    1050624 105908223 104857600   50G Linux filesystem
+/dev/sda3  105908224 525338623 419430400  200G Linux filesystem
+
+
+Disk /dev/mapper/root-root: 45 GiB, 48318382080 bytes, 94371840 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
 </code></pre></li>
 </ol>
 
@@ -601,11 +639,9 @@ reboot
 
 <h2 id="1-命令行下弹出usb设备">1. 命令行下弹出usb设备：</h2>
 
-<pre><code>```
-pacman -S udisks2
+<pre><code>pacman -S udisks2
 udisksctl unmount -b /dev/sdb1
 udisksctl power-off -b /dev/sdb
-```
 </code></pre>
 
 <h2 id="2-挂载iso">2. 挂载iso</h2>
@@ -650,8 +686,6 @@ udisksctl power-off -b /dev/sdb
 <li><p>Linux 是很自由的，基本上你想到的问题都会有相关的文档和软件包。（如果找不到解决方案，理论上也可以自己写代码解决，只不过 Linux 社区发展这么久的，常见的问题都有前人做好，只需要你学会使用搜索引擎主动寻求）</p></li>
 
 <li><p>磁盘分区还是有一定风险的，不熟练的话总是不敢下手，很多操作实际上是不可逆的。必须得清楚知道自己在干嘛，敲起命令来才放心。</p></li>
-
-<li><p>“一切皆文件”的 UNIX 思想很有意思。</p></li>
 </ol>
 
     </div>
@@ -664,7 +698,7 @@ udisksctl power-off -b /dev/sdb
   </p>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
-    <span class="item-content">2018-09-09</span>
+    <span class="item-content">2018-09-26</span>
   </p>
   
   <p class="copyright-item">
