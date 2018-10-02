@@ -26,7 +26,7 @@
       <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
       
       <guid>https://gobomb.github.io/cheatsheet/</guid>
-      <description>Cheatsheet Go 可以使用 go tool vet -shadow you_file.go 检查幽灵变量 go get 只下载不安装： go get -d string 和 int 转换 //string到int int,err:=strconv.Atoi(string) //string到int64 int64, err := strconv.ParseInt(string, 10, 64) //i</description>
+      <description>Cheatsheet Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &amp;quot;*.log&amp;quot; ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制</description>
     </item>
     
     <item>
