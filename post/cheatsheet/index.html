@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Golang 自带的单元测试 - Present Day, Present Time</title>
+  <title>Cheat Sheet - Present Day, Present Time</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,8 +16,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="gobomb" /><meta name="description" content="了解一下 Goalng 的测试" />
-<meta name="keywords" content="golang" />
+<meta name="author" content="gobomb" /><meta name="description" content="速查表。新条目更新到评论" />
+<meta name="keywords" content="cheatsheet" />
 
 
 
@@ -28,7 +28,7 @@
 <meta name="generator" content="Hugo 0.49-DEV" />
 
 
-<link rel="canonical" href="https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/" />
+<link rel="canonical" href="https://gobomb.github.io/post/cheatsheet/" />
 
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -48,25 +48,25 @@
 
 
 
-<meta property="og:title" content="Golang 自带的单元测试" />
-<meta property="og:description" content="了解一下 Goalng 的测试" />
+<meta property="og:title" content="Cheat Sheet" />
+<meta property="og:description" content="速查表。新条目更新到评论" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/" /><meta property="article:published_time" content="2017-11-06T16:52:19&#43;08:00"/>
-<meta property="article:modified_time" content="2018-01-01T00:00:00&#43;00:00"/>
-<meta itemprop="name" content="Golang 自带的单元测试">
-<meta itemprop="description" content="了解一下 Goalng 的测试">
+<meta property="og:url" content="https://gobomb.github.io/post/cheatsheet/" /><meta property="article:published_time" content="2018-03-18T14:02:01&#43;08:00"/>
+<meta property="article:modified_time" content="2018-10-02T00:00:00&#43;00:00"/>
+<meta itemprop="name" content="Cheat Sheet">
+<meta itemprop="description" content="速查表。新条目更新到评论">
 
 
-<meta itemprop="datePublished" content="2017-11-06T16:52:19&#43;08:00" />
-<meta itemprop="dateModified" content="2017-11-06T16:52:19&#43;08:00" />
-<meta itemprop="wordCount" content="972">
+<meta itemprop="datePublished" content="2018-03-18T14:02:01&#43;08:00" />
+<meta itemprop="dateModified" content="2018-03-18T14:02:01&#43;08:00" />
+<meta itemprop="wordCount" content="976">
 
 
 
-<meta itemprop="keywords" content="golang,测试," />
+<meta itemprop="keywords" content="linux,vim,golang,git,cli,cheatsheet,运维," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Golang 自带的单元测试"/>
-<meta name="twitter:description" content="了解一下 Goalng 的测试"/>
+<meta name="twitter:title" content="Cheat Sheet"/>
+<meta name="twitter:description" content="速查表。新条目更新到评论"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -137,16 +137,16 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">Golang 自带的单元测试</h1>
+      <h1 class="post-title">Cheat Sheet</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 2017-11-06 </span>
+        <span class="post-time"> 2018-03-18 </span>
         <div class="post-category">
             
               <a href="/categories/%E8%AE%B0%E5%BD%95/"> 记录 </a>
             
           </div>
-        <span class="more-meta"> 972 words </span>
+        <span class="more-meta"> 976 words </span>
         <span class="more-meta"> 2 mins read </span>
         
       </div>
@@ -162,13 +162,10 @@
 <ul>
 <li>
 <ul>
-<li><a href="#为什么要写单元测试">为什么要写单元测试</a></li>
-<li><a href="#怎么写单元测试">怎么写单元测试</a>
-<ul>
-<li><a href="#单元测试">单元测试</a></li>
-<li><a href="#性能-压力-测试">性能(压力)测试：</a></li>
-<li><a href="#参考文章">参考文章</a></li>
-</ul></li>
+<li><a href="#linux">Linux</a></li>
+<li><a href="#数据库">数据库</a></li>
+<li><a href="#git">Git</a></li>
+<li><a href="#go">Go</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -182,140 +179,172 @@
     <div class="post-content">
       
 
-<h2 id="为什么要写单元测试">为什么要写单元测试</h2>
+<h2 id="linux">Linux</h2>
 
-<p>以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息。实际上重复性的工作很多，这一部分是可以用单元测试来做的。</p>
+<ol>
+<li><p>安装 deb 文件：</p>
 
-<p>另外，当项目比较大的时候，一般都是把项目分割成几个模块来写的。可以分别保证各个模块的正确性，最后再把各个项目组合起来。这时候也需要单元测试，增强可维护性。</p>
+<p><code>sudo dpkg -i [name].deb</code></p>
 
-<p>人的记忆力和思考能力毕竟是有限的，并不一定能马上想到边界条件和 bug 可能出现的地方，当代码发生更改，边界条件可能就改变了，程序可能会跑不通，这时跑一下测试代码，可以更快发现问题。</p>
+<p><code>sudo apt-get install -f</code> （修复依赖关系）</p></li>
 
-<p>测试保证程序是可运行的，运行结果是正确的，使问题及早暴露，便于问题的定位解决。而性能测试则关注程序在<strong>高并发</strong>的情况下的稳定性。</p>
+<li><p>linux 查找文件</p>
 
-<p>单元测试也可以方便读代码的人读懂，通过测试代码可以更快了解这个项目到底是干嘛的、该如何用。</p>
+<p><code>find [path] -name &quot;*.log&quot;</code></p></li>
 
-<h2 id="怎么写单元测试">怎么写单元测试</h2>
+<li><p>ubuntu（桌面版） 在终端输入<code>xkill</code>，鼠标变成<code>x</code>，点击 GUI 程序，可强制关闭之</p></li>
 
-<h3 id="单元测试">单元测试</h3>
+<li><p>调用自己定义的编辑器来编辑当前命令行:</p>
 
-<ul>
-<li><p>go语言自己有一个轻量级的测试框架 <code>testing</code>和命令<code>go test</code>,可用来进行单元测试和性能测试。</p></li>
+<p><code>ctrl-x ctrl-e</code></p>
 
-<li><p>测试文件用 <code>xxx_test.go</code>命名，测试函数命名为<code>TestXxx</code>或<code>Test_Xxx</code></p></li>
+<p>设置自己的默认编辑器：</p>
 
-<li><p>在终端中输入 <code>go test</code>，将对当前目录下的所有<code>xxx_test.go</code>文件进行编译并自动运行测试。</p></li>
+<p><code>export EDITOR=vi</code></p></li>
 
-<li><p>测试某个文件，要带上被测试的原文件</p></li>
-</ul>
+<li><p>shell 脚本报错：<code>... /bin/sh^M: bad interpreter: No such file or directory</code></p>
 
-<p>&ensp;&emsp;&emsp;<code>go test xxx.go xxx_test.go
-</code></p>
+<p>解决：</p>
 
-<ul>
-<li><p>测试某个方法:<code>go test -run='Test_Xxx'</code></p></li>
+<p><code>vim [name.sh]</code></p>
 
-<li><p><code>go  test -v</code> 则输出通过的测试函数信息</p></li>
-</ul>
+<p><code>:set ff</code> 查看文件格式，若看到输出<code>fileformat=dos</code>，可<code>:set ff=unix</code>修改为 unix 格式</p></li>
 
-<p>如对以下代码进行测试：</p>
+<li><p>本地文件传输到远程机器</p>
 
-<pre><code class="language-go">package test
+<p><code>scp -P [port] /path/to/source [user]@[ip]:/path/to/target</code></p></li>
 
-func Fibonacci(n int) int{
-	if n==1{
-		return 1
-	}else if n==0{
-		return 1
-	}
-	return Fibonacci(n-1)+Fibonacci(n-2)
-}
+<li><p>不挂断地运行命令</p>
 
-</code></pre>
+<p><code>nohup [command] [arg..] [&amp;]</code></p>
 
-<p>测试代码为：</p>
+<p>例如：<code>nohup hugo server  --buildDrafts &gt;&gt; hugo.log 2&gt;&amp;1 &amp;</code> 后台运行 hugo，将标准输出和标准错误重定向到 hugo.log 中，该命令将返回进程号：<code>[1] 24102</code>。</p>
 
-<pre><code class="language-go">package test
+<p>使用<code>jobs</code>命令可以看到该后台进程（当前终端有效）：<code>[1]  + running    nohup hugo server --buildDrafts &gt;&gt; hugo.log 2&gt;&amp;1</code></p>
 
-import &quot;testing&quot;
+<p>使用<code>fg %1</code>（%1 为 jobs 编号而非 PID）可以使后台作业切换到前台</p></li>
+</ol>
 
-func TestFibonacci5(t *testing.T) {
-	e:=Fibonacci(5)
-	if e!= 8{
-		t.Fail()
-	}else{
-		t.Log(&quot;ok&quot;)
-	}
-}
+<h2 id="数据库">数据库</h2>
 
-func TestFibonacci8(t *testing.T) {
-	e:=Fibonacci(8)
-	if e!= 34{
-		t.Fail()
-	}else{
-		t.Log(&quot;ok&quot;)
-	}
-}
+<ol>
+<li><p>mongo shell 查询 collections</p>
 
-</code></pre>
+<p><code>db.[collection].find();</code></p>
 
-<h3 id="性能-压力-测试">性能(压力)测试：</h3>
+<p>删除某一条文档：</p>
 
-<ul>
-<li><p>性能测试的函数命名为<code>BenchmarkXxx</code></p></li>
+<p><code>db.[collection].remove({&quot;[key]&quot;:&quot;[value]&quot;});</code></p></li>
 
-<li><p>函数格式为<code>func BenchmarkXXX(b *testing.B) { ... }</code></p></li>
+<li><p>cockroachDB 导入 sql 脚本：</p>
 
-<li><p><code>go test</code>默认不会执行压力测试的函数，要执行压力测试需要带上参数<code>-bench</code>指定测试函数，例如<code>go test -bench=.*</code>表示测试全部的压力测试函数。</p></li>
+<p><code>cat /path/to/schema.sql | cockroach sql -d [db] -u [user] --insecure</code></p></li>
+</ol>
 
-<li><p>文件名也必须以<code>_test.go</code>结尾</p></li>
-</ul>
+<h2 id="git">Git</h2>
 
-<p>一个示例压测代码：</p>
+<ol>
+<li><p>改变最近一次提交：</p>
 
-<pre><code class="language-go">package test
+<p>修改并<code>git add/rm [file]</code>后，<code>git commit --amend</code>，也可以修改 commit 说明</p></li>
 
-import (
-	&quot;testing&quot;
-)
+<li><p>落后远程分支几个版本，强行回退：</p>
 
-func Benchmark_Fibonacci(b *testing.B) {
-	for i := 0; i &lt; b.N; i++ { //use b.N for looping
-		Fibonacci( 20)
+<ol>
+<li><code>git reset [commitID]</code>，到上个版本</li>
+<li><code>git stash</code>，暂存修改</li>
+<li><code>git push --force</code>, 强制push,远程的最新的一次commit被删除</li>
+<li><code>git stash pop</code>，释放暂存的修改，开始修改代码</li>
+<li><code>git add .</code>-&gt; <code>git commit -m &quot;massage&quot;</code> -&gt; <code>git push</code></li>
+</ol></li>
 
-	}
-	//b.Log(b.N)
+<li><p>从某个 commit 中复制某个文件到暂存区:</p>
 
-}
+<p><code>git reset [commit-hash] file.txt</code></p>
 
-func Benchmark_TimeConsumingFunction(b *testing.B) {
-	b.StopTimer() //调用该函数停止压力测试的时间计数
+<p><code>git add file.txt</code> 的逆操作，可用来取消暂存：</p>
 
-	//做一些初始化的工作,例如读取文件数据,数据库连接之类的,
-	//这样这些时间不影响我们测试函数本身的性能
-	num:=35
+<p><code>git reset (HEAD) file.txt</code></p></li>
 
-	b.StartTimer() //重新开始时间
-	for i := 0; i &lt; b.N; i++ {
-		Fibonacci( num)
-	}
-}
-</code></pre>
+<li><p>git 的三棵树：</p>
 
-<pre><code>go test -test.bench=&quot;Benchmark_Fibonacci&quot;
+<table>
+<thead>
+<tr>
+<th>树</th>
+<th>用途</th>
+</tr>
+</thead>
 
-Benchmark_Fibonacci-4              30000             51647 ns/op
-PASS
-ok      projects/test   2.073s
-</code></pre>
+<tbody>
+<tr>
+<td>HEAD</td>
+<td>上一次提交的快照，下一次提交的父结点</td>
+</tr>
 
-<p>以上输出说明<code>Benchmark_Fibonacci</code>执行了30000次，每次的执行平均时间是51647纳秒。</p>
+<tr>
+<td>Index</td>
+<td>预期的下一次提交的快照（也就是暂存区）</td>
+</tr>
 
-<h3 id="参考文章">参考文章</h3>
+<tr>
+<td>Working Directory</td>
+<td>沙盒</td>
+</tr>
+</tbody>
+</table></li>
 
-<ul>
-<li><a href="https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/11.3.md">https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/11.3.md</a><br></li>
-<li><a href="http://www.cnblogs.com/yjf512/archive/2013/01/22/2870927.html">http://www.cnblogs.com/yjf512/archive/2013/01/22/2870927.html</a><br></li>
-</ul>
+<li><p><code>git reset</code> 命令会以特定的顺序重写这三棵树，在你指定以下选项时停止：</p>
+
+<ol>
+<li>移动 HEAD 分支的指向 （若指定了 <code>--soft</code>，则到此停止）</li>
+<li>使索引看起来像 HEAD （若未指定 <code>--hard</code>，则到此停止；即指定 <code>--mixed</code> 或默认情况）</li>
+<li>使工作目录看起来像索引 (指定<code>--hard</code>，危险操作)</li>
+</ol></li>
+
+<li><p>查看 git 远程仓库 URL：</p>
+
+<p><code>git remote -v</code></p></li>
+
+<li><p>git 查看某个文件的修改历史</p>
+
+<ol>
+<li><p><code>git log -p [filename]</code>
+查看文件的每一个详细的历史修改</p></li>
+
+<li><p><code>git log --pretty=oneline [filename]</code>
+每一行显示一个提交，先显示哈希码，再显示提交说明。</p></li>
+
+<li><p><code>git blame [filename]</code>
+查看文件的每一行是哪个提交最后修改的。</p></li>
+</ol></li>
+
+<li><p><code>git reflog</code>:</p>
+
+<p>当你 (在一个仓库下) 工作时，Git 会在你每次修改了 HEAD 时悄悄地将改动记录下来。当你提交或修改分支时，reflog 就会更新。</p></li>
+</ol>
+
+<h2 id="go">Go</h2>
+
+<ol>
+<li><p>可以使用 <code>go tool vet -shadow you_file.go</code> 检查幽灵变量</p></li>
+
+<li><p>go get 只下载不安装：</p>
+
+<p><code>go get -d</code></p></li>
+
+<li><p>string 和 int 转换</p>
+
+<pre><code class="language-go">//string到int  
+int,err:=strconv.Atoi(string)  
+//string到int64  
+int64, err := strconv.ParseInt(string, 10, 64)  
+//int到string  
+string:=strconv.Itoa(int)  
+//int64到string  
+string:=strconv.FormatInt(int64,10)  
+</code></pre></li>
+</ol>
 
     </div>
 
@@ -327,7 +356,7 @@ ok      projects/test   2.073s
   </p>
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
-    <span class="item-content">2018-01-01</span>
+    <span class="item-content">2018-10-02</span>
   </p>
   
   <p class="copyright-item">
@@ -342,23 +371,33 @@ ok      projects/test   2.073s
     <footer class="post-footer">
       <div class="post-tags">
           
+          <a href="/tags/linux/">linux</a>
+          
+          <a href="/tags/vim/">vim</a>
+          
           <a href="/tags/golang/">golang</a>
           
-          <a href="/tags/%E6%B5%8B%E8%AF%95/">测试</a>
+          <a href="/tags/git/">git</a>
+          
+          <a href="/tags/cli/">cli</a>
+          
+          <a href="/tags/cheatsheet/">cheatsheet</a>
+          
+          <a href="/tags/%E8%BF%90%E7%BB%B4/">运维</a>
           
         </div>
 
       
       <nav class="post-nav">
         
-          <a class="prev" href="/post/high-concurrency-model/">
+          <a class="prev" href="/post/install-arch-linux/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">并发模型比较</span>
+            <span class="prev-text nav-default">Arch Linux 安装记录</span>
             <span class="prev-text nav-mobile">Prev</span>
           </a>
         
-          <a class="next" href="/post/make-a-blog-by-hugo-and-github-page/">
-            <span class="next-text nav-default">用 Hugo 和 GitHub Page 搭建博客</span>
+          <a class="next" href="/post/evaluation_strategy/">
+            <span class="next-text nav-default">编程语言的求值策略</span>
             <span class="next-text nav-mobile">Next</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -374,8 +413,8 @@ ok      projects/test   2.073s
     <script src="/lib/gitalk/gitalk-1.2.2.min.js"></script>
   <script type="text/javascript">
   var gitalk = new Gitalk({
-    id: '2017-11-06 16:52:19 \x2b0800 CST',
-    title: 'Golang 自带的单元测试',
+    id: '2018-03-18 14:02:01 \x2b0800 CST',
+    title: 'Cheat Sheet',
     clientID: '4957ab69e121b509d750',
     clientSecret: '4f959986f787cd85c4dfa8470921d8eb1900c622',
     repo: 'gobomb.github.io',

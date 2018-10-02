@@ -21,6 +21,15 @@
     </item>
     
     <item>
+      <title>Cheat Sheet</title>
+      <link>https://gobomb.github.io/post/cheatsheet/</link>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/cheatsheet/</guid>
+      <description>Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &amp;quot;*.log&amp;quot; ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关</description>
+    </item>
+    
+    <item>
       <title>交叉编译 V2Ray</title>
       <link>https://gobomb.github.io/post/cross-complie-v2ray/</link>
       <pubDate>Fri, 29 Dec 2017 17:17:27 +0800</pubDate>

@@ -10,8 +10,8 @@
   </url>
   
   <url>
-    <loc>https://gobomb.github.io/cheatsheet/</loc>
-    <lastmod>2018-03-18T14:02:01+08:00</lastmod>
+    <loc>https://gobomb.github.io/post/cheatsheet/</loc>
+    <lastmod>2018-10-02T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -128,8 +128,29 @@
   </url>
   
   <url>
+    <loc>https://gobomb.github.io/tags/cheatsheet/</loc>
+    <lastmod>2018-10-02T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://gobomb.github.io/tags/cli/</loc>
+    <lastmod>2018-10-02T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://gobomb.github.io/tags/git/</loc>
+    <lastmod>2018-10-02T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://gobomb.github.io/tags/golang/</loc>
-    <lastmod>2018-01-25T17:09:03+08:00</lastmod>
+    <lastmod>2018-10-02T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>
@@ -149,8 +170,22 @@
   </url>
   
   <url>
+    <loc>https://gobomb.github.io/tags/linux/</loc>
+    <lastmod>2018-10-02T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://gobomb.github.io/tags/v2ray/</loc>
     <lastmod>2018-01-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://gobomb.github.io/tags/vim/</loc>
+    <lastmod>2018-10-02T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0</priority>
   </url>

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Linux on Present Day, Present Time</title>
+    <title>linux on Present Day, Present Time</title>
     <link>https://gobomb.github.io/tags/linux/</link>
-    <description>Recent content in Linux on Present Day, Present Time</description>
+    <description>Recent content in linux on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 09 Sep 2018 16:22:20 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 18 Mar 2018 14:02:01 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Arch Linux 安装记录</title>
-      <link>https://gobomb.github.io/post/install-arch-linux/</link>
-      <pubDate>Sun, 09 Sep 2018 16:22:20 +0800</pubDate>
+      <title>Cheat Sheet</title>
+      <link>https://gobomb.github.io/post/cheatsheet/</link>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
       
-      <guid>https://gobomb.github.io/post/install-arch-linux/</guid>
-      <description>旧笔记本之前是安装着 Windows 10 的，自从工作开始使用 rMBP 之后，就闲置着。我想不如重装成 Linux 系统，当作一个私人服务器用，也可以加深一下对操作系统的理解。很</description>
+      <guid>https://gobomb.github.io/post/cheatsheet/</guid>
+      <description>Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &amp;quot;*.log&amp;quot; ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关</description>
     </item>
     
   </channel>

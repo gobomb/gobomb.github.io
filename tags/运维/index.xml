@@ -20,5 +20,14 @@
       <description>旧笔记本之前是安装着 Windows 10 的，自从工作开始使用 rMBP 之后，就闲置着。我想不如重装成 Linux 系统，当作一个私人服务器用，也可以加深一下对操作系统的理解。很</description>
     </item>
     
+    <item>
+      <title>Cheat Sheet</title>
+      <link>https://gobomb.github.io/post/cheatsheet/</link>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/cheatsheet/</guid>
+      <description>Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &amp;quot;*.log&amp;quot; ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关</description>
+    </item>
+    
   </channel>
 </rss>

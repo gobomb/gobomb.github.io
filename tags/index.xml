@@ -48,9 +48,36 @@
     </item>
     
     <item>
+      <title>cheatsheet</title>
+      <link>https://gobomb.github.io/tags/cheatsheet/</link>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/tags/cheatsheet/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cli</title>
+      <link>https://gobomb.github.io/tags/cli/</link>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/tags/cli/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>git</title>
+      <link>https://gobomb.github.io/tags/git/</link>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/tags/git/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>golang</title>
       <link>https://gobomb.github.io/tags/golang/</link>
-      <pubDate>Thu, 25 Jan 2018 17:09:03 +0800</pubDate>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
       
       <guid>https://gobomb.github.io/tags/golang/</guid>
       <description></description>
@@ -75,11 +102,29 @@
     </item>
     
     <item>
+      <title>linux</title>
+      <link>https://gobomb.github.io/tags/linux/</link>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/tags/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>v2ray</title>
       <link>https://gobomb.github.io/tags/v2ray/</link>
       <pubDate>Fri, 29 Dec 2017 17:17:27 +0800</pubDate>
       
       <guid>https://gobomb.github.io/tags/v2ray/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vim</title>
+      <link>https://gobomb.github.io/tags/vim/</link>
+      <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/tags/vim/</guid>
       <description></description>
     </item>
     
