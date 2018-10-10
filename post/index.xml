@@ -62,7 +62,7 @@
       <pubDate>Sat, 25 Nov 2017 22:13:27 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/high-concurrency-model/</guid>
-      <description>Golang 的特色之一就是 goroutine ，使得程序员进行并发编程更加方便，适合用来进行服务器编程。作为后端开发工程师，有必要了解并发编程面临的场景和常见的解决方案</description>
+      <description>Go 的特色之一就是 goroutine ，使得程序员进行并发编程更加方便，适合用来进行服务器编程。作为后端开发工程师，有必要了解并发编程面临的场景和常见的解决方案</description>
     </item>
     
     <item>
