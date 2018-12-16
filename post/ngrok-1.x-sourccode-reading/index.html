@@ -59,7 +59,7 @@
 
 <meta itemprop="datePublished" content="2018-12-17T02:08:25&#43;08:00" />
 <meta itemprop="dateModified" content="2018-12-17T02:08:25&#43;08:00" />
-<meta itemprop="wordCount" content="3504">
+<meta itemprop="wordCount" content="3505">
 
 
 
@@ -146,7 +146,7 @@
               <a href="/categories/%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/"> 技术文章 </a>
             
           </div>
-        <span class="more-meta"> 3504 words </span>
+        <span class="more-meta"> 3505 words </span>
         <span class="more-meta"> 7 mins read </span>
         
       </div>
@@ -355,25 +355,23 @@
 <li>认证</li>
 <li>建立<code>control</code>实例<code>c</code>，上面的参数<code>ctlConn</code>会被作为<code>c</code>的成员<code>c.conn</code>，<code>control</code>实例注册到<code>controlRegistry</code></li>
 
-<li><p>启动发送消息的 goroutine，用来把从<code>c.out</code>读到的消息通过<code>c.conn</code>发给客户端</p>
+<li><p>启动发送消息的 goroutine，用来把从<code>c.out</code>读到的消息通过<code>c.conn</code>发给客户端:</p>
 
-<pre><code class="language-go">go c.writer()
-</code></pre>
+<pre><code>go c.writer()
+</code></pre></li>
 
-<ol>
-<li>要求客户端发起代理连接，将控制消息写到<code>c.out</code>里，这时候<code>c.writer()</code>就会异步地读取<code>c.out</code>里的信息
-<br /></li>
-</ol>
+<li><p>要求客户端发起代理连接，将控制消息写到<code>c.out</code>里，这时候<code>c.writer()</code>就会异步地读取<code>c.out</code>里的信息</p>
 
-<pre><code class="language-go">c.out &lt;- &amp;msg.ReqProxy{}
+<pre><code>c.out &lt;- &amp;msg.ReqProxy{}
 </code></pre></li>
 
 <li><p>启动三个 goroutine：<code>c.reader()</code>负责从控制连接里读信息并写到<code>c.in</code>；<code>c.manager()</code>负责从<code>c.in</code>里读消息并做对应的操作；<code>c.stopper()</code>等待停止的信号，负责回收所有资源，包括把<code>control</code>实例从<code>conrtorl</code>池移除：<code>controlRegistry.Del(c.id)</code>等</p>
 
-<pre><code class="language-go">go c.manager()
+<pre><code>go c.manager()
 go c.reader()
 go c.stopper()  
-</code></pre>
+</code></pre></li>
+</ol>
 
 <h4 id="goroutine-和-chan-的配合">goroutine 和 chan 的配合</h4>
 
@@ -384,8 +382,7 @@ go c.stopper()
 <p>在<code>NewContorl()</code>goroutine 内，<code>msg.ReqProxy{}</code>被塞到<code>c.out</code>这个 chan 里：</p>
 
 <pre><code class="language-go">	c.out &lt;- &amp;msg.ReqProxy{}
-</code></pre></li>
-</ol>
+</code></pre>
 
 <p>在<code>c.writer()</code>goroutine 内，不断从<code>c.out</code>读，然后把读到的信息<code>m</code>写到 <code>c.conn</code>（也就是该<code>control</code>对应的控制连接）里：</p>
 
