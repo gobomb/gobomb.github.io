@@ -12,12 +12,12 @@
     
     
     <item>
-      <title>ngrok 1.X 源码解析(WIP)</title>
-      <link>https://gobomb.github.io/post/ngrok-1.x-sourccode-reading/</link>
+      <title>ngrok 源码解析</title>
+      <link>https://gobomb.github.io/post/ngrok-source-code-reading/</link>
       <pubDate>Mon, 17 Dec 2018 02:08:25 +0800</pubDate>
       
-      <guid>https://gobomb.github.io/post/ngrok-1.x-sourccode-reading/</guid>
-      <description>背景 ngrok是我第一次接触的 go 项目，也是我第一个完整阅读过源码的开源项目。一开始读代码我还是 go 语言零基础，只写过一点点 Web 后端 API，读了好</description>
+      <guid>https://gobomb.github.io/post/ngrok-source-code-reading/</guid>
+      <description>背景 ngrok是我第一个完整阅读过源码的开源项目。一开始接触这套代码我几乎还是 go 语言零基础，之前只写过一点点 Web 后端 API，后来趁着做毕业设计</description>
     </item>
     
   </channel>
