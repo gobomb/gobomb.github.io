@@ -6,10 +6,19 @@
     <description>Recent content on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 17 Dec 2018 02:08:25 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 02 Jan 2019 03:26:33 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>2018 年终总结</title>
+      <link>https://gobomb.github.io/post/2018-summarize/</link>
+      <pubDate>Wed, 02 Jan 2019 03:26:33 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/2018-summarize/</guid>
+      <description>2018 过去了，年终总结我拖到2019才写。 这一年，正式从校园进入职场。 18 年读的书特别少，小说基本不怎么读了，实在没有读小说的心境。现在能想起来的</description>
+    </item>
     
     <item>
       <title>ngrok 源码解析</title>
