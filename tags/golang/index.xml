@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>golang on Present Day, Present Time</title>
+    <title>Golang on Present Day, Present Time</title>
     <link>https://gobomb.github.io/tags/golang/</link>
-    <description>Recent content in golang on Present Day, Present Time</description>
+    <description>Recent content in Golang on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
+    <language>en-us</language>
     <lastBuildDate>Mon, 17 Dec 2018 02:08:25 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
@@ -17,7 +17,12 @@
       <pubDate>Mon, 17 Dec 2018 02:08:25 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/ngrok-source-code-reading/</guid>
-      <description>背景 ngrok是我第一个完整阅读过源码的开源项目。一开始接触这套代码我几乎还是 go 语言零基础，之前只写过一点点 Web 后端 API，后来趁着做毕业设计</description>
+      <description>背景 ngrok是我第一个完整阅读过源码的开源项目。一开始接触这套代码我几乎还是 go 语言零基础，之前只写过一点点 Web 后端 API，后来趁着做毕业设计的机会还跟着源码重新敲了一遍，按照我自己的需要小改了一下。所以我从中收获了不少东西，一直都想写一篇文章总结一下我对这套代码的理解。
+ngrok 的目的是将本地的端口反向代理到公网，让你可以通过访问公网某个服务器，经过流量转发，访问到内网的机器。这个事情你可以有不同的叫法：反向代理、端口转发（映射）、内网穿透1……原理其实不难，解决的需求也简单。
+我们个人的设备一般都在 NAT （公司、学校内网，运营商也会喜欢做 NAT）后面，不能被公网设备直接访问到。内网机器可以主动向公网发起连接，但公网却不能穿越 NAT 主动访问到内网机器。ngrok 就适合用来穿越 NAT 来临时暴露内网服务。在技术人员常聚集的社区 V2EX，经常能看到问怎么做内网穿透的月经贴。可见这个需求十分常见。
+内网穿透的工具，现在大家用的比较多的是 frp了。frp 是中国人开发的，增加了很多新的功能，使用体验也比 ngrok 好很多，社区比较活跃。ngrok 虽然出现得比较早，但 2.0 转闭源， 1.0 不再维护了，用得人也少了。但这不妨碍我们扒源码学习。
+项目结构 先来看一下 ngrok 整个项目的结构（忽略掉了一些不必要的文件）：
+. ├── ... ├── assets	// 存放 web 静态文件和 tls 文件 │ ├── ... └── src └── ngrok ├── cache	// 缓存 │ └── lru.go ├── client │ ├── cli.go	// 命令行参数定义 │ ├── config.go	// 配置文件读取 │ ├── controller.</description>
     </item>
     
     <item>
@@ -26,7 +31,25 @@
       <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/cheatsheet/</guid>
-      <description>Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &amp;quot;*.log&amp;quot; ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关</description>
+      <description>Linux  安装 deb 文件：
+sudo dpkg -i [name].deb
+sudo apt-get install -f （修复依赖关系）
+ linux 查找文件
+find [path] -name &amp;quot;*.log&amp;quot;
+ ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关闭之
+ 调用自己定义的编辑器来编辑当前命令行:
+ctrl-x ctrl-e
+设置自己的默认编辑器：
+export EDITOR=vi
+ shell 脚本报错：... /bin/sh^M: bad interpreter: No such file or directory
+解决：
+vim [name.sh]
+:set ff 查看文件格式，若看到输出fileformat=dos，可:set ff=unix修改为 unix 格式
+ 本地文件传输到远程机器
+scp -P [port] /path/to/source [user]@[ip]:/path/to/target
+ 不挂断地运行命令
+nohup [command] [arg..] [&amp;amp;]
+例如：nohup hugo server --buildDrafts &amp;gt;&amp;gt; hugo.</description>
     </item>
     
     <item>
@@ -35,7 +58,14 @@
       <pubDate>Thu, 25 Jan 2018 17:09:03 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/evaluation_strategy/</guid>
-      <description>在面试的时候遇到一个问题：“golang 的传参是按值传递还是按引用传递？”我第一反应是 go 在很多场景下传参和赋值都会发生内存的复制，同时记得 go</description>
+      <description>在面试的时候遇到一个问题：“golang 的传参是按值传递还是按引用传递？”我第一反应是 go 在很多场景下传参和赋值都会发生内存的复制，同时记得 go 里也有引用类型（map、slice、channel），就贸然给出“类似 slice 的引用类型是按引用传递的，其他是按值传递”的错误回答（正确答案是“golang 都是按值传递”）。
+这其实是与求值策略(Evaluation strategy)相关的概念。在传递参数的时候，编译器是怎么进行求值的，是否会发生内存的复制，不同的语言有自己的规定。不了解所使用的编程语言的规定，就很容易出错，也很容易写出低效率的代码。
+定义 这些概念有些抽象，从字面理解，很容易产生歧义。先尽量跳出某一种编程语言的习惯，做出一些定义，再来讨论具体语言的特定做法。了解通用的定义，对于不同的语言的规定以及为何这么规定会更加清晰。
+求值策略(Evaluation strategy)指确定编程语言中表达式的求值的一组（通常确定性的）规则。描述的是求值和传值的方式，关注的点在于，表达式在调用函数的过程中，求值的时机、值的形式的选取等问题。
+ 按值传递（Pass by value）：函数的形参是被调用时所传实参的副本。修改形参的值并不会影响实参。（发生了值的复制） 按引用传递（Pass by reference）：传递给函数的是它的实参的隐式引用（别名）而不是实参的拷贝。修改形参会改变实参。（发生了引用的复制） 按共享对象传递（Pass by sharing）：传一个共享对象的引用的副本。修改形参的值会影响实参，修改形参本身不会影响实参。（发生了地址/指针的复制）  比如传递一个a，设a的引用为rf，a的地址为ad：
+ 按值传递：a的值复制给b，函数拿到的是b的值和b的引用，和a无关。函数通过b的引用修改b，对调用者不可见。
+ （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | | 复 ↓ 制 （子函数）rf of b -&amp;gt; ad of b -&amp;gt; b:100  按引用传递：a的值没有发生复制，函数拿到的是a的引用ar，通过这个引用修改a，也对调用者可见。
+ （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | ^ 复 | | 制 ↓ | （子函数）rf of a ----—--&amp;gt;  按共享对象传递：重新构造了一个指向a的引用rf2，将a的地址复制给rf2，函数拿到的是这个rf的副本rf2，通过rf2修改a的值，对调用者可见，但如果修改引用rf2本身（使它指向别的地址），是对调用者不可见的，因为改的是副本。</description>
     </item>
     
     <item>
@@ -44,7 +74,9 @@
       <pubDate>Fri, 29 Dec 2017 17:17:27 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/cross-complie-v2ray/</guid>
-      <description>问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算</description>
+      <description>问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算单元，专用于浮点运算的处理器)，官方 Mips 版本并不支持软解浮点数运算，无法顺利运行。
+环境  目标机器：OpenWRT mipsle（32位机器，小端序） 本地机器：CentOS amd64 golang1.9  解决过程 参考官方提供的编译步骤：
+  （安装 git 和 golang 环境的步骤略去） 下载 V2Ray 源文件：go get -u v2ray.com/core/... 下载 V2Ray 扩展包：go get -u v2ray.com/ext/... 生成编译脚本： go install v2ray.com/ext/tools/build/vbuild 编译 V2Ray：$GOPATH/bin/vbuild V2Ray 程序及配置文件会被放在 $GOPATH/bin/v2ray-XXX 文件夹下（XXX 视平台不同而不同）    编译 V2Ray 至少要 go1.9 以上的版本 最新的 v2ray 源码是 go1.9 实现的，如果用 go1.8 进行编译会提示找不到“math/bits”标准库文件 unrecognized import path &amp;quot;math/bits&amp;quot; (import path does not begin with hostname) （https://github.</description>
     </item>
     
     <item>
@@ -53,7 +85,21 @@
       <pubDate>Mon, 06 Nov 2017 16:52:19 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/how-to-write-unit-testing-in-golang/</guid>
-      <description>为什么要写单元测试 以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息</description>
+      <description>为什么要写单元测试 以前写程序的时候，一般不写测试，阅读开源代码遇到测试也都是跳过不读。调试的时候一半都是手动输入测试数据，在代码里打印 log 信息。实际上重复性的工作很多，这一部分是可以用单元测试来做的。
+另外，当项目比较大的时候，一般都是把项目分割成几个模块来写的。可以分别保证各个模块的正确性，最后再把各个项目组合起来。这时候也需要单元测试，增强可维护性。
+人的记忆力和思考能力毕竟是有限的，并不一定能马上想到边界条件和 bug 可能出现的地方，当代码发生更改，边界条件可能就改变了，程序可能会跑不通，这时跑一下测试代码，可以更快发现问题。
+测试保证程序是可运行的，运行结果是正确的，使问题及早暴露，便于问题的定位解决。而性能测试则关注程序在高并发的情况下的稳定性。
+单元测试也可以方便读代码的人读懂，通过测试代码可以更快了解这个项目到底是干嘛的、该如何用。
+怎么写单元测试 单元测试  go语言自己有一个轻量级的测试框架 testing和命令go test,可用来进行单元测试和性能测试。
+ 测试文件用 xxx_test.go命名，测试函数命名为TestXxx或Test_Xxx
+ 在终端中输入 go test，将对当前目录下的所有xxx_test.go文件进行编译并自动运行测试。
+ 测试某个文件，要带上被测试的原文件
+  &amp;ensp;&amp;emsp;&amp;emsp;go test xxx.go xxx_test.go 
+ 测试某个方法:go test -run=&#39;Test_Xxx&#39;
+ go test -v 则输出通过的测试函数信息
+  如对以下代码进行测试：
+package test func Fibonacci(n int) int{ if n==1{ return 1 }else if n==0{ return 1 } return Fibonacci(n-1)+Fibonacci(n-2) }  测试代码为：
+package test import &amp;quot;testing&amp;quot; func TestFibonacci5(t *testing.</description>
     </item>
     
   </channel>

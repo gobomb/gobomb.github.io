@@ -5,7 +5,7 @@
     <link>https://gobomb.github.io/tags/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/</link>
     <description>Recent content in 编程语言 on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
+    <language>en-us</language>
     <lastBuildDate>Thu, 25 Jan 2018 17:09:03 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/tags/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/index.xml" rel="self" type="application/rss+xml" />
@@ -17,7 +17,14 @@
       <pubDate>Thu, 25 Jan 2018 17:09:03 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/evaluation_strategy/</guid>
-      <description>在面试的时候遇到一个问题：“golang 的传参是按值传递还是按引用传递？”我第一反应是 go 在很多场景下传参和赋值都会发生内存的复制，同时记得 go</description>
+      <description>在面试的时候遇到一个问题：“golang 的传参是按值传递还是按引用传递？”我第一反应是 go 在很多场景下传参和赋值都会发生内存的复制，同时记得 go 里也有引用类型（map、slice、channel），就贸然给出“类似 slice 的引用类型是按引用传递的，其他是按值传递”的错误回答（正确答案是“golang 都是按值传递”）。
+这其实是与求值策略(Evaluation strategy)相关的概念。在传递参数的时候，编译器是怎么进行求值的，是否会发生内存的复制，不同的语言有自己的规定。不了解所使用的编程语言的规定，就很容易出错，也很容易写出低效率的代码。
+定义 这些概念有些抽象，从字面理解，很容易产生歧义。先尽量跳出某一种编程语言的习惯，做出一些定义，再来讨论具体语言的特定做法。了解通用的定义，对于不同的语言的规定以及为何这么规定会更加清晰。
+求值策略(Evaluation strategy)指确定编程语言中表达式的求值的一组（通常确定性的）规则。描述的是求值和传值的方式，关注的点在于，表达式在调用函数的过程中，求值的时机、值的形式的选取等问题。
+ 按值传递（Pass by value）：函数的形参是被调用时所传实参的副本。修改形参的值并不会影响实参。（发生了值的复制） 按引用传递（Pass by reference）：传递给函数的是它的实参的隐式引用（别名）而不是实参的拷贝。修改形参会改变实参。（发生了引用的复制） 按共享对象传递（Pass by sharing）：传一个共享对象的引用的副本。修改形参的值会影响实参，修改形参本身不会影响实参。（发生了地址/指针的复制）  比如传递一个a，设a的引用为rf，a的地址为ad：
+ 按值传递：a的值复制给b，函数拿到的是b的值和b的引用，和a无关。函数通过b的引用修改b，对调用者不可见。
+ （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | | 复 ↓ 制 （子函数）rf of b -&amp;gt; ad of b -&amp;gt; b:100  按引用传递：a的值没有发生复制，函数拿到的是a的引用ar，通过这个引用修改a，也对调用者可见。
+ （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | ^ 复 | | 制 ↓ | （子函数）rf of a ----—--&amp;gt;  按共享对象传递：重新构造了一个指向a的引用rf2，将a的地址复制给rf2，函数拿到的是这个rf的副本rf2，通过rf2修改a的值，对调用者可见，但如果修改引用rf2本身（使它指向别的地址），是对调用者不可见的，因为改的是副本。</description>
     </item>
     
   </channel>

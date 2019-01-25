@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>hugo on Present Day, Present Time</title>
+    <title>Hugo on Present Day, Present Time</title>
     <link>https://gobomb.github.io/tags/hugo/</link>
-    <description>Recent content in hugo on Present Day, Present Time</description>
+    <description>Recent content in Hugo on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
+    <language>en-us</language>
     <lastBuildDate>Tue, 31 Oct 2017 16:02:19 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
@@ -17,7 +17,16 @@
       <pubDate>Tue, 31 Oct 2017 16:02:19 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/make-a-blog-by-hugo-and-github-page/</guid>
-      <description>图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。 hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。 安装</description>
+      <description>图省事，懒得花钱买域名和备案，就用 GitHub Page 来搭博客了。
+hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另一个用js写的同类工具jekyll 比较出名。
+安装和使用Hugo  如果有 Go 环境，直接在终端输入：
+go get -v github.com/spf13/hugo hugo new site /path/to/site  path/to/site是本地站点目录
+ 创建 about 页面：
+hugo new about.md  皮肤我用的是 rockrock：
+cd themes git clone https://github.com/chingli/rockrock   在本地运行  在站点根目录下运行： hugo server --theme=rockrock --buildDrafts 
+ 在浏览器访问： http://localhost:1313 
+ 这里修改 Markdown 文件可以动态更新，很方便。 
+  在 GitHub 上部署 1 在 GitHub 建一个 Repository，命名为 sidddhartha.</description>
     </item>
     
   </channel>

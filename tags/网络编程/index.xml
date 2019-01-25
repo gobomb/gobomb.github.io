@@ -5,7 +5,7 @@
     <link>https://gobomb.github.io/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/</link>
     <description>Recent content in 网络编程 on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
+    <language>en-us</language>
     <lastBuildDate>Mon, 17 Dec 2018 02:08:25 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
@@ -17,7 +17,12 @@
       <pubDate>Mon, 17 Dec 2018 02:08:25 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/ngrok-source-code-reading/</guid>
-      <description>背景 ngrok是我第一个完整阅读过源码的开源项目。一开始接触这套代码我几乎还是 go 语言零基础，之前只写过一点点 Web 后端 API，后来趁着做毕业设计</description>
+      <description>背景 ngrok是我第一个完整阅读过源码的开源项目。一开始接触这套代码我几乎还是 go 语言零基础，之前只写过一点点 Web 后端 API，后来趁着做毕业设计的机会还跟着源码重新敲了一遍，按照我自己的需要小改了一下。所以我从中收获了不少东西，一直都想写一篇文章总结一下我对这套代码的理解。
+ngrok 的目的是将本地的端口反向代理到公网，让你可以通过访问公网某个服务器，经过流量转发，访问到内网的机器。这个事情你可以有不同的叫法：反向代理、端口转发（映射）、内网穿透1……原理其实不难，解决的需求也简单。
+我们个人的设备一般都在 NAT （公司、学校内网，运营商也会喜欢做 NAT）后面，不能被公网设备直接访问到。内网机器可以主动向公网发起连接，但公网却不能穿越 NAT 主动访问到内网机器。ngrok 就适合用来穿越 NAT 来临时暴露内网服务。在技术人员常聚集的社区 V2EX，经常能看到问怎么做内网穿透的月经贴。可见这个需求十分常见。
+内网穿透的工具，现在大家用的比较多的是 frp了。frp 是中国人开发的，增加了很多新的功能，使用体验也比 ngrok 好很多，社区比较活跃。ngrok 虽然出现得比较早，但 2.0 转闭源， 1.0 不再维护了，用得人也少了。但这不妨碍我们扒源码学习。
+项目结构 先来看一下 ngrok 整个项目的结构（忽略掉了一些不必要的文件）：
+. ├── ... ├── assets	// 存放 web 静态文件和 tls 文件 │ ├── ... └── src └── ngrok ├── cache	// 缓存 │ └── lru.go ├── client │ ├── cli.go	// 命令行参数定义 │ ├── config.go	// 配置文件读取 │ ├── controller.</description>
     </item>
     
   </channel>

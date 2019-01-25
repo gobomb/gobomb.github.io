@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>linux on Present Day, Present Time</title>
+    <title>Linux on Present Day, Present Time</title>
     <link>https://gobomb.github.io/tags/linux/</link>
-    <description>Recent content in linux on Present Day, Present Time</description>
+    <description>Recent content in Linux on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
-    <lastBuildDate>Sun, 18 Mar 2018 14:02:01 +0800</lastBuildDate>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 09 Sep 2018 16:22:20 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Arch Linux 安装记录</title>
+      <link>https://gobomb.github.io/post/install-arch-linux/</link>
+      <pubDate>Sun, 09 Sep 2018 16:22:20 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/install-arch-linux/</guid>
+      <description>旧笔记本之前是安装着 Windows 10 的，自从工作开始使用 rMBP 之后，就闲置着。我想不如重装成 Linux 系统，当作一个私人服务器用，也可以加深一下对操作系统的理解。很早就听说滚动发行的 Arch Linux 的大名，就想趁机试一试。跟着官方 Wiki 走，大概花了6、7个小时才装好，中间也遇到了一些问题，但那时没有记录下来。用了一段时间后，/boot分区不小心被我覆盖了（估计是我使用 lvm 创建物理卷的时候把引导分区给格式化了），导致系统启动不了，一时半会也不会修。
+放着有半个月，今天有空干脆格盘重装，再过一遍安装过程，把过程和问题记录下来，下一次遇到问题就不用再去 google。覆盖引导的问题，也是因为我没有把分区规划的信息留下来，后面自己也乱了。而且实际上90%的问题都会重复遇到，做好记录能极大提高效率。
+Arch 官方 Wiki 做得真是很好，基本上遇到问题耐心读一读 Wiki 就能够解决。用来学习 Linux 相关知识也特别有用。
+整个安装过程的大体步骤
+ 制作安装介质 从安装介质启动 分区和挂载磁盘 下载安装基本包到系统分区中 从安装介质切换到系统 完成基本的设置，并安装引导  分区和安装引导的部分是比较容易出错的，但大部分情况都可以从 Arch Wiki 中找到答案。
+安装准备  下载 ArchLinux iso 文件
+https://www.archlinux.org/download/
+ 制作安装介质
+ 在 Mac 下安装pv （用来查看dd的进度）
+brew install pv
+ 找到 U 盘对应的设备
+diskutil list
+我这里是/dev/disk2
+ 查看 U 盘挂载的目录
+df -h
+ 解除挂载</description>
+    </item>
     
     <item>
       <title>Cheat Sheet</title>
@@ -17,7 +41,25 @@
       <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/cheatsheet/</guid>
-      <description>Linux 安装 deb 文件： sudo dpkg -i [name].deb sudo apt-get install -f （修复依赖关系） linux 查找文件 find [path] -name &amp;quot;*.log&amp;quot; ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关</description>
+      <description>Linux  安装 deb 文件：
+sudo dpkg -i [name].deb
+sudo apt-get install -f （修复依赖关系）
+ linux 查找文件
+find [path] -name &amp;quot;*.log&amp;quot;
+ ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关闭之
+ 调用自己定义的编辑器来编辑当前命令行:
+ctrl-x ctrl-e
+设置自己的默认编辑器：
+export EDITOR=vi
+ shell 脚本报错：... /bin/sh^M: bad interpreter: No such file or directory
+解决：
+vim [name.sh]
+:set ff 查看文件格式，若看到输出fileformat=dos，可:set ff=unix修改为 unix 格式
+ 本地文件传输到远程机器
+scp -P [port] /path/to/source [user]@[ip]:/path/to/target
+ 不挂断地运行命令
+nohup [command] [arg..] [&amp;amp;]
+例如：nohup hugo server --buildDrafts &amp;gt;&amp;gt; hugo.</description>
     </item>
     
   </channel>
