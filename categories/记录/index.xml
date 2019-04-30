@@ -70,7 +70,7 @@ nohup [command] [arg..] [&amp;amp;]
       <guid>https://gobomb.github.io/post/cross-complie-v2ray/</guid>
       <description>问题和背景 朋友想在路由器里跑 V2Ray，但官方 release 版本不能用，拜托我重新编译一份可执行文件。该路由器没有 FPU（Float Point Unit，浮点运算单元，专用于浮点运算的处理器)，官方 Mips 版本并不支持软解浮点数运算，无法顺利运行。
 环境  目标机器：OpenWRT mipsle（32位机器，小端序） 本地机器：CentOS amd64 golang1.9  解决过程 参考官方提供的编译步骤：
-  （安装 git 和 golang 环境的步骤略去） 下载 V2Ray 源文件：go get -u v2ray.com/core/... 下载 V2Ray 扩展包：go get -u v2ray.com/ext/... 生成编译脚本： go install v2ray.com/ext/tools/build/vbuild 编译 V2Ray：$GOPATH/bin/vbuild V2Ray 程序及配置文件会被放在 $GOPATH/bin/v2ray-XXX 文件夹下（XXX 视平台不同而不同）    编译 V2Ray 至少要 go1.9 以上的版本 最新的 v2ray 源码是 go1.9 实现的，如果用 go1.8 进行编译会提示找不到“math/bits”标准库文件 unrecognized import path &amp;quot;math/bits&amp;quot; (import path does not begin with hostname) （https://github.</description>
+1. （安装 git 和 golang 环境的步骤略去） 2. 下载 V2Ray 源文件：`go get -u v2ray.com/core/...` 3. 下载 V2Ray 扩展包：`go get -u v2ray.com/ext/...` 4. 生成编译脚本： `go install v2ray.com/ext/tools/build/vbuild` 5. 编译 `V2Ray：$GOPATH/bin/vbuild` 6. V2Ray 程序及配置文件会被放在 `$GOPATH/bin/v2ray-XXX` 文件夹下（XXX 视平台不同而不同）   编译 V2Ray 至少要 go1.9 以上的版本 最新的 v2ray 源码是 go1.9 实现的，如果用 go1.8 进行编译会提示找不到“math/bits”标准库文件 unrecognized import path &amp;quot;math/bits&amp;quot; (import path does not begin with hostname) （https://github.</description>
     </item>
     
     <item>
