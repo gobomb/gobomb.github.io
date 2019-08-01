@@ -6,10 +6,27 @@
     <description>Recent content on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 02 Jan 2019 03:26:33 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 01 Aug 2019 08:14:03 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>容器运行时笔记</title>
+      <link>https://gobomb.github.io/post/container-runtime-note/</link>
+      <pubDate>Thu, 01 Aug 2019 08:14:03 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/container-runtime-note/</guid>
+      <description>Kubernetes 通过容器运行时（container runtime）来启动和管理容器。官方文档列举了以下几种 runtime：Docker，CRI-O，Containerd，fraki。它们之间有什么区别和联系呢？经常会看到 OCI、CRI 这些缩写，这些和容器、docker 到底是什么关系呢？
+这篇文章不会深入到很细节的部分，旨在为初学者提供一个比较初步的概览，对一些基本概念做一些简单介绍。
+简单说说什么是容器。容器实际上是 Linux 内核几组功能的组合：cgroup、namespace 和 union file system。cgroup 用来限制进程组所使用的系统资源（CPU、Memory、IO 等）；namespace 用来隔离进程对系统资源的访问（IPC、Network、PID 等），让不同 namespace 的进程看不到彼此的存在；union file system 用来支持对文件系统的修改分层。
+容器并不是虚拟机。虚拟机一般会虚拟完整的操作系统内核，而容器只是虚拟进程的运行环境。容器用到的技术，本身就是内核提供的。容器与容器是共享一个内核的，而虚拟机与虚拟机有可能跑在同一台物理机器上但是各有一个内核。
+容器运行时是管理容器和容器镜像的程序。对于 k8s 而言，runtime 指的是 CRI-runtime，它不关心如何调用内核 API，只规定了 kubelet 与容器相关的接口；对于 docker 而言，runtime 一般指的是 ORI-runtime，封装具体的内核交互和系统调用。
+OCI 标准 OCI（Open Container Initiative）标准是由 Docker 公司主导的一个关于容器格式和运行时的标准或规范，包含运行时标准（runtime-spec ）和容器镜像标准（image-spec）。运行时标准规定了怎么去运行一个容器，如何去表达容器的状态（state）和生命周期（lifestyle）、如何设置 namespace、cgroup、文件系统等等，可以理解为运行期的动态描述；而容器镜像标准规定了容器镜像的格式、配置、元数据等，可以理解为对镜像的静态描述。
+为什么要搞这么一个标准呢？应该是为了防止各家容器各有一套互不兼容的格式导致生态过于碎片化，另外一个目的是尽管目前只有 Linux 系统有容器，但万一我们要在 Windows 或者 Unix 上实现容器，要不要重新搞一套标准呢？OCI 规范也可以在其他操作系统和平台上实现。
+runc OCI 规范在 Linux 上的完整实现是 runC。我们通过 runC 命令可以看到一些基本的说明：
+[root@master ~]# runc --help NAME: runc - Open Container Initiative runtime runc is a command line client for running applications packaged according to the Open Container Initiative (OCI) format and is a compliant implementation of the Open Container Initiative specification.</description>
+    </item>
     
     <item>
       <title>2018 年终总结</title>
