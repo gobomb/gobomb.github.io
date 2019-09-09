@@ -222,7 +222,7 @@ FLANNEL_IPMASQ=true
 
 <h2 id="flannel-没有做什么">flannel 没有做什么</h2>
 
-<p>从上文可知，flannel 会创建 vxlan，分配每台 node 的网段，设置路由等规则，根据配置调用 bridge，但并没有涉及 pod 内的网络设备如何创建，具体的 ip 如何分配。后者其实是由 kubelet 根据 pod 的生命周期调用 CNI 插件实现的。这一部分的具体情况就不在这篇文章展开了。另外一些常用的功能如访问控制，flannel 也没有考虑，如果这方面的功能，则需要考虑其他的集群方案，如 weave 等。</p>
+<p>从上文可知，flannel 会创建 vxlan，分配每台 node 的网段，设置路由等规则，根据配置调用 bridge，但并没有涉及 pod 内的网络设备如何创建，具体的 ip 如何分配。后者其实是由 kubelet 根据 pod 的生命周期调用 CNI 插件实现的。这一部分的具体情况就不在这篇文章展开了。另外一些常用的功能如访问控制，flannel 也没有考虑，如果需要做访问控制，则需考虑其他的集群网络方案，如 weave 等。</p>
 
 <h2 id="flannel-网络示意和解析">flannel 网络示意和解析</h2>
 
