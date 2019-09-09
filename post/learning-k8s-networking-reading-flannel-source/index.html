@@ -145,7 +145,7 @@ node3    Ready    &lt;none&gt;   33m   v1.15.3   10.10.13.62   &lt;none&gt;     
 
 <h2 id="flanneld-源码阅读">flanneld 源码阅读</h2>
 
-<p>flanneld 源代码仓库地址在：<a href="https://github.com/coreos/flannel，代码大致流程如下：">https://github.com/coreos/flannel，代码大致流程如下：</a></p>
+<p>flanneld 源代码仓库地址在：<a href="https://github.com/coreos/flannel">https://github.com/coreos/flannel</a> ，代码大致流程如下：</p>
 
 <ol>
 <li>查找外部网卡 <code>extIface, err = LookupExtIface(&quot;&quot;, &quot;&quot;)</code></li>
@@ -219,6 +219,10 @@ FLANNEL_IPMASQ=true
 <p>在 node 的 <code>/opt/cni/bin</code> 目录下还有一个 <a href="https://github.com/containernetworking/plugins/tree/master/plugins/meta/flannel">flannel plugin 二进制</a>，由 kubelet 在创建单个 pod 的时候调用，将读取 flanneld 产生的 <code>/run/flannel/subnet.env</code>，生成一系列配置文件，写入 <code>/var/lib/cni/flannel/[pod id]</code>，然后将生成的配置作为参数调用另一个 CNI plugin 二进制 <a href="https://github.com/containernetworking/plugins/tree/master/plugins/main/bridge">bridge</a>，用来给 pod 分配 IP 地址。</p>
 
 <p>bridge 二进制会在 node 上生成一个 Linux bridge 设备，默认名字是 <code>cni0</code>。这个 bridge 就是一个虚拟交换机，新生成的 pod 网卡会通过 veth 设备连接到这个 bridge 上面。</p>
+
+<h2 id="flannel-没有做什么">flannel 没有做什么</h2>
+
+<p>从上文可知，flannel 会创建 vxlan，分配每台 node 的网段，设置路由等规则，根据配置调用 bridge，但并没有涉及 pod 内的网络设备如何创建，具体的 ip 如何分配。后者其实是由 kubelet 根据 pod 的生命周期调用 CNI 插件实现的。这一部分的具体情况就不在这篇文章展开了。另外一些常用的功能如访问控制，flannel 也没有考虑，如果这方面的功能，则需要考虑其他的集群方案，如 weave 等。</p>
 
 <h2 id="flannel-网络示意和解析">flannel 网络示意和解析</h2>
 
@@ -364,7 +368,7 @@ Address                  HWtype  HWaddress           Flags Mask            Iface
 
 <p>flannel 相对而言还是比较简单的，它实现了跨主机的集群网络，但没有提供更多的功能，比如访问控制。</p>
 
-<p>flannel 有大量操作 Linux 网络设备的代码，如创建 vxlan 设备、操作路由、操作 fdb 等，这一部分其实就是 Unix 环境编程，需要对 Unix/Linux 系统调用有一定了解。flannel 是使用了<code>github.com/vishvananda/netlink</code>这个库来做相关的调用。</p>
+<p>flannel 有大量操作 Linux 网络设备的代码，如创建 vxlan 设备、操作路由、操作 fdb 等，这一部分属于 Unix/Linux 系统编程的范畴，需要对 Unix/Linux 系统调用有一定了解。flannel 是使用了<code>github.com/vishvananda/netlink</code>这个库来做相关的调用。</p>
 
 <p>flannel 除了使用 vxlan 作为后端，还可以用 ipsec、ipip、gce、udp 封装等方式，但都大同小异，他们都实现了<code>backend/common.go</code>中的 interface。</p>
 
