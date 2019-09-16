@@ -8,6 +8,11 @@
   </url>
   
   <url>
+    <loc>https://gobomb.github.io/post/learning-linux-veth-and-bridge/</loc>
+    <lastmod>2019-09-09T18:59:32+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://gobomb.github.io/post/container-runtime-note/</loc>
     <lastmod>2019-08-01T08:14:03+08:00</lastmod>
   </url>

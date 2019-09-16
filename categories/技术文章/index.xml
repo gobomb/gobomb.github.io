@@ -27,6 +27,21 @@ k8s 的 pod 网络有如下假设:
     </item>
     
     <item>
+      <title>通过实验学习 Linux VETH 和 Bridge</title>
+      <link>https://gobomb.github.io/post/learning-linux-veth-and-bridge/</link>
+      <pubDate>Mon, 09 Sep 2019 18:59:32 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/learning-linux-veth-and-bridge/</guid>
+      <description>背景 docker 容器的网络，以及 flannel 网络的实现都用到了 VETH 和 Bridge 这两种虚拟设备。大致原理是在主机创建一个 Bridge，每当一个新的容器创建，就创建一对 VETH，一端连接到主机的 Bridge，另一端连接到容器命名空间里，作为容器的默认网卡，并将容器的默认网卡设置为 Bridge。
+本文将用 Linux 的相关命令，模拟上述网络创建的过程，并通过实验和抓包对原理进行验证，加深对容器和 Linux 网络的理解。
+概念 VETH（virtual Ethernet）：是 Linux 内核支持的一种虚拟网络设备，表示一对虚拟的网络接口，VETH 对的两端可以处于不同的网络命名空间，所以可以用来做主机和容器之间的网络通信。
+Bridge：Bridge 类似于交换机，用来做二层的交换。可以将其他网络设备挂在 Bridge 上面，当有数据到达时，Bridge 会根据报文中的 MAC 信息进行广播、转发或丢弃。
+Namespace：是 Linux 提供的一种内核级别环境隔离的方法。不同命名空间下的资源集合无法互相访问。
+实验环境： root@ubuntu:~# cat /proc/version Linux version 4.4.0-38-generic (buildd@lgw01-58) (gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.2) ) #57-Ubuntu SMP Tue Sep 6 15:42:33 UTC 2016  网卡名称和 IP 地址为ens160 10.10.12.27/24
+网络拓扑示意图  +------------------------+ | | iptables +----------+ | br01 192.</description>
+    </item>
+    
+    <item>
       <title>ngrok 源码解析</title>
       <link>https://gobomb.github.io/post/ngrok-source-code-reading/</link>
       <pubDate>Mon, 17 Dec 2018 02:08:25 +0800</pubDate>
