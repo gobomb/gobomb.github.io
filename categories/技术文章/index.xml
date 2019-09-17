@@ -17,7 +17,7 @@
       <pubDate>Tue, 17 Sep 2019 01:07:13 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/learning-linux-veth-and-bridge/</guid>
-      <description>背景 docker 容器的网络，以及 flannel 网络的实现都用到了 VETH 和 Bridge 这两种虚拟设备。大致原理是在主机创建一个 Bridge，每当一个新的容器创建，就创建一对 VETH，一端连接到主机的 Bridge，另一端连接到容器命名空间里，作为容器的默认网卡，并将容器的默认网卡设置为 Bridge。
+      <description>背景 docker 容器的网络，以及 flannel 网络的实现都用到了 VETH 和 Bridge 这两种虚拟设备。大致原理是在主机创建一个 Bridge，每当一个新的容器创建，就创建一对 VETH，一端连接到主机的 Bridge，另一端连接到容器命名空间里，作为容器的默认网卡，并将容器的默认路由设置为 Bridge。
 本文将用 Linux 的相关命令，模拟上述网络创建的过程，并通过实验和抓包对原理进行验证，加深对容器和 Linux 网络的理解。
 概念 VETH（virtual Ethernet）：是 Linux 内核支持的一种虚拟网络设备，表示一对虚拟的网络接口，VETH 对的两端可以处于不同的网络命名空间，所以可以用来做主机和容器之间的网络通信。
 Bridge：Bridge 类似于交换机，用来做二层的交换。可以将其他网络设备挂在 Bridge 上面，当有数据到达时，Bridge 会根据报文中的 MAC 信息进行广播、转发或丢弃。
