@@ -20,8 +20,8 @@
       <description>Situation 公司和家庭在各自的内网里，并不互通，使用 wireguard 加一台处于公网的服务器，组成虚拟局域网，方便在家里访问公司内网或在公司访问家庭内网。
 为什么不用 frp 或端口映射工具？ 需求之一是希望七层应用（包括 DNS）都不需要特别地设置；而端口映射作用在四层，每当有一个新的应用都得配置一遍。VPN 虚拟出来的网络处于网络层，路由规则一次性配好之后，就不需要再为了新的七层应用作额外的配置。
 机器信息和 IP 规划 VPN 网段：192.168.2.0/24
-bcc 的公网 IP： 106.13.13.13
-   机器 主机名 VPN IP 本地网卡 本地 IP     百度云机器 Ubuntu bcc 192.168.2.1/24 eth0 -   家庭内网机器 ArchLinux home 192.168.2.2/24 wlp2s0 192.168.0.9/24   公司内网机器 CentOS company 192.168.2.3/24 ens192 10.10.13.62/24   公司内网机器 CentOS target - ens192 10.10.13.61/24    Task 前提  公网服务器(bcc) 公司和家庭内网的机器能够访问公网(home和company都可以访问到bcc) 公司内网网段和家庭内网网段不冲突  目标 能从家庭网络访问公司内部网络（使用 wireguard + iptables + route路由表实现），如在本文中就是要实现 home 能够访问到 target</description>
+bcc 的公网 IP（假设为）： 106.13.13.13
+   机器 主机名 VPN IP 本地网卡 本地 IP     百度云机器 Ubuntu bcc 192.168.2.1/24 eth0 -   家庭内网机器 ArchLinux home 192.168.2.2/24 wlp2s0 192.168.0.9/24   公司内网机器 CentOS company 192.168.2.3/24 ens192 10.10.13.62/24   公司内网机器 CentOS target - ens192 10.10.13.61/24    Task 前提  公网服务器（bcc） 公司和家庭内网的机器能够访问公网（home 和 company 都可以访问到 bcc） 公司内网网段和家庭内网网段不冲突  目标 能从家庭网络访问公司内部网络（使用 wireguard + iptables + route路由表实现），如在本文中就是要实现 home 能够访问到 target</description>
     </item>
     
     <item>
