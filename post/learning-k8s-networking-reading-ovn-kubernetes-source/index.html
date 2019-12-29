@@ -380,15 +380,27 @@ ifaceID := bridgeName + &quot;_&quot; + nodeName
 <li>启动对 pods / services / endpoints / networkpolicy 的监听</li>
 </ol>
 
-<h3 id="对-node-的监听-watchnode">对 node 的监听：WatchNode</h3>
+<h3 id="对-node-的监听-watchnodes">对 node 的监听：WatchNodes</h3>
 
-<pre><code>```go
-    hostSubnet, err := oc.addNode(node)
+<pre><code>AddFunc: func(obj interface{}) {
+            node := obj.(*kapi.Node)
+            logrus.Debugf(&quot;Added event for Node %q&quot;, node.Name)
+            hostSubnet, err := oc.addNode(node)
+            if err != nil {
+                logrus.Errorf(&quot;error creating subnet for node %s: %v&quot;, node.Name, err)
+                return
+            }
 
-    err = oc.syncNodeManagementPort(node, hostSubnet)
+            err = oc.syncNodeManagementPort(node, hostSubnet)
+            if err != nil {
+                logrus.Errorf(&quot;error creating Node Management Port for node %s: %v&quot;, node.Name, err)
+            }
 
-    err = oc.syncNodeGateway(node, hostSubnet)
-```
+            if err := oc.syncNodeGateway(node, hostSubnet); err != nil {
+                gatewaysFailed[node.Name] = true
+                logrus.Errorf(err.Error())
+            }
+        },
 </code></pre>
 
 <p>下面具体讲一下这三个函数具体做了什么：</p>
@@ -440,53 +452,38 @@ ifaceID := bridgeName + &quot;_&quot; + nodeName
 
 <li><p>创建 geteway router: <code>GR_[nodeName]</code></p>
 
-<pre><code class="language-go">    // Create a gateway router.
-    gatewayRouter := &quot;GR_&quot; + nodeName
-    stdout, stderr, err := RunOVNNbctl(&quot;--&quot;, &quot;--may-exist&quot;, &quot;lr-add&quot;,
-        gatewayRouter, &quot;--&quot;, &quot;set&quot;, &quot;logical_router&quot;, gatewayRouter,
-        &quot;options:chassis=&quot;+systemID, &quot;external_ids:physical_ip=&quot;+physicalIP)
-</code></pre>
-
-<ol>
-<li>在 join 上创建 lsp：<code>jtor-GR_[nodeName]</code>，并分配 mac 地址routerMac和 IP 地址routerCIDR</li>
-<li>在 gatewayRouter 上创建 lrp：<code>rtoj-GR_[nodeName]</code>，mac和IP设置为<code>jtor-GR_[nodeName]</code>的</li>
-<li>在 gatewayRouter设置options：lb_force_snat_ip：<code>rtoj-GR_[nodeName]</code>的IP</li>
-<li>在 gatewayRouter添加到达每个子网的路由，<code>via 100.64.0.1</code></li>
-<li>在 <code>ovn_cluster_router</code>上添加到gatewayRouter的默认路由</li>
-<li>在gatewayRouter上添加负载均衡器</li>
-<li>创建逻辑交换机 <code>ext_[nodeName]</code>，添加 port：[ifaceID]，并设置为 localnet，将交换机连接到<code>GR_[nodeName]</code></li>
-<li>在gatewayRouter上添加静态路由 <code>0.0.0.0/0 默认网关IP地址 rtoe-GW_[nodeName]</code></li>
-<li>在gatewayRouter上添加SNAT规则，将去子网的包 snat 成 gateway IP</li>
-<li>在<code>ovn_cluster_router</code>上添加/32 路由：routerCIDR routerCIDR
-14.</li>
-</ol>
-
-<pre><code class="language-go">    if rampoutIPSubnet != &quot;&quot; {
-        rampoutIPSubnets := strings.Split(rampoutIPSubnet, &quot;,&quot;)
-        for _, rampoutIPSubnet = range rampoutIPSubnets {
-            _, _, err = net.ParseCIDR(rampoutIPSubnet)
-            if err != nil {
-                continue
-            }
-    
-            // Add source IP address based routes in distributed router
-            // for this gateway router.
-            stdout, stderr, err = RunOVNNbctl(&quot;--may-exist&quot;,
-                &quot;--policy=src-ip&quot;, &quot;lr-route-add&quot;, k8sClusterRouter,
-                rampoutIPSubnet, routerCIDR.IP.String())
-            if err != nil {
-                return fmt.Errorf(&quot;Failed to add source IP address based &quot;+
-                    &quot;routes in distributed router, stdout: %q, &quot;+
-                    &quot;stderr: %q, error: %v&quot;, stdout, stderr, err)
-            }
-        }
-    }
+<pre><code>// Create a gateway router.
+gatewayRouter := &quot;GR_&quot; + nodeName
+stdout, stderr, err := RunOVNNbctl(&quot;--&quot;, &quot;--may-exist&quot;, &quot;lr-add&quot;,
+    gatewayRouter, &quot;--&quot;, &quot;set&quot;, &quot;logical_router&quot;, gatewayRouter,
+    &quot;options:chassis=&quot;+systemID, &quot;external_ids:physical_ip=&quot;+physicalIP)
 </code></pre></li>
+
+<li><p>在 join 上创建 lsp：<code>jtor-GR_[nodeName]</code>，并分配 mac 地址routerMac和 IP 地址routerCIDR</p></li>
+
+<li><p>在 gatewayRouter 上创建 lrp：<code>rtoj-GR_[nodeName]</code>，mac和IP设置为<code>jtor-GR_[nodeName]</code>的</p></li>
+
+<li><p>在 gatewayRouter设置options：lb_force_snat_ip：<code>rtoj-GR_[nodeName]</code>的IP</p></li>
+
+<li><p>在 gatewayRouter添加到达每个子网的路由，<code>via 100.64.0.1</code></p></li>
+
+<li><p>在 <code>ovn_cluster_router</code>上添加到gatewayRouter的默认路由</p></li>
+
+<li><p>在gatewayRouter上添加负载均衡器</p></li>
+
+<li><p>创建逻辑交换机 <code>ext_[nodeName]</code>，添加 port：[ifaceID]，并设置为 localnet，将交换机连接到<code>GR_[nodeName]</code></p></li>
+
+<li><p>在gatewayRouter上添加静态路由 <code>0.0.0.0/0 默认网关IP地址 rtoe-GW_[nodeName]</code></p></li>
+
+<li><p>在gatewayRouter上添加SNAT规则，将去子网的包 snat 成 gateway IP</p></li>
+
+<li><p>在<code>ovn_cluster_router</code>上添加/32 路由：routerCIDR routerCIDR</p></li>
 </ol>
 
 <h3 id="对-pod-的监听-watchpods">对 pod 的监听： WatchPods</h3>
 
-<h4 id="addlogicalport-pod">addLogicalPort(pod)</h4>
+<pre><code>func (oc *Controller) addLogicalPort(pod *kapi.Pod) error
+</code></pre>
 
 <ol>
 <li>等待和node同名的logical switch建立</li>
