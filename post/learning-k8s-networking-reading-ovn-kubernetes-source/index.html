@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet"> 
+
+        <title>Kubernetes 网络学习：阅读 ovn-kubernetes 源码</title>
+
+        <link rel="stylesheet" href="/css/stylesheet.css">
+    </head>
+    <body>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-md navbar-light">
+
+          
+          <span class="navbar-brand mb-0 h1"></span>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation" name="button">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
+              
+              <a class="nav-item nav-link " href="/about/">About</a>
+            </div>
+          </div>
+        </nav>
+
+        <section id="page-title">
+          <h1><a href="/">Present Day, Present Time</a></h1>
+          <span id="author-name">
+            <h6><a href="/about/">gobomb</a></h6>
+          </span>
+        </section>
+
+
+<div class="blog-post">
+  <h1>Kubernetes 网络学习：阅读 ovn-kubernetes 源码</h1>
+  <div class="blog-post-subheader">
+    <time>29 Dec 2019</time>
+  </div>
+  <div class="blog-post-content">
+    
+
+<h1 id="1-软件定义网络介绍">1. 软件定义网络介绍</h1>
+
+<p>何谓软件定义网络（SDN，software-defined networking）</p>
+
+<p>根据维基百科的定义：软件定义网络是一种新型网络架构。它利用OpenFlow协议将路由器的控制平面（control plane）从数据平面（data plane）中分离，改以软件方式实现。该架构可使网络管理员在不更动硬件设备的前提下，以中央控制方式用程序重新规划网络，为控制网络流量提供了新方案，也为核心网络和应用创新提供了良好平台。</p>
+
+<p>在传统网络中，我们要修改整个网络的配置，可能需要去每一台路由器上面更改路由配置；而在 SDN 中，只需要修改 SDN 的集中控制器，配置的更改会被控制器通过统一的协议下发到路由器上。这里路由器是实际数据转发的节点，但路由信息的配置转移到了集中控制器上，使得更改网络配置更加灵活。</p>
+
+<h1 id="2-ovn-open-virtual-network-介绍">2. OVN (Open Virtual Network)介绍</h1>
+
+<p>Open vSwitch（OVS）是一款开源的分布式虚拟交换机，可以理解成软件实现的交换机。而 OVN 是基于 OVS 实现的一套网络方案，可以虚拟出二层和三层的网络。</p>
+
+<p><a href="http://www.openvswitch.org/support/dist-docs/ovn-architecture.7.html">OVN 的架构图</a>如下：</p>
+
+<pre><code>                                         CMS
+                                          |
+                                          |
+                              +-----------|-----------+
+                              |           |           |
+                              |     OVN/CMS Plugin    |
+                              |           |           |
+                              |           |           |
+                              |   OVN Northbound DB   |
+                              |           |           |
+                              |           |           |
+                              |       ovn-northd      |
+                              |           |           |
+                              +-----------|-----------+
+                                          |
+                                          |
+                                +-------------------+
+                                | OVN Southbound DB |
+                                +-------------------+
+                                          |
+                                          |
+                       +------------------+------------------+
+                       |                  |                  |
+         HV 1          |                  |    HV n          |
+       +---------------|---------------+  .  +---------------|---------------+
+       |               |               |  .  |               |               |
+       |        ovn-controller         |  .  |        ovn-controller         |
+       |         |          |          |  .  |         |          |          |
+       |         |          |          |     |         |          |          |
+       |  ovs-vswitchd   ovsdb-server  |     |  ovs-vswitchd   ovsdb-server  |
+       |                               |     |                               |
+       +-------------------------------+     +-------------------------------+
+</code></pre>
+
+<p>OVN Northbound DB / ovn-northd / OVN Southbound DB 部署在 Central 节点（master）上；ovn-controller / ovs-vswitch / ovsdb-server 部署在 Chassis 节点（slave）上。</p>
+
+<p>OVN 网络设置的大致流程：OVN/CMS Plugin 或用户使用 ovn-nbctl 更改 OVN Northbound DB 里的数据，定义 logical router / logical switch 等虚拟网络组件，ovn-northd 从 OVN Northbound DB 读取数据，翻译成 logical flow 写到 OVN Southbound DB；每台 chassis 上的 ovn-controller 读取 OVN Southbound DB 里的 logical flow 翻译成 openflow 配置写到 ovsdb-server 里，ovs-vswitchd 执行 openflow 规则。</p>
+
+<h1 id="3-ovn-kubernetes介绍">3. ovn-kubernetes介绍</h1>
+
+<p>ovn-kubernetes 是一个将 OVN 网络方案引入到 k8s 体系兼容 CNI 标准的一套代码，将 pod、service 网络都用 OVN 网络来实现。</p>
+
+<p>ovn-kubernetes 组件（1，2，3）是以 k8s 对象的形式在 k8s 集群内部署：</p>
+
+<ol>
+<li>ovnkube-db deployment(包含 nb-ovsdb,sb-ovsdb 两个容器)：顾名思义，部署的是ovn 的两个 db</li>
+<li>ovnkube-master deployment(包含 ovn-northd,nbctl-daemon,ovnkube-master 三个容器)：用来初始化 master 节点，并监听集群中对象的变化对 ovn 网络进行相应的配置；运行一个 cni 二进制的 http 服务器，相应 cmdAdd 和 cmdDel</li>
+<li>ovnkube daemonset for nodes(ovs-daemons,ovn-controller,ovnkube-node)：每台 node 上的守护进程，初始化 node</li>
+<li>ovn-k8s-overlay：CNI plugin 二进制，当 pod 创建/销毁的时候，会被 kubelet 调用</li>
+</ol>
+
+<p>ovn-kubernetes 生成的逻辑上的网络架构：</p>
+
+<pre><code>                                +----------------------+
+                                |                      |
+                                |   OvnClusterRouter   |
+                 +--------------+                      +--------------------------------+
+                 |              |   (logical router)   |                                |
+                 |              |                      |                                |
+                 |              +--------------+-------+                                |
+                 |                             |                                        |
+                 |                             |                              +---------+---------+
+     +-----------+---------+            +------+--------------+               |                   |
+     |                     |            |                     |               |   join            |
+     |   [nodename1]       |            |   [nodename2]       |               |                   |
+     |                     |            |                     |               |   (logical switch)|
+     |   (logical switch)  |            |   (logical switch)  |               |                   |
+     |                     |            |                     |               +--+------+------+--+
+     +-+---------+--------++            +-+---------+--------++                  |      |      |
+       |         |        |               |         |        |                   |      |      +
+       |         |        +               |         |        +                   |      |     ...
+       |         |       ...              |         |       ...                  |      |
+       |         |                        |         |           +----------------+-+  +-+----------------+
++------++     +--+---+             +------+      +--+---+       |                  |  |                  |
+|       |     |      |             |      |      |      |       |  GW-[nodename1]  |  |  GW-[nodename2]  |
+| Pod1  |     | Pod2 |             | Pod3 |      | Pod4 |       |                  |  |                  |
+|       |     |      |             |      |      |      |       | (gateway router) |  | (gateway router) |
++-------+     +------+             +------+      +------+       |                  |  |                  |
+                                                                +----------+-------+  +---------+--------+
+                                                                           |                    |
+                                                                           |                    |
+                                                                 +---------+-------+     +------+----------+
+                                                                 |                 |     |                 |
+                                                                 | ext-[nodename1] |     | ext-[nodename2] |
+                                                                 |                 |     |                 |
+                                                                 | (local network) |     | (local network) |
+                                                                 |                 |     |                 |
+                                                                 +-----------------+     +-----------------+
+
+
+
+</code></pre>
+
+<p>以上 logical router / logical switch 都是逻辑/虚拟的，每添加一台新的 node，ovn-kubernetes 会新建一台用 nodename 命名的 logical switch 连接到全局唯一的 OvnClusterRouter 上，每当有新的 pod 调度到 node，pod 就连接到对应 node 的 logical switch 上，用来形成 pod 网络（overlay / 东西向流量）。添加新 node 的同时，ovn-kubernetes 还会建立一个绑定到每一台 node 的 gateway router，连接到 join（join 是与 OvnClusterRouter 相连的 logical switch），用来连接 pod 网络（overlay）和 node 网络（underlay）（南北向流量）</p>
+
+<h1 id="4-ovn-kubernetes-源码阅读笔记">4. ovn-kubernetes 源码阅读笔记</h1>
+
+<p>ovnkube-master 和 ovnkube-node 实际上都是同一个可执行文件 ovnkube，只不过参数不通</p>
+
+<h2 id="ovnkube-的代码逻辑">ovnkube 的代码逻辑</h2>
+
+<ol>
+<li>CleanupClusterNode</li>
+<li>启动 master 或 node 逻辑</li>
+</ol>
+
+<p>下面分别从 node 和 master 来介绍源码</p>
+
+<h2 id="node-启动逻辑">node 启动逻辑</h2>
+
+<pre><code class="language-go">err = setupOVNNode(name)
+</code></pre>
+
+<ol>
+<li><p>初始化 ovs-vsctl</p>
+
+<p>调用 ovs-vsctl 设置封装协议、本机 IP、本机主机名等</p>
+
+<pre><code>util.RunOVSVsctl(&quot;set&quot;,
+        &quot;Open_vSwitch&quot;,
+        &quot;.&quot;,
+        fmt.Sprintf(&quot;external_ids:ovn-encap-type=%s&quot;, config.Default.EncapType),
+        fmt.Sprintf(&quot;external_ids:ovn-encap-ip=%s&quot;, nodeIP),
+        fmt.Sprintf(&quot;external_ids:ovn-remote-probe-interval=%d&quot;,
+            config.Default.InactivityProbe),
+        fmt.Sprintf(&quot;external_ids:hostname=\&quot;%s\&quot;&quot;, nodeName),
+    )
+</code></pre></li>
+
+<li><p>等待 master 节点创建该 node 的 logical_switch</p>
+
+<pre><code>        if cidr, _, err = util.RunOVNNbctl(&quot;get&quot;, &quot;logical_switch&quot;, node.Name, &quot;other-config:subnet&quot;); err != nil {
+            logrus.Errorf(&quot;error retrieving logical switch: %v&quot;, err)
+            return false, nil
+        }
+</code></pre></li>
+
+<li><p>初始化 Gateway</p></li>
+
+<li><p>创建 ManagementPort，用来让 node 通过私有 IP 访问 pods（做 health checking 等管理工作）</p>
+
+<p><code>func CreateManagementPort(nodeName string, localSubnet *net.IPNet, clusterSubnet []string) (map[string]string, error)</code> 的逻辑:</p>
+
+<ol>
+<li>创建 ovs bridge： br-int</li>
+
+<li><p>在 br-int 上创建 internal port / interface： k8s-[nodeName]</p>
+
+<pre><code>stdout, stderr, err = util.RunOVSVsctl(&quot;--&quot;, &quot;--may-exist&quot;, &quot;add-port&quot;,
+    &quot;br-int&quot;, interfaceName, &quot;--&quot;, &quot;set&quot;, &quot;interface&quot;, interfaceName,
+    &quot;type=internal&quot;, &quot;mtu_request=&quot;+fmt.Sprintf(&quot;%d&quot;, config.Default.MTU),
+    &quot;external-ids:iface-id=k8s-&quot;+nodeName)
+</code></pre></li>
+
+<li><p>给 internal interface 设置 IP（本地子网的第一个IP），添加 pod cidr 和 svc cidr 的路由到 stor-[nodeName]（ip为本地子网的下一个IP）</p></li>
+
+<li><p>在 k8s-[nodeName] 上添加 arp 记录，将 stor-[nodeName] 的 routeIP 和 routeMac 关联起来</p></li>
+
+<li><p>设置必要的 iptables 规则：把从 internal interface 出去的包 SNAT 成该网卡的 IP</p></li>
+
+<li><p>将 internal interface 的 mac 地址写到 annotations 里（&rdquo;k8s.ovn.org/node-mgmt-port-mac-address&rdquo;）并返回</p></li>
+</ol></li>
+
+<li><p>设置 node annotations</p></li>
+
+<li><p>写 CNI 配置，启动 CNI server</p></li>
+</ol>
+
+<p>下面细致讲一下以上第3步（初始化 Gateway）和第6步（启动 CNI server）的流程：</p>
+
+<h3 id="初始化-gateway">初始化 Gateway</h3>
+
+<p>所谓 Gateway，就是 node 网络进入 ovn 网络的网关</p>
+
+<ol>
+<li>如果开启了 NodePort，则初始化 load_balancer health checker</li>
+<li>根据配置里的 Gateway Mode 进行初始化: localnet/shared</li>
+</ol>
+
+<p>localnet 和 shared 模式的区别在于，前者 pod 的流量到达物理网卡需要通过宿主机的 iptables 做 nat 转发，后者是把物理网卡加入到 ovn 的网路中去，不需要通过 iptalbes 规则。</p>
+
+<h4 id="初始化-localneet-gateway">初始化 localneet Gateway</h4>
+
+<pre><code class="language-go">		annotations, err := initLocalnetGateway(nodeName, subnet, cluster.watchFactory)
+</code></pre>
+
+<ol>
+<li>创建 ovs bridge：<code>br-local</code>，并启动它</li>
+<li>在 br-local 上创建 internal port ：<code>br-nexthop</code>，并启动它</li>
+<li>将 localnetGatewayNextHopSubnet(&ldquo;169.254.33.<sup>1</sup>&frasl;<sub>24</sub>&rdquo;) 指定给 br-nexthop</li>
+<li>给 br-local 设置 mac 地址，添加到本地网络<code>physnet</code>的映射，设置<code>ifaceID=br-local_[nodeName]</code></li>
+<li>将 gateway mode、gateway Vlan ID、ifaceID、mac 地址、localnetGatewayIP、localnetGatewayNextHop 等信息写到 annotations 里</li>
+
+<li><p>设置 NAT 规则</p>
+
+<ol>
+<li>允许 br-nexthop 收到的包被转发</li>
+<li>追踪来自 br-nexthop 的包</li>
+<li>允许 br-nexthop 进入 localhost</li>
+<li>对来自 localnetGatewayIP（&rdquo;169.254.33.<sup>2</sup>&frasl;<sub>24</sub>&rdquo;）的包进行 SNAT</li>
+</ol></li>
+
+<li><p>如果开启了 NodePort，将监听 k8s svc 的事件并设置相应的 NAT 规则</p></li>
+</ol>
+
+<h4 id="初始化-shared-gateway">初始化 shared Gateway</h4>
+
+<pre><code class="language-go">// gatewayNextHop / gatewayIntf 若未指定则未默认网卡的下一跳地址/默认网卡名称，假设 gatewayIntf 为 eth0
+initSharedGateway(nodeName, subnet, gatewayNextHop, gatewayIntf, cluster.watchFactory)
+</code></pre>
+
+<ol>
+<li>判断该网卡 gatewayIntf 是否为 internal port 或者 OVS bridge，这里考虑该网卡为物理网卡的情况</li>
+
+<li><p>创建一个 OVS bridge：breth0，并将 eth0 的 IP 和路由设置给 breth0，eth0 被设置为 breth0 的 port</p>
+
+<pre><code>stdout, stderr, err := RunOVSVsctl(
+    &quot;--&quot;, &quot;--may-exist&quot;, &quot;add-br&quot;, bridge,
+    &quot;--&quot;, &quot;br-set-external-id&quot;, bridge, &quot;bridge-id&quot;, bridge,
+    &quot;--&quot;, &quot;br-set-external-id&quot;, bridge, &quot;bridge-uplink&quot;, iface,
+    &quot;--&quot;, &quot;set&quot;, &quot;bridge&quot;, bridge, &quot;fail-mode=standalone&quot;,
+    fmt.Sprintf(&quot;other_config:hwaddr=%s&quot;, ifaceLink.Attrs().HardwareAddr),
+    &quot;--&quot;, &quot;--may-exist&quot;, &quot;add-port&quot;, bridge, iface,
+    &quot;--&quot;, &quot;set&quot;, &quot;port&quot;, iface, &quot;other-config:transient=true&quot;)
+</code></pre></li>
+
+<li><p>给 breth0 设置 mac 地址，添加到本地网络<code>physnet</code>的映射，设置<code>ifaceID=br-local_[nodeName]</code> ,设置<code>ifaceID=br-local_[nodeName]</code></p>
+
+<pre><code>// ovn-bridge-mappings maps a physical network name to a local ovs bridge
+// that provides connectivity to that network.
+_, stderr, err := util.RunOVSVsctl(&quot;set&quot;, &quot;Open_vSwitch&quot;, &quot;.&quot;,
+    fmt.Sprintf(&quot;external_ids:ovn-bridge-mappings=%s:%s&quot;, util.PhysicalNetworkName, bridgeName))
+
+ifaceID := bridgeName + &quot;_&quot; + nodeName
+</code></pre></li>
+
+<li><p>将 gateway mode、gateway Vlan ID、ifaceID、mac 地址、localnetGatewayIP、localnetGatewayNextHop 等信息写到 annotations 里</p></li>
+
+<li><p>设置 openflow 默认 ConntrackRules 规则：规定 pod 与 host 协议栈之间的流量；如果开启了 NodePort，则监听 k8s svc 的事件并设置相应的 openflow 规则</p>
+
+<pre><code>    // Program cluster.GatewayIntf to let non-pod traffic to go to host
+    // stack
+    if err := addDefaultConntrackRules(nodeName, bridgeName, uplinkName); err != nil {
+        return err
+    }
+
+    if config.Gateway.NodeportEnable {
+        // Program cluster.GatewayIntf to let nodePort traffic to go to pods.
+        if err := nodePortWatcher(nodeName, bridgeName, uplinkName, wf); err != nil {
+            return err
+        }
+    }
+</code></pre></li>
+</ol>
+
+<h3 id="初始化-node-上的-cni-server">初始化 node 上的 CNI server</h3>
+
+<p>主要是两个函数，对应 CNI plugin 的两个命令：</p>
+
+<h4 id="cmdadd">cmdAdd()</h4>
+
+<ol>
+<li>获取 pod annotations</li>
+<li>pr.getCNIResult(podInterfaceInfo)&ndash;&gt;ConfigureInterface</li>
+<li>cmdAdd
+
+<ol>
+<li>创建 veth 对，一端在 ns 里，一端在 host</li>
+<li>根据podInterfaceInfo，设置在 ns 里的虚拟网卡，设置mac地址、ip以及路由</li>
+<li>host 端的网络名字设置成容器ID的前16位</li>
+<li>ifaceID=[namespace]_[podName]</li>
+<li>查找使用这个 ifaceID 的 ovs port 并移除，添加新的 ovs portL:hostIface.Name</li>
+<li>设置 pod bandwitth</li>
+</ol></li>
+</ol>
+
+<h4 id="cmddel">cmdDel()</h4>
+
+<ol>
+<li>删除 br-int 上的 port</li>
+<li>清除 PodBandwidth</li>
+</ol>
+
+<h2 id="master-启动逻辑">master 启动逻辑</h2>
+
+<ol>
+<li>选举</li>
+<li>排除掉已经被分配的子网，创建子网分配器</li>
+<li>创建逻辑路由器<code>ovn_cluster_router</code></li>
+<li>创建tcp和udp的负载均衡器</li>
+<li>创建逻辑交换机<code>join</code>，分配子网<code>100.64.0.0/16</code></li>
+<li>将 join 连接到 ovn_cluster_router 的 port <code>rtoj-ovn_cluster_router</code></li>
+<li>将 ovn_cluster_router 连接到 join 的 port <code>jtor-ovn_cluster_router</code></li>
+</ol>
+
+<h3 id="启动监听">启动监听</h3>
+
+<ol>
+<li>开一个 goroutine 每隔 30s 更新 nbdb 的时间戳</li>
+<li>启动对 node 的监听</li>
+<li>启动对 pods / services / endpoints / networkpolicy 的监听</li>
+</ol>
+
+<h3 id="对-node-的监听-watchnode">对 node 的监听：WatchNode</h3>
+
+<pre><code>```go
+    hostSubnet, err := oc.addNode(node)
+
+    err = oc.syncNodeManagementPort(node, hostSubnet)
+
+    err = oc.syncNodeGateway(node, hostSubnet)
+```
+</code></pre>
+
+<p>下面具体讲一下这三个函数具体做了什么：</p>
+
+<h4 id="1-func-oc-controller-addnode-node-kapi-node-hostsubnet-net-ipnet-err-error">1. <code>func (oc *Controller) addNode(node *kapi.Node) (hostsubnet *net.IPNet, err error)</code></h4>
+
+<ol>
+<li>从 node 的 annotations 中获取 hostnet</li>
+<li>如果 hostnet 已经存在，确保逻辑网络已经被设置
+
+<ol>
+<li>获取 hostsubnet 的第一个和第二个 IP（第二个为 node 上 management port 的 IP）</li>
+<li>获取 logical_router_port：<code>rtos-[nodeName]</code>的 mac 地址，如果为空则生成一个</li>
+<li>在 ovn_cluster_router 上添加 port：<code>rtos-[nodeName]</code>，同时 IP 为上述第一个 IP，mac 地址为上述 mac</li>
+<li>添加逻辑交换机<code>[nodeName]</code>，设置已存在的 hostnet，设置 gateway_ip 为第一个 IP</li>
+<li>在<code>[nodeName]</code>上添加 port <code>str-[nodeName]</code> 连接到<code>rtos-[nodeName]</code></li>
+<li>在 <code>[nodeName]</code> 上添加负载均衡器</li>
+</ol></li>
+<li>如果 hostnet 未存在，使用子网分配器获取子网</li>
+<li>确保逻辑网络建立</li>
+<li>设置 node 的 annotations</li>
+<li>返回 hostnet</li>
+</ol>
+
+<h4 id="2-func-oc-controller-syncnodemanagementport-node-kapi-node-subnet-net-ipnet-error">2. <code>func (oc *Controller) syncNodeManagementPort(node *kapi.Node, subnet *net.IPNet) error</code></h4>
+
+<ol>
+<li>获取 management port 的 mac 地址</li>
+<li>如果 mac 为空，则删除 k8s-[nodeName]</li>
+<li>在逻辑交换机 <code>[nodeName]</code>上添加 logical port <code>k8s-[nodeName]</code></li>
+</ol>
+
+<pre><code class="language-go">	// Create this node's management logical port on the node switch
+	stdout, stderr, err := util.RunOVNNbctl(
+		&quot;--&quot;, &quot;--may-exist&quot;, &quot;lsp-add&quot;, node.Name, &quot;k8s-&quot;+node.Name,
+		&quot;--&quot;, &quot;lsp-set-addresses&quot;, &quot;k8s-&quot;+node.Name, macAddress+&quot; &quot;+portIP.IP.String(),
+		&quot;--&quot;, &quot;--if-exists&quot;, &quot;remove&quot;, &quot;logical_switch&quot;, node.Name, &quot;other-config&quot;, &quot;exclude_ips&quot;)
+</code></pre>
+
+<h4 id="3-func-oc-controller-syncnodegateway-node-kapi-node-subnet-net-ipnet-error">3. <code>func (oc *Controller) syncNodeGateway(node *kapi.Node, subnet *net.IPNet) error</code></h4>
+
+<p>如果 gatewaymode 为空，清理；</p>
+
+<p>如果为非空，则同步网关逻辑网络</p>
+
+<ol>
+<li>从配置获取集群的子网</li>
+<li>从 node 的 annotations 中获取 ifaceID、gateway mac 地址、gateway IP 地址、默认网关 IP 地址、VLAN ID</li>
+
+<li><p>创建 geteway router: <code>GR_[nodeName]</code></p>
+
+<pre><code class="language-go">    // Create a gateway router.
+    gatewayRouter := &quot;GR_&quot; + nodeName
+    stdout, stderr, err := RunOVNNbctl(&quot;--&quot;, &quot;--may-exist&quot;, &quot;lr-add&quot;,
+        gatewayRouter, &quot;--&quot;, &quot;set&quot;, &quot;logical_router&quot;, gatewayRouter,
+        &quot;options:chassis=&quot;+systemID, &quot;external_ids:physical_ip=&quot;+physicalIP)
+</code></pre>
+
+<ol>
+<li>在 join 上创建 lsp：<code>jtor-GR_[nodeName]</code>，并分配 mac 地址routerMac和 IP 地址routerCIDR</li>
+<li>在 gatewayRouter 上创建 lrp：<code>rtoj-GR_[nodeName]</code>，mac和IP设置为<code>jtor-GR_[nodeName]</code>的</li>
+<li>在 gatewayRouter设置options：lb_force_snat_ip：<code>rtoj-GR_[nodeName]</code>的IP</li>
+<li>在 gatewayRouter添加到达每个子网的路由，<code>via 100.64.0.1</code></li>
+<li>在 <code>ovn_cluster_router</code>上添加到gatewayRouter的默认路由</li>
+<li>在gatewayRouter上添加负载均衡器</li>
+<li>创建逻辑交换机 <code>ext_[nodeName]</code>，添加 port：[ifaceID]，并设置为 localnet，将交换机连接到<code>GR_[nodeName]</code></li>
+<li>在gatewayRouter上添加静态路由 <code>0.0.0.0/0 默认网关IP地址 rtoe-GW_[nodeName]</code></li>
+<li>在gatewayRouter上添加SNAT规则，将去子网的包 snat 成 gateway IP</li>
+<li>在<code>ovn_cluster_router</code>上添加/32 路由：routerCIDR routerCIDR
+14.</li>
+</ol>
+
+<pre><code class="language-go">    if rampoutIPSubnet != &quot;&quot; {
+        rampoutIPSubnets := strings.Split(rampoutIPSubnet, &quot;,&quot;)
+        for _, rampoutIPSubnet = range rampoutIPSubnets {
+            _, _, err = net.ParseCIDR(rampoutIPSubnet)
+            if err != nil {
+                continue
+            }
+    
+            // Add source IP address based routes in distributed router
+            // for this gateway router.
+            stdout, stderr, err = RunOVNNbctl(&quot;--may-exist&quot;,
+                &quot;--policy=src-ip&quot;, &quot;lr-route-add&quot;, k8sClusterRouter,
+                rampoutIPSubnet, routerCIDR.IP.String())
+            if err != nil {
+                return fmt.Errorf(&quot;Failed to add source IP address based &quot;+
+                    &quot;routes in distributed router, stdout: %q, &quot;+
+                    &quot;stderr: %q, error: %v&quot;, stdout, stderr, err)
+            }
+        }
+    }
+</code></pre></li>
+</ol>
+
+<h3 id="对-pod-的监听-watchpods">对 pod 的监听： WatchPods</h3>
+
+<h4 id="addlogicalport-pod">addLogicalPort(pod)</h4>
+
+<ol>
+<li>等待和node同名的logical switch建立</li>
+<li>读取pod的annotations，在logical switch上建立port：[pod.Namespace + &ldquo;_&rdquo; + pod.Name]，如果annotations中的ip和mac已经存在，则直接设置到port，如果不存在则设置成dynamic的</li>
+<li>获取logical switch 上的gateway ip</li>
+<li>在annotaions里写IP、MAC、GW</li>
+<li>把pod加到ns里</li>
+<li>设置pod的annotaions</li>
+</ol>
+
+<h3 id="对-services-endpoints-networkpolicy-的监听">对  services / endpoints / networkpolicy 的监听</h3>
+
+<p>这几个监听是 service 网络的建立以及访问控制的实现，套路实际上都差不多，相应从 k8s-apiserver 监听到的事件，然后调用 ovn/ovs 写入 openflow 流表，使得整个逻辑网络实现我们想要的行为。</p>
+
+<h1 id="5-ref">5. REF</h1>
+
+<ol>
+<li><a href="http://www.openvswitch.org/support/dist-docs/ovn-architecture.7.html">http://www.openvswitch.org/support/dist-docs/ovn-architecture.7.html</a></li>
+<li><a href="https://github.com/ovn-org/ovn-kubernetes">https://github.com/ovn-org/ovn-kubernetes</a></li>
+<li><a href="http://blog.spinhirne.com/2016/09/a-primer-on-ovn.html">http://blog.spinhirne.com/2016/09/a-primer-on-ovn.html</a> OVN 入门系列文章，可以参考这个系列实践一下 OVN 相关的操作，如创建虚拟交换机、虚拟路由器、负载均衡、网关、实现容器网络等</li>
+<li><a href="https://en.wikipedia.org/wiki/Open_vSwitch">https://en.wikipedia.org/wiki/Open_vSwitch</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Software-defined_networking">https://en.wikipedia.org/wiki/Software-defined_networking</a></li>
+<li><a href="https://en.wikipedia.org/wiki/OVN">https://en.wikipedia.org/wiki/OVN</a></li>
+</ol>
+
+  </div>
+</div>
+
+      <footer>
+        <hr>
+        <small>
+          &copy; 2019 gobomb.
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> using the <a href="https://github.com/arjunkrishnababu96/basics" target="_blank">Basics</a> theme.
+        </small>
+      </footer>
+    </div> 
+
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  </body>
+</html>
+

@@ -6,10 +6,24 @@
     <description>Recent content in 技术文章 on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 17 Sep 2019 01:07:13 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 29 Dec 2019 22:37:00 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/categories/%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kubernetes 网络学习：阅读 ovn-kubernetes 源码</title>
+      <link>https://gobomb.github.io/post/learning-k8s-networking-reading-ovn-kubernetes-source/</link>
+      <pubDate>Sun, 29 Dec 2019 22:37:00 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/learning-k8s-networking-reading-ovn-kubernetes-source/</guid>
+      <description>1. 软件定义网络介绍 何谓软件定义网络（SDN，software-defined networking）
+根据维基百科的定义：软件定义网络是一种新型网络架构。它利用OpenFlow协议将路由器的控制平面（control plane）从数据平面（data plane）中分离，改以软件方式实现。该架构可使网络管理员在不更动硬件设备的前提下，以中央控制方式用程序重新规划网络，为控制网络流量提供了新方案，也为核心网络和应用创新提供了良好平台。
+在传统网络中，我们要修改整个网络的配置，可能需要去每一台路由器上面更改路由配置；而在 SDN 中，只需要修改 SDN 的集中控制器，配置的更改会被控制器通过统一的协议下发到路由器上。这里路由器是实际数据转发的节点，但路由信息的配置转移到了集中控制器上，使得更改网络配置更加灵活。
+2. OVN (Open Virtual Network)介绍 Open vSwitch（OVS）是一款开源的分布式虚拟交换机，可以理解成软件实现的交换机。而 OVN 是基于 OVS 实现的一套网络方案，可以虚拟出二层和三层的网络。
+OVN 的架构图如下：
+ CMS | | +-----------|-----------+ | | | | OVN/CMS Plugin | | | | | | | | OVN Northbound DB | | | | | | | | ovn-northd | | | | +-----------|-----------+ | | +-------------------+ | OVN Southbound DB | +-------------------+ | | +------------------+------------------+ | | | HV 1 | | HV n | +---------------|---------------+ .</description>
+    </item>
     
     <item>
       <title>通过实验学习 Linux VETH 和 Bridge</title>
