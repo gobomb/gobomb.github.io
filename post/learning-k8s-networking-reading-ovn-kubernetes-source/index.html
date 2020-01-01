@@ -65,6 +65,8 @@ if (!doNotTrack) {
 
 <h1 id="1-软件定义网络介绍">1. 软件定义网络介绍</h1>
 
+<hr />
+
 <p>何谓软件定义网络（SDN，software-defined networking）</p>
 
 <p>根据维基百科的定义：软件定义网络是一种新型网络架构。它利用OpenFlow协议将路由器的控制平面（control plane）从数据平面（data plane）中分离，改以软件方式实现。该架构可使网络管理员在不更动硬件设备的前提下，以中央控制方式用程序重新规划网络，为控制网络流量提供了新方案，也为核心网络和应用创新提供了良好平台。</p>
@@ -72,6 +74,8 @@ if (!doNotTrack) {
 <p>在传统网络中，我们要修改整个网络的配置，可能需要去每一台路由器上面更改路由配置；而在 SDN 中，只需要修改 SDN 的集中控制器，配置的更改会被控制器通过统一的协议下发到路由器上。这里路由器是实际数据转发的节点，但路由信息的配置转移到了集中控制器上，使得更改网络配置更加灵活。</p>
 
 <h1 id="2-ovn-open-virtual-network-介绍">2. OVN (Open Virtual Network)介绍</h1>
+
+<hr />
 
 <p>Open vSwitch（OVS）是一款开源的分布式虚拟交换机，可以理解成软件实现的交换机。而 OVN 是基于 OVS 实现的一套网络方案，可以虚拟出二层和三层的网络。</p>
 
@@ -116,6 +120,8 @@ if (!doNotTrack) {
 <p>OVN 网络设置的大致流程：OVN/CMS Plugin 或用户使用 ovn-nbctl 更改 OVN Northbound DB 里的数据，定义 logical router / logical switch 等虚拟网络组件，ovn-northd 从 OVN Northbound DB 读取数据，翻译成 logical flow 写到 OVN Southbound DB；每台 chassis 上的 ovn-controller 读取 OVN Southbound DB 里的 logical flow 翻译成 openflow 配置写到 ovsdb-server 里，ovs-vswitchd 执行 openflow 规则。</p>
 
 <h1 id="3-ovn-kubernetes介绍">3. ovn-kubernetes介绍</h1>
+
+<hr />
 
 <p>ovn-kubernetes 是一个将 OVN 网络方案引入到 k8s 体系兼容 CNI 标准的一套代码，将 pod、service 网络都用 OVN 网络来实现。</p>
 
@@ -173,6 +179,8 @@ if (!doNotTrack) {
 <p>以上 logical router / logical switch 都是逻辑/虚拟的，每添加一台新的 node，ovn-kubernetes 会新建一台用 nodename 命名的 logical switch 连接到全局唯一的 OvnClusterRouter 上，每当有新的 pod 调度到 node，pod 就连接到对应 node 的 logical switch 上，用来形成 pod 网络（overlay / 东西向流量）。添加新 node 的同时，ovn-kubernetes 还会建立一个绑定到每一台 node 的 gateway router，连接到 join（join 是与 OvnClusterRouter 相连的 logical switch），用来连接 pod 网络（overlay）和 node 网络（underlay）（南北向流量）</p>
 
 <h1 id="4-ovn-kubernetes-源码阅读笔记">4. ovn-kubernetes 源码阅读笔记</h1>
+
+<hr />
 
 <p>ovnkube-master 和 ovnkube-node 实际上都是同一个可执行文件 ovnkube，只不过参数不通</p>
 
@@ -499,6 +507,8 @@ stdout, stderr, err := RunOVNNbctl(&quot;--&quot;, &quot;--may-exist&quot;, &quo
 <p>这几个监听是 service 网络的建立以及访问控制的实现，套路实际上都差不多，相应从 k8s-apiserver 监听到的事件，然后调用 ovn/ovs 写入 openflow 流表，使得整个逻辑网络实现我们想要的行为。</p>
 
 <h1 id="5-ref">5. REF</h1>
+
+<hr />
 
 <ol>
 <li><a href="http://www.openvswitch.org/support/dist-docs/ovn-architecture.7.html">http://www.openvswitch.org/support/dist-docs/ovn-architecture.7.html</a></li>

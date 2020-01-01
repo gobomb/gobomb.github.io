@@ -182,13 +182,14 @@ console.log(obj.x); // 200
 
 <li><p>修改引用的副本本身，函数内部的 o 对 obj 的引用断掉了</p>
 
-<pre><code class="language-js">var obj = {x : 1};
+<pre><code>var obj = {x : 1};
 function foo(o) {
     o = 100;
 }
 foo(obj);
 console.log(obj.x); // 1
-</code></pre>
+</code></pre></li>
+</ul>
 
 <h2 id="定义的澄清">定义的澄清</h2>
 
@@ -262,7 +263,6 @@ console.log(obj.x); // 1
 <li><a href="https://www.zhihu.com/question/20628016/answer/28970414">为什么 Java 只有值传递，但 C# 既有值传递，又有引用传递，这种语言设计有哪些好处？</a></li>
 <li><a href="https://segmentfault.com/a/1190000005794070">JS中的值是按值传递，还是按引用传递呢？</a></li>
 <li><a href="https://leokongwq.github.io/2017/01/22/golang-param-pass-value-or-point.html">值传递, 指针传递 这是一个问题</a></li>
-</ul></li>
 </ul>
 
   </div>
