@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet"> 
+
+        <title>使用 OpenSSH 建立 L2 和 L3 隧道</title>
+
+        <link rel="stylesheet" href="/css/stylesheet.css">
+    </head>
+    <body>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-md navbar-light">
+
+          
+          <span class="navbar-brand mb-0 h1"></span>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation" name="button">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
+              
+              <a class="nav-item nav-link " href="/about/">About</a>
+            </div>
+          </div>
+        </nav>
+
+        <section id="page-title">
+          <h1><a href="/">Present Day, Present Time</a></h1>
+          <span id="author-name">
+            <h6><a href="/about/">gobomb</a></h6>
+          </span>
+        </section>
+
+
+<div class="blog-post">
+  <h1>使用 OpenSSH 建立 L2 和 L3 隧道</h1>
+  <div class="blog-post-subheader">
+    <time>09 Jan 2020</time>
+  </div>
+  <div class="blog-post-content">
+    
+
+<h1 id="服务器环境">服务器环境</h1>
+
+<pre><code>server：ubuntu，处于172.16.0.0/16网段，默认网卡是eth0，server处于公网
+client：centos，处于10.10.13.0/24网段，默认网卡是ens192，client处于nat之后
+</code></pre>
+
+<h1 id="server端的配置">server端的配置</h1>
+
+<p><code>vi /etc/ssh/sshd_config</code></p>
+
+<pre><code>PermitRootLogin yes
+PermitTunnel yes
+</code></pre>
+
+<h1 id="l3-tunnel-配置过程">L3 Tunnel 配置过程</h1>
+
+<p>在client上执行</p>
+
+<pre><code>ssh -w 5:5 root@[server 公网ip] 
+</code></pre>
+
+<p>如果<code>-w</code>设置为<code>any</code>，会自动使用下一个可用的tun设备。</p>
+
+<p>执行完该命令会进入到server中，client和server各自会创建一个link：<code>tun5</code>。</p>
+
+<p>给server的VPN网卡配置地址和路由：</p>
+
+<pre><code># 配置地址10.0.1.1
+# 或者 ip address add 10.0.1.1/30 dev tun5
+ifconfig tun5 10.0.1.1 netmask 255.255.255.252
+
+# 启动网卡
+ip link set tun5 up
+# 配置到达10.10.13.0/24的路由
+# 或者 
+# ip route add 10.10.13.0/24 dev tun5
+route add -net 10.10.13.0 netmask 255.255.255.0 dev tun5
+
+# 开启转发
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward 
+iptables -t filter -A FORWARD -P ACCEPT
+
+# 设置nat
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+</code></pre>
+
+<p>在client：</p>
+
+<pre><code># 配置地址10.0.1.2
+# 或者 ip address add 10.0.1.2/30 dev tun5
+ifconfig tun5 10.0.1.2 netmask 255.255.255.252
+
+# 启动网卡
+ip link set tun5 up
+# 配置到达172.16.0.0/16的路由
+# 或者 
+# ip route add 172.16.0.0/16 dev tun5
+route add -net 172.16.0.0 netmask 255.255.0.0 dev tun5
+
+# 开启转发
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward 
+iptables -t filter -A FORWARD -P ACCEPT
+# 设置nat
+iptables -t nat -A POSTROUTING -o ens192 -j MASQUERADE
+</code></pre>
+
+<p>此时，在client可ping通172.16.0.0/16网段的机器，在server上可ping通10.10.13.0/24的机器。</p>
+
+<p>当进程<code>root     28073 23865  0 17:40 pts/0    00:00:00 ssh -w 5:5 root@[server 公网ip]</code>被kill，连接就会断掉。</p>
+
+<h1 id="l2-tunnel-配置过程">L2 Tunnel 配置过程</h1>
+
+<p>安装<code>brctl</code>工具</p>
+
+<pre><code># ubuntu
+apt install bridge-utils
+# centos
+yum install brctl
+</code></pre>
+
+<p>建立连接：</p>
+
+<pre><code># 参数 -o 需要在 -w 前面
+ssh -o Tunnel=ethernet -w 6:6 root@[server 公网ip]
+</code></pre>
+
+<p>执行完该命令会进入到server中，在server和client执行<code>ip link</code>可以看到新创建了tap设备<code>tap6</code>。</p>
+
+<p>在server上配置bridge <code>br0</code>，并把<code>tap6</code>加到<code>br0</code>中</p>
+
+<pre><code># 添加 br0
+brctl addbr br0
+# 添加 tap6 到 br0 中
+brctl addif br0 tap6
+# 给 br0 添加 ip 地址
+ip address add 10.0.1.1/30 dev br0
+# 启动 br0 和 tap6
+ip link set br0 up; ip link set tap6 up
+</code></pre>
+
+<p>在client上配置bridge <code>br0</code>，并把<code>tap6</code>加到<code>br0</code>中</p>
+
+<pre><code># 添加 br0
+brctl addbr br0
+# 添加 tap6 到 br0 中
+brctl addif br0 tap6
+# 给 br0 添加 ip 地址
+ip address add 10.0.1.2/30 dev br0
+# 启动 br0 和 tap6
+ip link set br0 up; ip link set tap6 up
+</code></pre>
+
+<p>在client通过<code>ip link</code>可以看到<code>br0</code>和<code>tap6</code>的mac地址是<code>9a:87:d2:12:8f:bd</code></p>
+
+<p>在server通过<code>ip link</code>可以看到<code>br0</code>和<code>tap6</code>的mac地址是<code>82:55:5b:75:e4:29</code></p>
+
+<p>在server通过<code>bridge fdb</code>可以看到server的mac转发表有client的记录（client的主机名是master）：</p>
+
+<pre><code>9a:87:d2:12:8f:bd dev tap6 master br0
+</code></pre>
+
+<p>在client通过<code>bridge fdb</code>可以看到client的mac转发表有server的记录：</p>
+
+<pre><code>82:55:5b:75:e4:29 dev tap6 master br0
+</code></pre>
+
+<p>或者通过<code>arp -a</code>查看arp缓存：</p>
+
+<pre><code># on server
+? (10.0.1.2) at 9a:87:d2:12:8f:bd [ether] on br0
+# on client
+? (10.0.1.1) at 82:55:5b:75:e4:29 [ether] on br0
+</code></pre>
+
+<p>在server端<code>arping -I br0 10.0.1.2</code>，同时在client <code>tcpdump -i br0 -n</code>可以看到arp请求和响应，可见此时二层是通的：</p>
+
+<p>在 server 发起 arp 请求：</p>
+
+<pre><code>$ arping -I br0 10.0.1.2
+ARPING 10.0.1.2 from 10.0.1.1 br0
+Unicast reply from 10.0.1.2 [9A:87:D2:12:8F:BD]  8.453ms
+Unicast reply from 10.0.1.2 [9A:87:D2:12:8F:BD]  9.330ms
+Unicast reply from 10.0.1.2 [9A:87:D2:12:8F:BD]  9.682ms
+</code></pre>
+
+<p>在 client 抓包：</p>
+
+<pre><code>$ tcpdump -i br0 -n
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on br0, link-type EN10MB (Ethernet), capture size 262144 bytes
+11:55:40.843929 ARP, Request who-has 10.0.1.2 (Broadcast) tell 10.0.1.1, length 28
+11:55:40.843961 ARP, Reply 10.0.1.2 is-at 9a:87:d2:12:8f:bd, length 28
+11:55:41.844165 ARP, Request who-has 10.0.1.2 (9a:87:d2:12:8f:bd) tell 10.0.1.1, length 28
+11:55:41.844202 ARP, Reply 10.0.1.2 is-at 9a:87:d2:12:8f:bd, length 28
+11:55:42.844422 ARP, Request who-has 10.0.1.2 (9a:87:d2:12:8f:bd) tell 10.0.1.1, length 28
+11:55:42.844455 ARP, Reply 10.0.1.2 is-at 9a:87:d2:12:8f:bd, length 28
+11:56:06.226079 IP6 fe80::8055:5bff:fe75:e429 &gt; ff02::2: ICMP6, router solicitation, length 16
+</code></pre>
+
+<h1 id="ref">Ref</h1>
+
+<p><a href="https://linux265.com/course/3414.html">https://linux265.com/course/3414.html</a></p>
+
+<p><a href="https://unix.stackexchange.com/questions/268690/for-some-reason-sudo-ssh-w-any-o-tunnel-ethernet-rootremote-creates-tun-dev">https://unix.stackexchange.com/questions/268690/for-some-reason-sudo-ssh-w-any-o-tunnel-ethernet-rootremote-creates-tun-dev</a></p>
+
+<p><a href="https://la11111.wordpress.com/2012/09/24/layer-2-vpns-using-ssh/">https://la11111.wordpress.com/2012/09/24/layer-2-vpns-using-ssh/</a></p>
+
+  </div>
+</div>
+
+      <footer>
+        <hr>
+        <small>
+          &copy; 2020 gobomb.
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> using the <a href="https://github.com/arjunkrishnababu96/basics" target="_blank">Basics</a> theme.
+        </small>
+      </footer>
+    </div> 
+
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  </body>
+</html>
+

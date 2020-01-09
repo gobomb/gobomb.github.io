@@ -6,10 +6,24 @@
     <description>Recent content on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 29 Dec 2019 22:37:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 09 Jan 2020 12:05:28 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>使用 OpenSSH 建立 L2 和 L3 隧道</title>
+      <link>https://gobomb.github.io/post/build-l2-l3-vpn-by-openssh/</link>
+      <pubDate>Thu, 09 Jan 2020 12:05:28 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/build-l2-l3-vpn-by-openssh/</guid>
+      <description>服务器环境 server：ubuntu，处于172.16.0.0/16网段，默认网卡是eth0，server处于公网 client：centos，处于10.10.13.0/24网段，默认网卡是ens192，client处于nat之后  server端的配置 vi /etc/ssh/sshd_config
+PermitRootLogin yes PermitTunnel yes  L3 Tunnel 配置过程 在client上执行
+ssh -w 5:5 root@[server 公网ip]  如果-w设置为any，会自动使用下一个可用的tun设备。
+执行完该命令会进入到server中，client和server各自会创建一个link：tun5。
+给server的VPN网卡配置地址和路由：
+# 配置地址10.0.1.1 # 或者 ip address add 10.0.1.1/30 dev tun5 ifconfig tun5 10.0.1.1 netmask 255.255.255.252 # 启动网卡 ip link set tun5 up # 配置到达10.10.13.0/24的路由 # 或者 # ip route add 10.10.13.0/24 dev tun5 route add -net 10.10.13.0 netmask 255.255.255.0 dev tun5 # 开启转发 echo 1 &amp;gt; /proc/sys/net/ipv4/ip_forward iptables -t filter -A FORWARD -P ACCEPT # 设置nat iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE  在client：</description>
+    </item>
     
     <item>
       <title>Kubernetes 网络学习：阅读 ovn-kubernetes 源码</title>
