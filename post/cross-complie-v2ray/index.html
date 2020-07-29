@@ -213,7 +213,7 @@ $ ls -lh
 -rwxr-xr-x. 1 root root 14M Dec 29 14:38 main
 </code></pre></li>
 
-<li><p>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法是用 GDB 进行调试），大小为11M：</p>
+<li><p>go build 时用 ldflags 设置变量的值，-s 去掉符号信息， -w 去掉 DWARF 调试信息（去掉后无法使用 GDB 进行调试），大小为11M：</p>
 
 <pre><code>$ go1.10beta1 build -ldflags '-w -s'
 
@@ -251,7 +251,6 @@ $ ls -lh
 <ol>
 <li><a href="https://stray.love/wen-ti-jie-jue-fang-an/jie-jue-goyu-yan-bian-yi-cheng-xu-wu-fa-zai-openwrtshang-yun-xing-de-wen-ti">解决GO语言编译程序无法在openwrt上运行的问题</a></li>
 <li><a href="https://github.com/golang/go/issues/18162">runtime: mips32 soft float point support</a></li>
-<li><a href="https://github.com/xtaci/kcptun/issues/79">go-mips32 交叉编译go程序 编译kcptun例子</a></li>
 </ol>
 
   </div>
