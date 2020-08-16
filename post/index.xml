@@ -6,10 +6,22 @@
     <description>Recent content in Posts on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 29 Mar 2020 01:37:25 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 16 Aug 2020 12:19:35 +0800</lastBuildDate>
     
 	<atom:link href="https://gobomb.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>给 WeaveNet 社区提 PR</title>
+      <link>https://gobomb.github.io/post/debug-and-pr-for-weave/</link>
+      <pubDate>Sun, 16 Aug 2020 12:19:35 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/debug-and-pr-for-weave/</guid>
+      <description>任职的公司 K8s 集群网络插件用的是 WeaveNet。WeaveNet 是一套基于 VXLAN 的容器网络方案。我们还用了 weave-npc 作为 K8s NetworkPolicy 的实现。从 2.6.0 版本开始，weave 存在一个很严重的 bug，会导致新创建的 pod 所有的网络流量被丢弃，在我们开发、测试、生产环境 K8s 集群里有很大的概率被触发。本文主要记录如何定位到该 bug 以及如何修复，给 weave 上游提 Pull Request 并被接受的过程。
+现象及复现 K8s 集群使用 weave-kube 和 weave-npc 2.6.0～2.6.5 版本。创建一个 namespace，在此 namespace 下创建 2 到 3 个 deploymnet，同时每个 deployment 创建一个 networkpolicy，允许网络流量的进出。在这种配置下，该 deployment 关联的 pod 是能够访问到 networkpolicy 放行的 IP 的。
+在一切部署完成后，删除该 namespace kubectl delete namespace [ns name] 。重复此操作 n 次，会发现，新创建的 pod 的所有网络访问都不通了，包括 networkpolicy 所允许的。
+weave-kube 和 weave-npc 都是作为 daemonset 部署的。查看 pod 所在 node 上的 weave-npc 的日志，可以看到大量的 pod 对应的流量被 block 的日志。</description>
+    </item>
     
     <item>
       <title>2019 年终总结</title>
