@@ -1,16 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Golang on Present Day, Present Time</title>
+    <title>golang on Present Day, Present Time</title>
     <link>https://gobomb.github.io/tags/golang/</link>
-    <description>Recent content in Golang on Present Day, Present Time</description>
+    <description>Recent content in golang on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 17 Dec 2018 02:08:25 +0800</lastBuildDate>
-    
-	<atom:link href="https://gobomb.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 17 Dec 2018 02:08:25 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>ngrok 源码解析</title>
       <link>https://gobomb.github.io/post/ngrok-source-code-reading/</link>
@@ -31,25 +27,23 @@ ngrok 的目的是将本地的端口反向代理到公网，让你可以通过�
       <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/cheatsheet/</guid>
-      <description>Linux  安装 deb 文件：
+      <description>Linux   安装 deb 文件：
 sudo dpkg -i [name].deb
 sudo apt-get install -f （修复依赖关系）
- linux 查找文件
-find [path] -name &amp;quot;*.log&amp;quot;
- ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关闭之
- 调用自己定义的编辑器来编辑当前命令行:
+  linux 查找文件
+find [path] -name &amp;quot;*.log&amp;quot; 
+  ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关闭之
+  调用自己定义的编辑器来编辑当前命令行:
 ctrl-x ctrl-e
 设置自己的默认编辑器：
 export EDITOR=vi
- shell 脚本报错：... /bin/sh^M: bad interpreter: No such file or directory
+  shell 脚本报错：... /bin/sh^M: bad interpreter: No such file or directory
 解决：
 vim [name.sh]
 :set ff 查看文件格式，若看到输出fileformat=dos，可:set ff=unix修改为 unix 格式
- 本地文件传输到远程机器
+  本地文件传输到远程机器
 scp -P [port] /path/to/source [user]@[ip]:/path/to/target
- 不挂断地运行命令
-nohup [command] [arg..] [&amp;amp;]
-例如：nohup hugo server --buildDrafts &amp;gt;&amp;gt; hugo.</description>
+  不挂断地运行命令</description>
     </item>
     
     <item>
@@ -63,9 +57,10 @@ nohup [command] [arg..] [&amp;amp;]
 定义 这些概念有些抽象，从字面理解，很容易产生歧义。先尽量跳出某一种编程语言的习惯，做出一些定义，再来讨论具体语言的特定做法。了解通用的定义，对于不同的语言的规定以及为何这么规定会更加清晰。
 求值策略(Evaluation strategy)指确定编程语言中表达式的求值的一组（通常确定性的）规则。描述的是求值和传值的方式，关注的点在于，表达式在调用函数的过程中，求值的时机、值的形式的选取等问题。
  按值传递（Pass by value）：函数的形参是被调用时所传实参的副本。修改形参的值并不会影响实参。（发生了值的复制） 按引用传递（Pass by reference）：传递给函数的是它的实参的隐式引用（别名）而不是实参的拷贝。修改形参会改变实参。（发生了引用的复制） 按共享对象传递（Pass by sharing）：传一个共享对象的引用的副本。修改形参的值会影响实参，修改形参本身不会影响实参。（发生了地址/指针的复制）  比如传递一个a，设a的引用为rf，a的地址为ad：
- 按值传递：a的值复制给b，函数拿到的是b的值和b的引用，和a无关。函数通过b的引用修改b，对调用者不可见。
- （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | | 复 ↓ 制 （子函数）rf of b -&amp;gt; ad of b -&amp;gt; b:100  按引用传递：a的值没有发生复制，函数拿到的是a的引用ar，通过这个引用修改a，也对调用者可见。
- （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | ^ 复 | | 制 ↓ | （子函数）rf of a ----—--&amp;gt;  按共享对象传递：重新构造了一个指向a的引用rf2，将a的地址复制给rf2，函数拿到的是这个rf的副本rf2，通过rf2修改a的值，对调用者可见，但如果修改引用rf2本身（使它指向别的地址），是对调用者不可见的，因为改的是副本。</description>
+  按值传递：a的值复制给b，函数拿到的是b的值和b的引用，和a无关。函数通过b的引用修改b，对调用者不可见。
+ （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | | 复 ↓ 制 （子函数）rf of b -&amp;gt; ad of b -&amp;gt; b:100 ``
+  按引用传递：a的值没有发生复制，函数拿到的是a的引用ar，通过这个引用修改a，也对调用者可见。
+ （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 |	^ 复 |	| 制 ↓	| （子函数）rf of a ----—--&amp;gt; ``</description>
     </item>
     
     <item>
@@ -90,16 +85,15 @@ nohup [command] [arg..] [&amp;amp;]
 人的记忆力和思考能力毕竟是有限的，并不一定能马上想到边界条件和 bug 可能出现的地方，当代码发生更改，边界条件可能就改变了，程序可能会跑不通，这时跑一下测试代码，可以更快发现问题。
 测试保证程序是可运行的，运行结果是正确的，使问题及早暴露，便于问题的定位解决。而性能测试则关注程序在高并发的情况下的稳定性。
 单元测试也可以方便读代码的人读懂，通过测试代码可以更快了解这个项目到底是干嘛的、该如何用。
-怎么写单元测试 单元测试  go语言自己有一个轻量级的测试框架 testing和命令go test,可用来进行单元测试和性能测试。
- 测试文件用 xxx_test.go命名，测试函数命名为TestXxx或Test_Xxx
- 在终端中输入 go test，将对当前目录下的所有xxx_test.go文件进行编译并自动运行测试。
- 测试某个文件，要带上被测试的原文件
-  &amp;ensp;&amp;emsp;&amp;emsp;go test xxx.go xxx_test.go 
- 测试某个方法:go test -run=&#39;Test_Xxx&#39;
- go test -v 则输出通过的测试函数信息
+怎么写单元测试 单元测试   go语言自己有一个轻量级的测试框架 testing和命令go test,可用来进行单元测试和性能测试。
+  测试文件用 xxx_test.go命名，测试函数命名为TestXxx或Test_Xxx
+  在终端中输入 go test，将对当前目录下的所有xxx_test.go文件进行编译并自动运行测试。
+  测试某个文件，要带上被测试的原文件
+   go test xxx.go xxx_test.go
+  测试某个方法:go test -run=&#39;Test_Xxx&#39;
+  go test -v 则输出通过的测试函数信息
   如对以下代码进行测试：
-package test func Fibonacci(n int) int{ if n==1{ return 1 }else if n==0{ return 1 } return Fibonacci(n-1)+Fibonacci(n-2) }  测试代码为：
-package test import &amp;quot;testing&amp;quot; func TestFibonacci5(t *testing.</description>
+package test func Fibonacci(n int) int{ if n==1{ return 1 }else if n==0{ return 1 } return Fibonacci(n-1)+Fibonacci(n-2) } 测试代码为：</description>
     </item>
     
   </channel>

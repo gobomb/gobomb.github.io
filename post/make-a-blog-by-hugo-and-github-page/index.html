@@ -7,26 +7,14 @@
         
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
 
         <title>用 Hugo 和 GitHub Page 搭建博客</title>
 
         <link rel="stylesheet" href="/css/stylesheet.css">
     </head>
     <body>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-112443219-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
       <div class="container-fluid">
         <nav class="navbar navbar-expand-md navbar-light">
 
@@ -40,6 +28,7 @@ if (!doNotTrack) {
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link " href="/post/">Posts</a>
               <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
               
               <a class="nav-item nav-link " href="/about/">About</a>
@@ -55,73 +44,75 @@ if (!doNotTrack) {
         </section>
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
 <div class="blog-post">
   <h1>用 Hugo 和 GitHub Page 搭建博客</h1>
   <div class="blog-post-subheader">
     <time>31 Oct 2017</time>
   </div>
   <div class="blog-post-content">
-    
-
-<p>图省事，懒得花钱买域名和备案，就用 <a href="https://pages.github.com/">GitHub Page</a> 来搭博客了。</p>
-
+    <p>图省事，懒得花钱买域名和备案，就用 <a href="https://pages.github.com/">GitHub Page</a> 来搭博客了。</p>
 <p><a href="https://gohugo.io/">hugo</a> 是用 Golang 写的静态网站生成器。支持 Markdown 语法。
 另一个用js写的同类工具<a href="http://jekyll.com.cn/">jekyll</a>
-比较出名。<br /><br /></p>
-
+比较出名。<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="安装和使用hugo">安装和使用Hugo</h2>
-
 <ul>
-<li><p>如果有 Go 环境，直接在终端输入：</p>
-
+<li>如果有 Go 环境，直接在终端输入：</li>
+</ul>
 <pre><code>go get -v github.com/spf13/hugo
 
 hugo new site /path/to/site
-</code></pre></li>
-
-<li><p><code>path/to/site</code>是本地站点目录</p></li>
-
-<li><p>创建 about 页面：</p>
-
+</code></pre><ul>
+<li>
+<p><code>path/to/site</code>是本地站点目录</p>
+</li>
+<li>
+<p>创建 about 页面：</p>
+</li>
+</ul>
 <pre><code>hugo new about.md
-</code></pre></li>
-
-<li><p>皮肤我用的是 <a href="https://github.com/chingli/rockrock">rockrock</a>：</p>
-
+</code></pre><ul>
+<li>皮肤我用的是 <a href="https://github.com/chingli/rockrock">rockrock</a>：</li>
+</ul>
 <pre><code>cd themes
 
 git clone https://github.com/chingli/rockrock
-</code></pre></li>
-</ul>
-
-<h2 id="在本地运行">在本地运行</h2>
-
+</code></pre><h2 id="在本地运行">在本地运行</h2>
 <ul>
-<li><p>在站点根目录下运行：
+<li>
+<p>在站点根目录下运行：
 <code>hugo server --theme=rockrock --buildDrafts</code>
-<br/></p></li>
-
-<li><p>在浏览器访问：
+<!-- raw HTML omitted --></p>
+</li>
+<li>
+<p>在浏览器访问：
 <code>http://localhost:1313</code>
-<br/></p></li>
-
-<li><p>这里修改 Markdown 文件可以动态更新，很方便。
-<br/><br/></p></li>
+<!-- raw HTML omitted --></p>
+</li>
+<li>
+<p>这里修改 Markdown 文件可以动态更新，很方便。
+<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+</li>
 </ul>
-
 <h2 id="在-github-上部署">在 GitHub 上部署</h2>
-
 <p>1 在 GitHub 建一个 Repository，命名为 <code>sidddhartha.gitbub.io</code>,
 <code>sidddhartha</code> 为自己的用户名。
-<br/></p>
-
+<!-- raw HTML omitted --></p>
 <p>2 在站点根目录下执行：</p>
-
 <pre><code>hugo --theme=rockrock --baseUrl=&quot;https://sidddhartha.github.io/&quot;
-</code></pre>
-
-<p>3 将生成的 pubilc 目录里所有文件 push 到 <code>sidddhartha.gitbub.io</code> 的 master 分支</p>
-
+</code></pre><p>3 将生成的 pubilc 目录里所有文件 push 到 <code>sidddhartha.gitbub.io</code> 的 master 分支</p>
 <pre><code>cd public
 
 git init
@@ -133,34 +124,26 @@ git add -A
 git commit -m &quot;first commit&quot;
 
 git push -u origin master
-</code></pre>
-
-<p><br/>
-4 浏览器访问：<a href="https://sidddhartha.github.io">https://sidddhartha.github.io</a>
-<br/><br/></p>
-
+</code></pre><!-- raw HTML omitted -->
 <h2 id="代码高亮">代码高亮</h2>
-
 <p>使用 <a href="https://highlightjs.org/">highlight.js</a>：</p>
-
 <ol>
-<li><p>将 highlight.js 下载到本地</p></li>
-
-<li><p>把 js 库文件<code>highlight.pack.js</code> 复制到 <code>.../themes/rockrock/static/js/</code>下面；把 <code>github.css</code>复制到 <code>.../themes/rockrock/static/css/</code>下面；有多种风格样式，我选择的是 <code>github</code> 风格</p></li>
-
-<li><p>在<code>.../themes/rockrock/layouts/partials/header.html</code>里添加以下代码：</p></li>
+<li>
+<p>将 highlight.js 下载到本地</p>
+</li>
+<li>
+<p>把 js 库文件<code>highlight.pack.js</code> 复制到 <code>.../themes/rockrock/static/js/</code>下面；把 <code>github.css</code>复制到 <code>.../themes/rockrock/static/css/</code>下面；有多种风格样式，我选择的是 <code>github</code> 风格</p>
+</li>
+<li>
+<p>在<code>.../themes/rockrock/layouts/partials/header.html</code>里添加以下代码：</p>
+</li>
 </ol>
-
-<pre><code class="language-html">&lt;!-- Highlight.js and css --&gt;
-	 &lt;script src=&quot;{{ .Site.BaseURL }}js/highlight.pack.js&quot;&gt;&lt;/script&gt;
-	 &lt;link rel=&quot;stylesheet&quot; href=&quot;{{ .Site.BaseURL }}css/github.css&quot;&gt;
-	 &lt;script&gt;hljs.initHighlightingOnLoad();&lt;/script&gt;
-</code></pre>
-
-<p>highlight.js 会自动检测语言类型，并使用<code>github</code>样式。</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!-- Highlight.js and css --&gt;</span>
+	 &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;{{ .Site.BaseURL }}js/highlight.pack.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+	 &lt;<span style="color:#f92672">link</span> <span style="color:#a6e22e">rel</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stylesheet&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;{{ .Site.BaseURL }}css/github.css&#34;</span>&gt;
+	 &lt;<span style="color:#f92672">script</span>&gt;<span style="color:#a6e22e">hljs</span>.<span style="color:#a6e22e">initHighlightingOnLoad</span>();&lt;/<span style="color:#f92672">script</span>&gt;
+</code></pre></div><p>highlight.js 会自动检测语言类型，并使用<code>github</code>样式。</p>
 <h2 id="参考文章">参考文章</h2>
-
 <ul>
 <li><a href="http://www.gohugo.org/">http://www.gohugo.org/</a></li>
 <li><a href="http://tonybai.com/2015/09/23/intro-of-gohugo/">http://tonybai.com/2015/09/23/intro-of-gohugo/</a></li>

@@ -7,26 +7,14 @@
         
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
 
         <title>Categories</title>
 
         <link rel="stylesheet" href="/css/stylesheet.css">
     </head>
     <body>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-112443219-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
       <div class="container-fluid">
         <nav class="navbar navbar-expand-md navbar-light">
 
@@ -40,6 +28,7 @@ if (!doNotTrack) {
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link " href="/post/">Posts</a>
               <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
               
               <a class="nav-item nav-link " href="/about/">About</a>
@@ -55,8 +44,54 @@ if (!doNotTrack) {
         </section>
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
 <section>
   <ul class="posts_listing">
+    
+    <li>
+      <div class="row" id="posts">
+        <div class="d-none d-sm-block col-sm-3 date-time-title">
+          <time>09 Jan 2020</time>
+        </div>
+        <div class="col-sm date-time-title post">
+          <a href="https://gobomb.github.io/categories/%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/">技术文章</a>
+        </div>
+      </div>
+    </li>
+    
+    <li>
+      <div class="row" id="posts">
+        <div class="d-none d-sm-block col-sm-3 date-time-title">
+          <time>02 Jan 2019</time>
+        </div>
+        <div class="col-sm date-time-title post">
+          <a href="https://gobomb.github.io/categories/%E6%80%BB%E7%BB%93/">总结</a>
+        </div>
+      </div>
+    </li>
+    
+    <li>
+      <div class="row" id="posts">
+        <div class="d-none d-sm-block col-sm-3 date-time-title">
+          <time>09 Sep 2018</time>
+        </div>
+        <div class="col-sm date-time-title post">
+          <a href="https://gobomb.github.io/categories/%E8%AE%B0%E5%BD%95/">记录</a>
+        </div>
+      </div>
+    </li>
     
   </ul>
 </section>

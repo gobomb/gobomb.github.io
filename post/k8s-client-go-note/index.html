@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
+
+        <title>K8s client-go 源码阅读笔记</title>
+
+        <link rel="stylesheet" href="/css/stylesheet.css">
+    </head>
+    <body>
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-md navbar-light">
+
+          
+          <span class="navbar-brand mb-0 h1"></span>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation" name="button">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link " href="/post/">Posts</a>
+              <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
+              
+              <a class="nav-item nav-link " href="/about/">About</a>
+            </div>
+          </div>
+        </nav>
+
+        <section id="page-title">
+          <h1><a href="/">Present Day, Present Time</a></h1>
+          <span id="author-name">
+            <h6><a href="/about/">gobomb</a></h6>
+          </span>
+        </section>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+<div class="blog-post">
+  <h1>K8s client-go 源码阅读笔记</h1>
+  <div class="blog-post-subheader">
+    <time>12 Oct 2020</time>
+  </div>
+  <div class="blog-post-content">
+    <p>我们可以通过 list 和 watch 的机制向 k8s 的 apiserver 同步 k8s 资源对象和对象的变化。client-go 是官方提供的 apiserver go 客户端库，封装了对
+k8s 对象的操作，实现了一个 apiserver 的缓存。这篇笔记主要在 interface 的层面介绍一下 cache 包的结构。interface 构成不同业务逻辑的边界，调用往往都通过 interface 中的方法来进行，作为调用方只需要关心抽象行为，而不用关心具体实现。通过学习 client-go 的代码，也可以了解 interface 的最佳实践。从 interface 入手，可以快速了解整套代码的骨架。</p>
+<p>client-go 实现了一个缓存，定期同步和 apiserver / etcd 中的数据，并且提供了一组响应资源变化的回调函数。作为库的用户只要实现回调函数，处理自己关心的资源对象（如Pod、Deployment、自己实现的 CR 等等），而不需要关心和 apiserver 具体的交互逻辑（list and watch）。相当于一个编程框架，让开发者专注于自己的业务逻辑而不是重复实现通用的轮子。</p>
+<p>以下通过几个重要的概念来介绍 client-go cache 包（位于 [kubernetes/staging/src/k8s.io/client-go/tools/cache/] (<a href="https://github.com/kubernetes/kubernetes/tree/master/staging/src/k8s.io/client-go/tools/cache">https://github.com/kubernetes/kubernetes/tree/master/staging/src/k8s.io/client-go/tools/cache</a>) 基于 <code>1c5be7dd5046fba8733f44618fd28fbb79e7db07</code> ）的机制，名词后面的括号说明这个名词是interface还是struct：</p>
+<ol>
+<li>
+<p>ClientSet（struct）：封装了 k8s 所有资源对象的获取方式，实现了每一种对象的 list 和 watch 接口，可以通过 http 跟 apiserver 交互。实现了 ListerWatcher 接口。</p>
+</li>
+<li>
+<p>ListerWatcher（interface）：</p>
+<p>list 就是 apiserver 一次性获取全量的数据，watch 就是持续获取增量数据</p>
+</li>
+<li>
+<p>Controller（interface）：驱动 informer，这里负责做两件事情（Run方法） ：</p>
+<ol>
+<li>通过 Reflector，调用 apiserver 将 etcd 中的对象同步到本地的 Queue 中；</li>
+<li>启动一个processLoop goroutine 根据 Queue 弹出（Pop方法）的对象和变化类型（Delta），更新cache（ThreadSafeStore），并调用 ResourceEventHandler 中用户实现的增删改方法。</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Controller</span> <span style="color:#66d9ef">interface</span> {
+        <span style="color:#a6e22e">Run</span>(<span style="color:#a6e22e">stopCh</span> <span style="color:#f92672">&lt;-</span><span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{})
+        <span style="color:#a6e22e">HasSynced</span>() <span style="color:#66d9ef">bool</span>
+        <span style="color:#a6e22e">LastSyncResourceVersion</span>() <span style="color:#66d9ef">string</span>
+}
+</code></pre></div></li>
+<li>
+<p>informer（struct）：普通的informer，实现了Controller。一个informer实例关注一种对象资源。只能绑定一个 ResourceEventHandler。</p>
+</li>
+<li>
+<p>SharedInformer（interface ）：可以看到，这里包含了和Controller一模一样的方法集，所以实现了SharedInformer的struct也同时实现了Controller。SharedInformer可以添加多个 ResourceEventHandler ，可以分发 Queue 产生的事件到多个 handler上。所谓的 share 是指多个 handler 共用一个 Informer</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">SharedInformer</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">AddEventHandler</span>(<span style="color:#a6e22e">handler</span> <span style="color:#a6e22e">ResourceEventHandler</span>)
+    <span style="color:#a6e22e">AddEventHandlerWithResyncPeriod</span>(<span style="color:#a6e22e">handler</span> <span style="color:#a6e22e">ResourceEventHandler</span>, <span style="color:#a6e22e">resyncPeriod</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Duration</span>)
+    <span style="color:#a6e22e">GetStore</span>() <span style="color:#a6e22e">Store</span>
+    <span style="color:#a6e22e">GetController</span>() <span style="color:#a6e22e">Controller</span>
+    <span style="color:#a6e22e">Run</span>(<span style="color:#a6e22e">stopCh</span> <span style="color:#f92672">&lt;-</span><span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{})
+    <span style="color:#a6e22e">HasSynced</span>() <span style="color:#66d9ef">bool</span>
+    <span style="color:#a6e22e">LastSyncResourceVersion</span>() <span style="color:#66d9ef">string</span>
+    <span style="color:#a6e22e">SetWatchErrorHandler</span>(<span style="color:#a6e22e">handler</span> <span style="color:#a6e22e">WatchErrorHandler</span>) <span style="color:#66d9ef">error</span>
+}
+</code></pre></div></li>
+<li>
+<p>SharedIndexInformer（interface）：定义中包含了SharedInformer，实现了SharedIndexInformer也同时实现了SharedInformer和Controller。相当于在原来的informer功能基础上又作出了拓展，增加了索引相关的功能。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">SharedIndexInformer</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">SharedInformer</span>
+    <span style="color:#a6e22e">AddIndexers</span>(<span style="color:#a6e22e">indexers</span> <span style="color:#a6e22e">Indexers</span>) <span style="color:#66d9ef">error</span>
+    <span style="color:#a6e22e">GetIndexer</span>() <span style="color:#a6e22e">Indexer</span>
+}
+</code></pre></div></li>
+<li>
+<p>SharedInformerFactory（interface）：位于 kubernetes/staging/src/k8s.io/client-go/informers，定义了不同对象资源的 Informer 接口。Start将启动所有的informer。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">SharedInformerFactory</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">internalinterfaces</span>.<span style="color:#a6e22e">SharedInformerFactory</span>
+    <span style="color:#a6e22e">ForResource</span>(<span style="color:#a6e22e">resource</span> <span style="color:#a6e22e">schema</span>.<span style="color:#a6e22e">GroupVersionResource</span>) (<span style="color:#a6e22e">GenericInformer</span>, <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">WaitForCacheSync</span>(<span style="color:#a6e22e">stopCh</span> <span style="color:#f92672">&lt;-</span><span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}) <span style="color:#66d9ef">map</span>[<span style="color:#a6e22e">reflect</span>.<span style="color:#a6e22e">Type</span>]<span style="color:#66d9ef">bool</span>
+
+    <span style="color:#a6e22e">Admissionregistration</span>() <span style="color:#a6e22e">admissionregistration</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Internal</span>() <span style="color:#a6e22e">apiserverinternal</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Apps</span>() <span style="color:#a6e22e">apps</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Autoscaling</span>() <span style="color:#a6e22e">autoscaling</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Batch</span>() <span style="color:#a6e22e">batch</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Certificates</span>() <span style="color:#a6e22e">certificates</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Coordination</span>() <span style="color:#a6e22e">coordination</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Core</span>() <span style="color:#a6e22e">core</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Discovery</span>() <span style="color:#a6e22e">discovery</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Events</span>() <span style="color:#a6e22e">events</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Extensions</span>() <span style="color:#a6e22e">extensions</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Flowcontrol</span>() <span style="color:#a6e22e">flowcontrol</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Networking</span>() <span style="color:#a6e22e">networking</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Node</span>() <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Policy</span>() <span style="color:#a6e22e">policy</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Rbac</span>() <span style="color:#a6e22e">rbac</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Scheduling</span>() <span style="color:#a6e22e">scheduling</span>.<span style="color:#a6e22e">Interface</span>
+    <span style="color:#a6e22e">Storage</span>() <span style="color:#a6e22e">storage</span>.<span style="color:#a6e22e">Interface</span>
+}
+
+<span style="color:#75715e">// 位于 kubernetes/staging/src/k8s.io/client-go/informers/internalinterfaces
+</span><span style="color:#75715e">// SharedInformerFactory a small interface to allow for adding an informer without an import cycle
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">SharedInformerFactory</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">Start</span>(<span style="color:#a6e22e">stopCh</span> <span style="color:#f92672">&lt;-</span><span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{})
+    <span style="color:#a6e22e">InformerFor</span>(<span style="color:#a6e22e">obj</span> <span style="color:#a6e22e">runtime</span>.<span style="color:#a6e22e">Object</span>, <span style="color:#a6e22e">newFunc</span> <span style="color:#a6e22e">NewInformerFunc</span>) <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">SharedIndexInformer</span>
+}
+</code></pre></div></li>
+<li>
+<p>Reflector（struct）：通过 ListerWatcher（ClientSet） 调用 list 和 watch，将对象数据同步到 Queue 里面。构造 Reflector 需要传入 ListerWatcher 和 Store 接口。</p>
+</li>
+<li>
+<p>Store（interface）：提供一组对象在 cache（一个 map）中增删查改的方法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Store</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{}) <span style="color:#66d9ef">error</span>
+    <span style="color:#a6e22e">Update</span>(<span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{}) <span style="color:#66d9ef">error</span>
+    <span style="color:#a6e22e">Delete</span>(<span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{}) <span style="color:#66d9ef">error</span>
+    <span style="color:#a6e22e">List</span>() []<span style="color:#66d9ef">interface</span>{}
+    <span style="color:#a6e22e">ListKeys</span>() []<span style="color:#66d9ef">string</span>
+    <span style="color:#a6e22e">Get</span>(<span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{}) (<span style="color:#a6e22e">item</span> <span style="color:#66d9ef">interface</span>{}, <span style="color:#a6e22e">exists</span> <span style="color:#66d9ef">bool</span>, <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">GetByKey</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">item</span> <span style="color:#66d9ef">interface</span>{}, <span style="color:#a6e22e">exists</span> <span style="color:#66d9ef">bool</span>, <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">Replace</span>([]<span style="color:#66d9ef">interface</span>{}, <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">error</span>
+    <span style="color:#a6e22e">Resync</span>() <span style="color:#66d9ef">error</span>
+}
+</code></pre></div></li>
+<li>
+<p>ResourceEventHandler（interface）：由库的用户实现，用来响应对象的增删改事件</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ResourceEventHandler</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">OnAdd</span>(<span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{})
+    <span style="color:#a6e22e">OnUpdate</span>(<span style="color:#a6e22e">oldObj</span>, <span style="color:#a6e22e">newObj</span> <span style="color:#66d9ef">interface</span>{})
+    <span style="color:#a6e22e">OnDelete</span>(<span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{})
+}
+</code></pre></div></li>
+<li>
+<p>Queue（interface）：拓展了 Store，提供了一个 Pop 方法用来 Process 方法（调用ResourceEventHandler）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Queue</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">Store</span>
+    <span style="color:#a6e22e">Pop</span>(<span style="color:#a6e22e">PopProcessFunc</span>) (<span style="color:#66d9ef">interface</span>{}, <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">AddIfNotPresent</span>(<span style="color:#66d9ef">interface</span>{}) <span style="color:#66d9ef">error</span>
+    <span style="color:#a6e22e">HasSynced</span>() <span style="color:#66d9ef">bool</span>
+    <span style="color:#a6e22e">Close</span>()
+}
+
+</code></pre></div></li>
+<li>
+<p>DeltaFIFO（struct）：是一个 Queue 的实现。生产者是 Reflector ，消费者是 Pop 方法的调用者。Queue 还有另一个实现，叫 FIFO，和 DeltaFIFO 的区别是前者不会弹出对象删除的事件。</p>
+<p>定义了另一个 struct 用来封装对象，带有变化的类型（Added/Updated/Deleted/Replaced/Sync）：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Delta</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#a6e22e">Type</span>   <span style="color:#a6e22e">DeltaType</span>
+    <span style="color:#a6e22e">Object</span> <span style="color:#66d9ef">interface</span>{}
+}
+</code></pre></div></li>
+<li>
+<p>Indexer（interface）：实现了Store的同时，给 cache 中的对象建立索引，方便快速地获取对象</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Indexer</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">Store</span>
+    <span style="color:#a6e22e">Index</span>(<span style="color:#a6e22e">indexName</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{}) ([]<span style="color:#66d9ef">interface</span>{}, <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">IndexKeys</span>(<span style="color:#a6e22e">indexName</span>, <span style="color:#a6e22e">indexedValue</span> <span style="color:#66d9ef">string</span>) ([]<span style="color:#66d9ef">string</span>, <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">ListIndexFuncValues</span>(<span style="color:#a6e22e">indexName</span> <span style="color:#66d9ef">string</span>) []<span style="color:#66d9ef">string</span>
+    <span style="color:#a6e22e">ByIndex</span>(<span style="color:#a6e22e">indexName</span>, <span style="color:#a6e22e">indexedValue</span> <span style="color:#66d9ef">string</span>) ([]<span style="color:#66d9ef">interface</span>{}, <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">GetIndexers</span>() <span style="color:#a6e22e">Indexers</span>
+    <span style="color:#a6e22e">AddIndexers</span>(<span style="color:#a6e22e">newIndexers</span> <span style="color:#a6e22e">Indexers</span>) <span style="color:#66d9ef">error</span>
+}
+</code></pre></div><p>有几个重要的概念，很容易混淆：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Index</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#a6e22e">sets</span>.<span style="color:#a6e22e">String</span>
+
+<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Indexers</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#a6e22e">IndexFunc</span>
+
+<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Indices</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#a6e22e">Index</span>
+
+<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">IndexFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{}) ([]<span style="color:#66d9ef">string</span>, <span style="color:#66d9ef">error</span>)
+</code></pre></div><ol>
+<li>Index：存储 key 和对象的映射</li>
+<li>Indexers：存储 Index 类型和 IndexFunc 的映射</li>
+<li>Indices：存储 Index 类型和对应类型的 Index 的映射</li>
+<li>IndexFunc：计算对象用于索引的 key。默认的 IndexFunc 是 MetaNamespaceKeyFunc，也就是用对象的 namespace 作为 key。</li>
+</ol>
+</li>
+<li>
+<p>ThreadSafeStore（interface）：线程安全的 Store，实现了此接口也意味着实现了 Store 和 Indexer。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ThreadSafeStore</span> <span style="color:#66d9ef">interface</span> {
+    <span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{})
+    <span style="color:#a6e22e">Update</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{})
+    <span style="color:#a6e22e">Delete</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>)
+    <span style="color:#a6e22e">Get</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">item</span> <span style="color:#66d9ef">interface</span>{}, <span style="color:#a6e22e">exists</span> <span style="color:#66d9ef">bool</span>)
+    <span style="color:#a6e22e">List</span>() []<span style="color:#66d9ef">interface</span>{}
+    <span style="color:#a6e22e">ListKeys</span>() []<span style="color:#66d9ef">string</span>
+    <span style="color:#a6e22e">Replace</span>(<span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">interface</span>{}, <span style="color:#66d9ef">string</span>)
+
+    <span style="color:#a6e22e">Index</span>(<span style="color:#a6e22e">indexName</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">obj</span> <span style="color:#66d9ef">interface</span>{}) ([]<span style="color:#66d9ef">interface</span>{}, <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">IndexKeys</span>(<span style="color:#a6e22e">indexName</span>, <span style="color:#a6e22e">indexKey</span> <span style="color:#66d9ef">string</span>) ([]<span style="color:#66d9ef">string</span>, <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">ListIndexFuncValues</span>(<span style="color:#a6e22e">name</span> <span style="color:#66d9ef">string</span>) []<span style="color:#66d9ef">string</span>
+    <span style="color:#a6e22e">ByIndex</span>(<span style="color:#a6e22e">indexName</span>, <span style="color:#a6e22e">indexKey</span> <span style="color:#66d9ef">string</span>) ([]<span style="color:#66d9ef">interface</span>{}, <span style="color:#66d9ef">error</span>)
+    <span style="color:#a6e22e">GetIndexers</span>() <span style="color:#a6e22e">Indexers</span>
+    <span style="color:#a6e22e">AddIndexers</span>(<span style="color:#a6e22e">newIndexers</span> <span style="color:#a6e22e">Indexers</span>) <span style="color:#66d9ef">error</span>
+
+    <span style="color:#a6e22e">Resync</span>() <span style="color:#66d9ef">error</span>
+}
+</code></pre></div></li>
+</ol>
+<p>简单来讲，总的流程是 Reflector 通过 ClientSet 从 apiserver 获取数据，数据被同步到 DeltaFIFO 队列里，DeltaFIFO Pop 出数据，被 Informer 消费：存入 ThreadSafeStore，并触发 ResourceEventHandler。</p>
+<p>有几个比较难懂的概念，我花了很长时间才搞明白：</p>
+<ol>
+<li>SharedInformer：一开始我能理解 informer 的机制，但是看不懂 ShareInformer 到底是在 share 什么，与一般的 informer 到底有什么区别。一开始以为是不同的 informer share 同一个 cache 或者同一个 queue，实际上不是。后来观察 SharedInformer 的方法，多了 AddEventHandler，说明可以添加多个 handler， 而普通的 informer 只能注册一个handler。SharedInformer 的实现也有一大部分代码是在处理如何分发事件和管理 handler。</li>
+<li>index：和 index 相关有几个 map：Index、Indexes、Indices，名称相近，十分令人费解。实际上是为了支持多种 index 算法或者种类。</li>
+<li>store：为何有那么多种 store 的接口和实现（Queue、cache、index、FIFO、DeltaFIFO……）？他们之间是什么关系，各自又有什么目的？实际上，资源对象在这里是冗余的，一份数据可能出现在 queue、cache、index 中。</li>
+</ol>
+<p>Ref：</p>
+<p><a href="https://github.com/kubernetes/kubernetes/tree/master/staging/src/k8s.io/client-go/tools/cache">kubernetes/staging/src/k8s.io/client-go/tools/cache/</a></p>
+<p><a href="https://blog.csdn.net/weixin_42663840/article/details/81699303">深入浅出kubernetes之client-go的SharedInformer</a></p>
+<p><a href="https://mp.weixin.qq.com/s/xCa6yZTk0X76IZhOx6IbHQ">client-go 之 Indexer 的理解</a></p>
+
+  </div>
+</div>
+
+      <footer>
+        <hr>
+        <small>
+          &copy; 2020 gobomb.
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> using the <a href="https://github.com/arjunkrishnababu96/basics" target="_blank">Basics</a> theme.
+        </small>
+      </footer>
+    </div> 
+
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  </body>
+</html>
+

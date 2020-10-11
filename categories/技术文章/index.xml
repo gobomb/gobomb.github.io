@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>技术文章 on Present Day, Present Time</title>
@@ -6,23 +6,19 @@
     <description>Recent content in 技术文章 on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 09 Jan 2020 12:05:28 +0800</lastBuildDate>
-    
-	<atom:link href="https://gobomb.github.io/categories/%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Thu, 09 Jan 2020 12:05:28 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/categories/%E6%8A%80%E6%9C%AF%E6%96%87%E7%AB%A0/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>使用 OpenSSH 建立 L2 和 L3 隧道</title>
       <link>https://gobomb.github.io/post/build-l2-l3-vpn-by-openssh/</link>
       <pubDate>Thu, 09 Jan 2020 12:05:28 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/build-l2-l3-vpn-by-openssh/</guid>
-      <description>服务器环境 server：ubuntu，处于172.16.0.0/16网段，默认网卡是eth0，server处于公网 client：centos，处于10.10.13.0/24网段，默认网卡是ens192，client处于nat之后  server端的配置 vi /etc/ssh/sshd_config
-PermitRootLogin yes PermitTunnel yes  L3 Tunnel 配置过程 在client上执行
-ssh -w 5:5 root@[server 公网ip]  如果-w设置为any，会自动使用下一个可用的tun设备。
+      <description>服务器环境 server：ubuntu，处于172.16.0.0/16网段，默认网卡是eth0，server处于公网 client：centos，处于10.10.13.0/24网段，默认网卡是ens192，client处于nat之后 server端的配置 vi /etc/ssh/sshd_config
+PermitRootLogin yes PermitTunnel yes L3 Tunnel 配置过程 在client上执行
+ssh -w 5:5 root@[server 公网ip] 如果-w设置为any，会自动使用下一个可用的tun设备。
 执行完该命令会进入到server中，client和server各自会创建一个link：tun5。
 给server的VPN网卡配置地址和路由：
-# 配置地址10.0.1.1 # 或者 ip address add 10.0.1.1/30 dev tun5 ifconfig tun5 10.0.1.1 netmask 255.255.255.252 # 启动网卡 ip link set tun5 up # 配置到达10.10.13.0/24的路由 # 或者 # ip route add 10.10.13.0/24 dev tun5 route add -net 10.10.13.0 netmask 255.255.255.0 dev tun5 # 开启转发 echo 1 &amp;gt; /proc/sys/net/ipv4/ip_forward iptables -t filter -A FORWARD -P ACCEPT # 设置nat iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE  在client：</description>
+# 配置地址10.0.1.1 # 或者 ip address add 10.0.1.1/30 dev tun5 ifconfig tun5 10.0.1.1 netmask 255.255.255.252 # 启动网卡 ip link set tun5 up # 配置到达10.10.13.0/24的路由 # 或者 # ip route add 10.10.13.0/24 dev tun5 route add -net 10.10.13.0 netmask 255.255.255.0 dev tun5 # 开启转发 echo 1 &amp;gt; /proc/sys/net/ipv4/ip_forward iptables -t filter -A FORWARD -P ACCEPT # 设置nat iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 在client：</description>
     </item>
     
     <item>
@@ -31,10 +27,10 @@ ssh -w 5:5 root@[server 公网ip]  如果-w设置为any，会自动使用下一�
       <pubDate>Sun, 29 Dec 2019 22:37:00 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/learning-k8s-networking-reading-ovn-kubernetes-source/</guid>
-      <description>1. 软件定义网络介绍 何谓软件定义网络（SDN，software-defined networking）
+      <description>1. 软件定义网络介绍  何谓软件定义网络（SDN，software-defined networking）
 根据维基百科的定义：软件定义网络是一种新型网络架构。它利用OpenFlow协议将路由器的控制平面（control plane）从数据平面（data plane）中分离，改以软件方式实现。该架构可使网络管理员在不更动硬件设备的前提下，以中央控制方式用程序重新规划网络，为控制网络流量提供了新方案，也为核心网络和应用创新提供了良好平台。
 在传统网络中，我们要修改整个网络的配置，可能需要去每一台路由器上面更改路由配置；而在 SDN 中，只需要修改 SDN 的集中控制器，配置的更改会被控制器通过统一的协议下发到路由器上。这里路由器是实际数据转发的节点，但路由信息的配置转移到了集中控制器上，使得更改网络配置更加灵活。
-2. OVN (Open Virtual Network)介绍 Open vSwitch（OVS）是一款开源的分布式虚拟交换机，可以理解成软件实现的交换机。而 OVN 是基于 OVS 实现的一套网络方案，可以虚拟出二层和三层的网络。
+2. OVN (Open Virtual Network)介绍  Open vSwitch（OVS）是一款开源的分布式虚拟交换机，可以理解成软件实现的交换机。而 OVN 是基于 OVS 实现的一套网络方案，可以虚拟出二层和三层的网络。
 OVN 的架构图如下：
  CMS | | +-----------|-----------+ | | | | OVN/CMS Plugin | | | | | | | | OVN Northbound DB | | | | | | | | ovn-northd | | | | +-----------|-----------+ | | +-------------------+ | OVN Southbound DB | +-------------------+ | | +------------------+------------------+ | | | HV 1 | | HV n | +---------------|---------------+ .</description>
     </item>
@@ -50,7 +46,7 @@ OVN 的架构图如下：
 概念 VETH（virtual Ethernet）：是 Linux 内核支持的一种虚拟网络设备，表示一对虚拟的网络接口，VETH 对的两端可以处于不同的网络命名空间，所以可以用来做主机和容器之间的网络通信。
 Bridge：Bridge 类似于交换机，用来做二层的交换。可以将其他网络设备挂在 Bridge 上面，当有数据到达时，Bridge 会根据报文中的 MAC 信息进行广播、转发或丢弃。
 Namespace：是 Linux 提供的一种内核级别环境隔离的方法。不同命名空间下的资源集合无法互相访问。
-实验环境： root@ubuntu:~# cat /proc/version Linux version 4.4.0-38-generic (buildd@lgw01-58) (gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.2) ) #57-Ubuntu SMP Tue Sep 6 15:42:33 UTC 2016  网卡名称和 IP 地址为ens160 10.10.12.27/24
+实验环境： root@ubuntu:~# cat /proc/version Linux version 4.4.0-38-generic (buildd@lgw01-58) (gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.2) ) #57-Ubuntu SMP Tue Sep 6 15:42:33 UTC 2016 网卡名称和 IP 地址为ens160 10.10.12.27/24
 网络拓扑示意图  +------------------------+ | | iptables +----------+ | br01 192.</description>
     </item>
     
@@ -94,9 +90,10 @@ ngrok 的目的是将本地的端口反向代理到公网，让你可以通过�
 定义 这些概念有些抽象，从字面理解，很容易产生歧义。先尽量跳出某一种编程语言的习惯，做出一些定义，再来讨论具体语言的特定做法。了解通用的定义，对于不同的语言的规定以及为何这么规定会更加清晰。
 求值策略(Evaluation strategy)指确定编程语言中表达式的求值的一组（通常确定性的）规则。描述的是求值和传值的方式，关注的点在于，表达式在调用函数的过程中，求值的时机、值的形式的选取等问题。
  按值传递（Pass by value）：函数的形参是被调用时所传实参的副本。修改形参的值并不会影响实参。（发生了值的复制） 按引用传递（Pass by reference）：传递给函数的是它的实参的隐式引用（别名）而不是实参的拷贝。修改形参会改变实参。（发生了引用的复制） 按共享对象传递（Pass by sharing）：传一个共享对象的引用的副本。修改形参的值会影响实参，修改形参本身不会影响实参。（发生了地址/指针的复制）  比如传递一个a，设a的引用为rf，a的地址为ad：
- 按值传递：a的值复制给b，函数拿到的是b的值和b的引用，和a无关。函数通过b的引用修改b，对调用者不可见。
- （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | | 复 ↓ 制 （子函数）rf of b -&amp;gt; ad of b -&amp;gt; b:100  按引用传递：a的值没有发生复制，函数拿到的是a的引用ar，通过这个引用修改a，也对调用者可见。
- （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | ^ 复 | | 制 ↓ | （子函数）rf of a ----—--&amp;gt;  按共享对象传递：重新构造了一个指向a的引用rf2，将a的地址复制给rf2，函数拿到的是这个rf的副本rf2，通过rf2修改a的值，对调用者可见，但如果修改引用rf2本身（使它指向别的地址），是对调用者不可见的，因为改的是副本。</description>
+  按值传递：a的值复制给b，函数拿到的是b的值和b的引用，和a无关。函数通过b的引用修改b，对调用者不可见。
+ （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 | | 复 ↓ 制 （子函数）rf of b -&amp;gt; ad of b -&amp;gt; b:100 ``
+  按引用传递：a的值没有发生复制，函数拿到的是a的引用ar，通过这个引用修改a，也对调用者可见。
+ （主函数）rf of a -&amp;gt; ad of a -&amp;gt; a:100 |	^ 复 |	| 制 ↓	| （子函数）rf of a ----—--&amp;gt; ``</description>
     </item>
     
     <item>
@@ -106,12 +103,12 @@ ngrok 的目的是将本地的端口反向代理到公网，让你可以通过�
       
       <guid>https://gobomb.github.io/post/high-concurrency-model/</guid>
       <description>Go 的特色之一就是 goroutine ，使得程序员进行并发编程更加方便，适合用来进行服务器编程。作为后端开发工程师，有必要了解并发编程面临的场景和常见的解决方案。一般情况下，是怎样做高并发的编程呢？有那些经典的模型呢？
-一切始于 C10k C10k 就是 Client 10000，单机服务器同时服务1万个客户端。当然，现在的业务面临的是 C100k、C1000k 了。早期的服务器是基于进程/线程模型，每新来一个连接，就分配一个进程（线程）去处理这个连接。而进程（线程）在操作系统中，占有一定的资源。由于硬件的限制，进程（线程）的创建是有瓶颈的。另外进程（线程）的上下文切换也有成本：每次调度器调度线程，操作系统都要把线程的各种必要的信息，如程序计数器、堆栈、寄存器、状态等保存起来。
+ 一切始于 C10k C10k 就是 Client 10000，单机服务器同时服务1万个客户端。当然，现在的业务面临的是 C100k、C1000k 了。早期的服务器是基于进程/线程模型，每新来一个连接，就分配一个进程（线程）去处理这个连接。而进程（线程）在操作系统中，占有一定的资源。由于硬件的限制，进程（线程）的创建是有瓶颈的。另外进程（线程）的上下文切换也有成本：每次调度器调度线程，操作系统都要把线程的各种必要的信息，如程序计数器、堆栈、寄存器、状态等保存起来。
 CPU 运算远远快于 I/O 操作。一般而言，常见的互联网应用（比如 Web）都是 I/O 密集型而非计算密集型。I/O 密集型是指，计算机 CPU 大量的时间都花在等待数据的输入输出，而不是计算。当 CPU 大部分时间都在等待 I/O 的时候，大部分计算资源都被浪费掉了。
 显然，简单粗暴地开一个进程/线程去 handle 一个连接是不够的。为了达到高并发，应该好好考虑一下 I/O 策略。同样的硬件条件下，不同的设计产生的效果差别也会很大。在讨论几种 I/O 模型之前，先介绍一下同步/异步、阻塞/非阻塞的概念，以及操作系统的知识。
 参考：
 The C10K problem
-同步/异步？阻塞/非阻塞？ 同步，是调用者主动去查看调用的状态，实时跟进，不可以同时做其他事情；异步，则是其他线程（可能是被调用者，也可能是一个帮你关注调用结果的实体）来通知调用者，调用者可以同时做其他事情，当调用结果更新，调用者会收到通知，再去处理调用结果。
+ 同步/异步？阻塞/非阻塞？ 同步，是调用者主动去查看调用的状态，实时跟进，不可以同时做其他事情；异步，则是其他线程（可能是被调用者，也可能是一个帮你关注调用结果的实体）来通知调用者，调用者可以同时做其他事情，当调用结果更新，调用者会收到通知，再去处理调用结果。
 主动轮询就是同步行为，调用者需要不断地去查看状态是否更新，在状态更新或结果返回之后，调用者才能跳出循环。而注册回调函数的方式，则是异步的。在 Web 应用里，前端可通过 jQuery AJAX 以异步的方式向服务器请求数据，在数据还没到达之前，AJAX 里的回调函数不会被执行，而调用者执行 AJAX 之后的代码，等到数据到达，才触发回调里的逻辑。
 （感谢 @CuberL 在评论中指出: jQuery AJAX 也有同步和异步两种方式。可通过指定 async 的值来确定，默认情况下是异步方式。）
 用一个生活中的例子来说明：快递员（调用者）送包裹，打电话叫你过来取（调用），然后他会等在那里，实时跟进包裹是否被你拿走（主动查看调用状态），只有你来拿了（调用状态更新）他才能离开，并记下此包裹被取（处理调用结果），继续送其他包裹，这就是同步方式。异步的情况则是，快递员打电话叫你过来取（调用），把包裹放在快递柜里（向另一个执行实体注册回调函数），然后离开，做其他事情。你从快递柜里取走包裹（调用状态更新），快递柜通知快递员或者你打电话告诉快递员：包裹已经被取走了（把状态更新的信息通知调用者），快递员可以停下其他事情，记录一下此包裹被取（执行回调函数，也即处理调用结果），继续做其他事情。

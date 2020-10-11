@@ -7,26 +7,14 @@
         
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
 
         <title>Cheat Sheet</title>
 
         <link rel="stylesheet" href="/css/stylesheet.css">
     </head>
     <body>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-112443219-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
       <div class="container-fluid">
         <nav class="navbar navbar-expand-md navbar-light">
 
@@ -40,6 +28,7 @@ if (!doNotTrack) {
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link " href="/post/">Posts</a>
               <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
               
               <a class="nav-item nav-link " href="/about/">About</a>
@@ -55,103 +44,103 @@ if (!doNotTrack) {
         </section>
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
 <div class="blog-post">
   <h1>Cheat Sheet</h1>
   <div class="blog-post-subheader">
     <time>18 Mar 2018</time>
   </div>
   <div class="blog-post-content">
-    
-
-<h2 id="linux">Linux</h2>
-
+    <h2 id="linux">Linux</h2>
 <ol>
-<li><p>安装 deb 文件：</p>
-
+<li>
+<p>安装 deb 文件：</p>
 <p><code>sudo dpkg -i [name].deb</code></p>
-
-<p><code>sudo apt-get install -f</code> （修复依赖关系）</p></li>
-
-<li><p>linux 查找文件</p>
-
-<p><code>find [path] -name &quot;*.log&quot;</code></p></li>
-
-<li><p>ubuntu（桌面版） 在终端输入<code>xkill</code>，鼠标变成<code>x</code>，点击 GUI 程序，可强制关闭之</p></li>
-
-<li><p>调用自己定义的编辑器来编辑当前命令行:</p>
-
+<p><code>sudo apt-get install -f</code> （修复依赖关系）</p>
+</li>
+<li>
+<p>linux 查找文件</p>
+<p><code>find [path] -name &quot;*.log&quot; </code></p>
+</li>
+<li>
+<p>ubuntu（桌面版） 在终端输入<code>xkill</code>，鼠标变成<code>x</code>，点击 GUI 程序，可强制关闭之</p>
+</li>
+<li>
+<p>调用自己定义的编辑器来编辑当前命令行:</p>
 <p><code>ctrl-x ctrl-e</code></p>
-
 <p>设置自己的默认编辑器：</p>
-
-<p><code>export EDITOR=vi</code></p></li>
-
-<li><p>shell 脚本报错：<code>... /bin/sh^M: bad interpreter: No such file or directory</code></p>
-
+<p><code>export EDITOR=vi</code></p>
+</li>
+<li>
+<p>shell 脚本报错：<code>... /bin/sh^M: bad interpreter: No such file or directory</code></p>
 <p>解决：</p>
-
 <p><code>vim [name.sh]</code></p>
-
-<p><code>:set ff</code> 查看文件格式，若看到输出<code>fileformat=dos</code>，可<code>:set ff=unix</code>修改为 unix 格式</p></li>
-
-<li><p>本地文件传输到远程机器</p>
-
-<p><code>scp -P [port] /path/to/source [user]@[ip]:/path/to/target</code></p></li>
-
-<li><p>不挂断地运行命令</p>
-
+<p><code>:set ff</code> 查看文件格式，若看到输出<code>fileformat=dos</code>，可<code>:set ff=unix</code>修改为 unix 格式</p>
+</li>
+<li>
+<p>本地文件传输到远程机器</p>
+<p><code>scp -P [port] /path/to/source [user]@[ip]:/path/to/target</code></p>
+</li>
+<li>
+<p>不挂断地运行命令</p>
 <p><code>nohup [command] [arg..] [&amp;]</code></p>
-
 <p>例如：<code>nohup hugo server  --buildDrafts &gt;&gt; hugo.log 2&gt;&amp;1 &amp;</code> 后台运行 hugo，将标准输出和标准错误重定向到 hugo.log 中，该命令将返回进程号：<code>[1] 24102</code>。</p>
-
 <p>使用<code>jobs</code>命令可以看到该后台进程（当前终端有效）：<code>[1]  + running    nohup hugo server --buildDrafts &gt;&gt; hugo.log 2&gt;&amp;1</code></p>
-
-<p>使用<code>fg %1</code>（%1 为 jobs 编号而非 PID）可以使后台作业切换到前台</p></li>
+<p>使用<code>fg %1</code>（%1 为 jobs 编号而非 PID）可以使后台作业切换到前台</p>
+</li>
 </ol>
-
 <h2 id="数据库">数据库</h2>
+<ol start="7">
+<li>
+<p>mongo shell 查询 collections</p>
+<pre><code>`db.[collection].find();`
 
-<ol>
-<li><p>mongo shell 查询 collections</p>
+删除某一条文档：
 
-<p><code>db.[collection].find();</code></p>
-
-<p>删除某一条文档：</p>
-
-<p><code>db.[collection].remove({&quot;[key]&quot;:&quot;[value]&quot;});</code></p></li>
-
-<li><p>cockroachDB 导入 sql 脚本：</p>
-
-<p><code>cat /path/to/schema.sql | cockroach sql -d [db] -u [user] --insecure</code></p></li>
+`db.[collection].remove({&quot;[key]&quot;:&quot;[value]&quot;});`
+</code></pre>
+</li>
+<li>
+<p>cockroachDB 导入 sql 脚本：</p>
+<p><code>cat /path/to/schema.sql | cockroach sql -d [db] -u [user] --insecure</code></p>
+</li>
 </ol>
-
 <h2 id="git">Git</h2>
-
-<ol>
-<li><p>改变最近一次提交：</p>
-
-<p>修改并<code>git add/rm [file]</code>后，<code>git commit --amend</code>，也可以修改 commit 说明</p></li>
-
-<li><p>落后远程分支几个版本，强行回退：</p>
-
+<ol start="8">
+<li>
+<p>改变最近一次提交：</p>
+<p>修改并<code>git add/rm [file]</code>后，<code>git commit --amend</code>，也可以修改 commit 说明</p>
+</li>
+<li>
+<p>落后远程分支几个版本，强行回退：</p>
 <ol>
 <li><code>git reset [commitID]</code>，到上个版本</li>
 <li><code>git stash</code>，暂存修改</li>
 <li><code>git push --force</code>, 强制push,远程的最新的一次commit被删除</li>
 <li><code>git stash pop</code>，释放暂存的修改，开始修改代码</li>
-<li><code>git add .</code>-&gt; <code>git commit -m &quot;massage&quot;</code> -&gt; <code>git push</code></li>
-</ol></li>
-
-<li><p>从某个 commit 中复制某个文件到暂存区:</p>
-
+<li><code>git add . </code>-&gt; <code>git commit -m &quot;massage&quot;</code> -&gt; <code>git push</code></li>
+</ol>
+</li>
+<li>
+<p>从某个 commit 中复制某个文件到暂存区:</p>
 <p><code>git reset [commit-hash] file.txt</code></p>
-
 <p><code>git add file.txt</code> 的逆操作，可用来取消暂存：</p>
-
-<p><code>git reset (HEAD) file.txt</code></p></li>
-
-<li><p>git 的三棵树：</p>
-
+<p><code>git reset (HEAD) file.txt</code></p>
+</li>
+<li>
+<p>git 的三棵树：</p>
 <table>
 <thead>
 <tr>
@@ -159,75 +148,76 @@ if (!doNotTrack) {
 <th>用途</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>HEAD</td>
 <td>上一次提交的快照，下一次提交的父结点</td>
 </tr>
-
 <tr>
 <td>Index</td>
 <td>预期的下一次提交的快照（也就是暂存区）</td>
 </tr>
-
 <tr>
 <td>Working Directory</td>
 <td>沙盒</td>
 </tr>
 </tbody>
-</table></li>
-
-<li><p><code>git reset</code> 命令会以特定的顺序重写这三棵树，在你指定以下选项时停止：</p>
-
+</table>
+</li>
+<li>
+<p><code>git reset</code> 命令会以特定的顺序重写这三棵树，在你指定以下选项时停止：</p>
 <ol>
 <li>移动 HEAD 分支的指向 （若指定了 <code>--soft</code>，则到此停止）</li>
 <li>使索引看起来像 HEAD （若未指定 <code>--hard</code>，则到此停止；即指定 <code>--mixed</code> 或默认情况）</li>
 <li>使工作目录看起来像索引 (指定<code>--hard</code>，危险操作)</li>
-</ol></li>
-
-<li><p>查看 git 远程仓库 URL：</p>
-
-<p><code>git remote -v</code></p></li>
-
-<li><p>git 查看某个文件的修改历史</p>
-
-<ol>
-<li><p><code>git log -p [filename]</code>
-查看文件的每一个详细的历史修改</p></li>
-
-<li><p><code>git log --pretty=oneline [filename]</code>
-每一行显示一个提交，先显示哈希码，再显示提交说明。</p></li>
-
-<li><p><code>git blame [filename]</code>
-查看文件的每一行是哪个提交最后修改的。</p></li>
-</ol></li>
-
-<li><p><code>git reflog</code>:</p>
-
-<p>当你 (在一个仓库下) 工作时，Git 会在你每次修改了 HEAD 时悄悄地将改动记录下来。当你提交或修改分支时，reflog 就会更新。</p></li>
 </ol>
-
-<h2 id="go">Go</h2>
-
+</li>
+<li>
+<p>查看 git 远程仓库 URL：</p>
+<p><code>git remote -v</code></p>
+</li>
+<li>
+<p>git 查看某个文件的修改历史</p>
 <ol>
-<li><p>可以使用 <code>go tool vet -shadow you_file.go</code> 检查幽灵变量</p></li>
-
-<li><p>go get 只下载不安装：</p>
-
-<p><code>go get -d</code></p></li>
-
-<li><p>string 和 int 转换</p>
-
-<pre><code class="language-go">//string到int  
-int,err:=strconv.Atoi(string)  
-//string到int64  
-int64, err := strconv.ParseInt(string, 10, 64)  
-//int到string  
-string:=strconv.Itoa(int)  
-//int64到string  
-string:=strconv.FormatInt(int64,10)  
-</code></pre></li>
+<li>
+<p><code>git log -p [filename]</code>
+查看文件的每一个详细的历史修改</p>
+</li>
+<li>
+<p><code>git log --pretty=oneline [filename]</code>
+每一行显示一个提交，先显示哈希码，再显示提交说明。</p>
+</li>
+<li>
+<p><code>git blame [filename]</code>
+查看文件的每一行是哪个提交最后修改的。</p>
+</li>
+</ol>
+</li>
+<li>
+<p><code>git reflog</code>:</p>
+<p>当你 (在一个仓库下) 工作时，Git 会在你每次修改了 HEAD 时悄悄地将改动记录下来。当你提交或修改分支时，reflog 就会更新。</p>
+</li>
+</ol>
+<h2 id="go">Go</h2>
+<ol>
+<li>
+<p>可以使用 <code>go tool vet -shadow you_file.go</code> 检查幽灵变量</p>
+</li>
+<li>
+<p>go get 只下载不安装：</p>
+<p><code>go get -d</code></p>
+</li>
+<li>
+<p>string 和 int 转换</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">//string到int  
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span>,<span style="color:#a6e22e">err</span><span style="color:#f92672">:=</span><span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Atoi</span>(<span style="color:#66d9ef">string</span>)  
+<span style="color:#75715e">//string到int64  
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int64</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">ParseInt</span>(<span style="color:#66d9ef">string</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">64</span>)  
+<span style="color:#75715e">//int到string  
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">string</span><span style="color:#f92672">:=</span><span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Itoa</span>(<span style="color:#66d9ef">int</span>)  
+<span style="color:#75715e">//int64到string  
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">string</span><span style="color:#f92672">:=</span><span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">FormatInt</span>(<span style="color:#66d9ef">int64</span>,<span style="color:#ae81ff">10</span>)  
+</code></pre></div></li>
 </ol>
 
   </div>

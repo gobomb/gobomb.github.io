@@ -7,26 +7,14 @@
         
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
 
         <title>ngrok 源码解析</title>
 
         <link rel="stylesheet" href="/css/stylesheet.css">
     </head>
     <body>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-112443219-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
       <div class="container-fluid">
         <nav class="navbar navbar-expand-md navbar-light">
 
@@ -40,6 +28,7 @@ if (!doNotTrack) {
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link " href="/post/">Posts</a>
               <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
               
               <a class="nav-item nav-link " href="/about/">About</a>
@@ -55,28 +44,32 @@ if (!doNotTrack) {
         </section>
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
 <div class="blog-post">
   <h1>ngrok 源码解析</h1>
   <div class="blog-post-subheader">
     <time>17 Dec 2018</time>
   </div>
   <div class="blog-post-content">
-    
-
-<h2 id="背景">背景</h2>
-
+    <h2 id="背景">背景</h2>
 <p><a href="https://github.com/inconshreveable/ngrok">ngrok</a>是我第一个完整阅读过源码的开源项目。一开始接触这套代码我几乎还是 go 语言零基础，之前只写过一点点 Web 后端 API，后来趁着做毕业设计的机会还跟着源码重新敲了一遍，按照我自己的需要小改了一下。所以我从中收获了不少东西，一直都想写一篇文章总结一下我对这套代码的理解。</p>
-
-<p>ngrok 的目的是将本地的端口反向代理到公网，让你可以通过访问公网某个服务器，经过流量转发，访问到内网的机器。这个事情你可以有不同的叫法：反向代理、端口转发（映射）、内网穿透<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>……原理其实不难，解决的需求也简单。</p>
-
+<p>ngrok 的目的是将本地的端口反向代理到公网，让你可以通过访问公网某个服务器，经过流量转发，访问到内网的机器。这个事情你可以有不同的叫法：反向代理、端口转发（映射）、内网穿透<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>……原理其实不难，解决的需求也简单。</p>
 <p>我们个人的设备一般都在 NAT （公司、学校内网，运营商也会喜欢做 NAT）后面，不能被公网设备直接访问到。内网机器可以主动向公网发起连接，但公网却不能穿越 NAT 主动访问到内网机器。ngrok 就适合用来穿越 NAT 来临时暴露内网服务。在技术人员常聚集的社区 V2EX，经常能看到问怎么做内网穿透的月经贴。可见这个需求十分常见。</p>
-
 <p>内网穿透的工具，现在大家用的比较多的是 <a href="https://github.com/fatedier/frp">frp</a>了。frp 是中国人开发的，增加了很多新的功能，使用体验也比 ngrok 好很多，社区比较活跃。ngrok 虽然出现得比较早，但 2.0 转闭源， 1.0 不再维护了，用得人也少了。但这不妨碍我们扒源码学习。</p>
-
 <h2 id="项目结构">项目结构</h2>
-
 <p>先来看一下 ngrok 整个项目的结构（忽略掉了一些不必要的文件）：</p>
-
 <pre><code>.
 ├── ...
 ├── assets							// 存放 web 静态文件和 tls 文件
@@ -130,219 +123,177 @@ if (!doNotTrack) {
         └── version
             └── version.go			// 输出版本号
 
-</code></pre>
-
-<h2 id="服务端代码">服务端代码</h2>
-
+</code></pre><h2 id="服务端代码">服务端代码</h2>
 <p>我们从 main 函数开始来过一下服务端 ngrokd 的关键代码（为了简洁，以下代码大都忽略掉了错误处理和资源清理的语句；正文引用到的函数签名则省略了参数）：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">Main</span>() {
+	<span style="color:#f92672">...</span>
+	<span style="color:#75715e">// init tunnel/control registry
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">registryCacheFile</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;REGISTRY_CACHE_FILE&#34;</span>)
+	<span style="color:#75715e">// 初始化 tunnelRegistry 用来注册 tunnel
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">tunnelRegistry</span> = <span style="color:#a6e22e">NewTunnelRegistry</span>(<span style="color:#a6e22e">registryCacheSize</span>, <span style="color:#a6e22e">registryCacheFile</span>)
+	<span style="color:#75715e">// 初始化 controlRegistry 用来注册多个客户端
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">controlRegistry</span> = <span style="color:#a6e22e">NewControlRegistry</span>()
 
-<pre><code class="language-go">func Main() {
-	...
-	// init tunnel/control registry
-	registryCacheFile := os.Getenv(&quot;REGISTRY_CACHE_FILE&quot;)
-	// 初始化 tunnelRegistry 用来注册 tunnel
-	tunnelRegistry = NewTunnelRegistry(registryCacheSize, registryCacheFile)
-	// 初始化 controlRegistry 用来注册多个客户端
-	controlRegistry = NewControlRegistry()
-
-	// 初始化一个监听池，保证可以通过协议名来找到对应的监听
-	listeners = make(map[string]*conn.Listener)
-	...
-	// 监听来自公网的http请求。https 和 http 的逻辑是类似的，只是多了一个加载 tls 配置的步骤，这里就先省略 https 的部分。
-	if opts.httpAddr != &quot;&quot; {
-		listeners[&quot;http&quot;] = startHttpListener(opts.httpAddr, nil)
+	<span style="color:#75715e">// 初始化一个监听池，保证可以通过协议名来找到对应的监听
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">listeners</span> = make(<span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#f92672">*</span><span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Listener</span>)
+	<span style="color:#f92672">...</span>
+	<span style="color:#75715e">// 监听来自公网的http请求。https 和 http 的逻辑是类似的，只是多了一个加载 tls 配置的步骤，这里就先省略 https 的部分。
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">opts</span>.<span style="color:#a6e22e">httpAddr</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;&#34;</span> {
+		<span style="color:#a6e22e">listeners</span>[<span style="color:#e6db74">&#34;http&#34;</span>] = <span style="color:#a6e22e">startHttpListener</span>(<span style="color:#a6e22e">opts</span>.<span style="color:#a6e22e">httpAddr</span>, <span style="color:#66d9ef">nil</span>)
 	}
-	...
-	// 监听控制连接和建立代理连接的请求
-	tunnelListener(opts.tunnelAddr, tlsConfig)
+	<span style="color:#f92672">...</span>
+	<span style="color:#75715e">// 监听控制连接和建立代理连接的请求
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">tunnelListener</span>(<span style="color:#a6e22e">opts</span>.<span style="color:#a6e22e">tunnelAddr</span>, <span style="color:#a6e22e">tlsConfig</span>)
 	}
-</code></pre>
-
-<p>在这里一个<code>control对应一个 ngrok 客户端，每个客户端可能处于不同的 NAT 之后。客户端会主动连接</code>tunnelAddr<code>端口，向服务端建立</code>控制连接<code>，注册自己，并保持心跳。通过控制连接两端会互相发送一些</code>控制信息`，比如说开始新的代理、关闭连接、认证等等。</p>
-
+</code></pre></div><p>在这里一个<code>control对应一个 ngrok 客户端，每个客户端可能处于不同的 NAT 之后。客户端会主动连接</code>tunnelAddr<code>端口，向服务端建立</code>控制连接<code>，注册自己，并保持心跳。通过控制连接两端会互相发送一些</code>控制信息`，比如说开始新的代理、关闭连接、认证等等。</p>
 <p><code>tunnel</code>维护逻辑上的端口映射，分为两种：TCP 和 HTTP/HTTPS。一个 TCP
 映射的路径是：<code>服务端端口--tunnelAddr&lt;--客户端--&gt;内网目的端口</code>，HTTP ：<code>服务端http端口（一般是80）--tunnelAddr&lt;--客户端--&gt;内网http服务</code>。<code>tunnel</code>记录了必要的信息，保证你从公网访问这个<code>服务端端口</code>/<code>服务端http端口</code>的时候，ngrokd 能够找到对应的客户端和内网里真正的被代理端口。（这里的箭头表明实际连接发起的方向，可以看到所有的连接，不管对内还是对外，都是客户端发起的）</p>
-
 <p>ngrokd 启动的时候，会暴露三个主要端口，一个（<code>httpAddr</code>）用来监听 HTTP 连接，一个（<code>httspAddr</code>）监听 HTTPS 连接，最后一个（<code>tunnelAddr</code>）用来监听两类连接：<code>控制连接</code>和<code>代理连接</code>。后面当<code>tunnel</code>注册的时候，还会随机或由客户端指定一些端口，用以给提供公网侧的 TCP 代理。</p>
-
 <p>我们分三个阶段来分析 ngrokd 做的工作：</p>
-
 <ol>
 <li>注册阶段</li>
 <li>建立代理连接阶段</li>
 <li>转发阶段</li>
 </ol>
-
 <h3 id="注册阶段">注册阶段</h3>
-
 <p>在这个<code>tunnelListener()</code>函数里，其实根据<code>控制信息</code>的不同做了分流，分别是<code>注册阶段</code>（<code>NewControl()</code>）和<code>建立代理连接阶段</code>（<code>NewProxy()</code>）的入口：</p>
-
-<pre><code class="language-go">func tunnelListener(addr string, tlsConfig *tls.Config) {
-	// 这里监听 tunnelAddr，进来的连接会被打上 tun 的标记，然后放到 listener.Conns 的 channel 里
-	listener, err := conn.Listen(addr, &quot;tun&quot;, tlsConfig)
-	...
-	// 而在这里则从上述的 listener.Conns 里取出连接，针对每个连接起一个 goroutine 并发地处理
-	for c := range listener.Conns {
-		go func(tunnelConn conn.Conn) {
-			...
-			// 从连接里读取控制信息
-			var rawMsg msg.Message
-			if rawMsg, err = msg.ReadMsg(tunnelConn); err != nil {
-				tunnelConn.Warn(&quot;Failed to read message: %v&quot;, err)
-				tunnelConn.Close()
-				return
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">tunnelListener</span>(<span style="color:#a6e22e">addr</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">tlsConfig</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">tls</span>.<span style="color:#a6e22e">Config</span>) {
+	<span style="color:#75715e">// 这里监听 tunnelAddr，进来的连接会被打上 tun 的标记，然后放到 listener.Conns 的 channel 里
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">listener</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Listen</span>(<span style="color:#a6e22e">addr</span>, <span style="color:#e6db74">&#34;tun&#34;</span>, <span style="color:#a6e22e">tlsConfig</span>)
+	<span style="color:#f92672">...</span>
+	<span style="color:#75715e">// 而在这里则从上述的 listener.Conns 里取出连接，针对每个连接起一个 goroutine 并发地处理
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">listener</span>.<span style="color:#a6e22e">Conns</span> {
+		<span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">tunnelConn</span> <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Conn</span>) {
+			<span style="color:#f92672">...</span>
+			<span style="color:#75715e">// 从连接里读取控制信息
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rawMsg</span> <span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">Message</span>
+			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">rawMsg</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">ReadMsg</span>(<span style="color:#a6e22e">tunnelConn</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+				<span style="color:#a6e22e">tunnelConn</span>.<span style="color:#a6e22e">Warn</span>(<span style="color:#e6db74">&#34;Failed to read message: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+				<span style="color:#a6e22e">tunnelConn</span>.<span style="color:#a6e22e">Close</span>()
+				<span style="color:#66d9ef">return</span>
 			}
-			...
-			// 根据不同的控制信息做不同的操作
-			switch m := rawMsg.(type) {
-			// 注册一个新的 control（进入注册阶段）
-			case *msg.Auth:
-				NewControl(tunnelConn, m)
-			// 请求建立新的代理连接（进入建立代理连接阶段），后面再解释
-			case *msg.RegProxy:
-				NewProxy(tunnelConn, m)
+			<span style="color:#f92672">...</span>
+			<span style="color:#75715e">// 根据不同的控制信息做不同的操作
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">m</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">rawMsg</span>.(<span style="color:#66d9ef">type</span>) {
+			<span style="color:#75715e">// 注册一个新的 control（进入注册阶段）
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">case</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">Auth</span>:
+				<span style="color:#a6e22e">NewControl</span>(<span style="color:#a6e22e">tunnelConn</span>, <span style="color:#a6e22e">m</span>)
+			<span style="color:#75715e">// 请求建立新的代理连接（进入建立代理连接阶段），后面再解释
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">case</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">RegProxy</span>:
+				<span style="color:#a6e22e">NewProxy</span>(<span style="color:#a6e22e">tunnelConn</span>, <span style="color:#a6e22e">m</span>)
 
-			default:
-				tunnelConn.Close()
+			<span style="color:#66d9ef">default</span>:
+				<span style="color:#a6e22e">tunnelConn</span>.<span style="color:#a6e22e">Close</span>()
 			}
-		}(c)
+		}(<span style="color:#a6e22e">c</span>)
 	}
 }
-</code></pre>
-
-<h3 id="newcontorl-做了什么">- NewContorl() 做了什么</h3>
-
+</code></pre></div><h3 id="--newcontorl-做了什么">- NewContorl() 做了什么</h3>
 <p><code>NewContorl(ctlConn conn.Conn, authMsg *msg.Auth)</code>做了这么一些事情：</p>
-
 <ol>
-<li>认证</li>
-<li>建立<code>control</code>实例<code>c</code>，上面的参数<code>ctlConn</code>会被作为<code>c</code>的属性<code>c.conn</code>，而<code>control</code>实例<code>c</code>会被注册到<code>controlRegistry</code></li>
-
-<li><p>启动发送消息的 goroutine，用来把从<code>c.out</code>读到的消息通过<code>c.conn</code>发给客户端:</p>
-
+<li>
+<p>认证</p>
+</li>
+<li>
+<p>建立<code>control</code>实例<code>c</code>，上面的参数<code>ctlConn </code>会被作为<code>c</code>的属性<code>c.conn</code>，而<code>control</code>实例<code>c</code>会被注册到<code>controlRegistry</code></p>
+</li>
+<li>
+<p>启动发送消息的 goroutine，用来把从<code>c.out</code>读到的消息通过<code>c.conn</code>发给客户端:</p>
 <pre><code>go c.writer()
-</code></pre></li>
-
-<li><p>要求客户端发起代理连接，将控制消息写到<code>c.out</code>里，这时候<code>c.writer()</code>就会异步地读取<code>c.out</code>里的信息</p>
-
+</code></pre><p>``</p>
+</li>
+<li>
+<p>要求客户端发起代理连接，将控制消息写到<code>c.out</code>里，这时候<code>c.writer()</code>就会异步地读取<code>c.out</code>里的信息</p>
 <pre><code>c.out &lt;- &amp;msg.ReqProxy{}
-</code></pre></li>
-
-<li><p>启动三个 goroutine：<code>c.reader()</code>负责从控制连接里读信息并写到<code>c.in</code>；<code>c.manager()</code>负责从<code>c.in</code>里读消息并做对应的操作；<code>c.stopper()</code>等待停止的信号，负责回收所有资源，包括把<code>control</code>实例从<code>control</code>池移除：<code>controlRegistry.Del(c.id)</code>等</p>
-
-<pre><code>go c.manager()
-go c.reader()
-go c.stopper()  
-</code></pre></li>
+</code></pre><p>``</p>
+</li>
+<li>
+<p>启动三个 goroutine：<code>c.reader()</code>负责从控制连接里读信息并写到<code>c.in</code>；<code>c.manager()</code>负责从<code>c.in</code>里读消息并做对应的操作；<code>c.stopper()</code>等待停止的信号，负责回收所有资源，包括把<code>control</code>实例从<code>control</code>池移除：<code>controlRegistry.Del(c.id)</code>等</p>
+<pre><code></code></pre></li>
 </ol>
-
-<h3 id="goroutine-和-chan-的配合">- goroutine 和 chan 的配合</h3>
-
+<p>go c.manager()
+go c.reader()
+go c.stopper()
+```</p>
+<h3 id="--goroutine-和-chan-的配合">- goroutine 和 chan 的配合</h3>
 <p>这里的 goroutine 和 chan 的用法很经典。<code>control</code>实例里有两个<code>chan</code>，分别是<code>in</code>和<code>out</code>，用来达成不同 goroutine 之间的通信。</p>
-
 <p>比如上面提到的“要求客户端发起代理连接”的操作，消息的传递路径是这样的：</p>
-
 <p>在<code>NewContorl()</code>goroutine 内，<code>msg.ReqProxy{}</code>被塞到<code>c.out</code>这个 chan 里：</p>
-
-<pre><code class="language-go">	c.out &lt;- &amp;msg.ReqProxy{}
-</code></pre>
-
-<p>在<code>c.writer()</code>goroutine 内，不断从<code>c.out</code>读，然后把读到的信息<code>m</code>写到 <code>c.conn</code>（也就是该<code>control</code>对应的控制连接）里：</p>
-
-<pre><code class="language-go">	for m := range c.out {
-		c.conn.SetWriteDeadline(time.Now().Add(controlWriteTimeout))
-		...
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">out</span> <span style="color:#f92672">&lt;-</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">ReqProxy</span>{}
+</code></pre></div><p>在<code>c.writer()</code>goroutine 内，不断从<code>c.out</code>读，然后把读到的信息<code>m</code>写到 <code>c.conn</code>（也就是该<code>control</code>对应的控制连接）里：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">m</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">out</span> {
+		<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">SetWriteDeadline</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>().<span style="color:#a6e22e">Add</span>(<span style="color:#a6e22e">controlWriteTimeout</span>))
+		<span style="color:#f92672">...</span>
 	}
-</code></pre>
-
-<p>而读取消息的路径是<code>c.conn--&gt;c.read()--&gt;c.in--&gt;c.manager()</code>。各个 goroutine 都是并发、异步、解耦的，中间通过 channel 串联起来，十分优雅。在各个 chan 没有消息的时候，<code>range</code>操作是阻塞着的，但因为 goroutine 是异步的，所以不会影响到其他的 goroutine，go 的 runtime 会帮你做好各个执行流的调度。</p>
-
+</code></pre></div><p>而读取消息的路径是<code>c.conn--&gt;c.read()--&gt;c.in--&gt;c.manager()</code>。各个 goroutine 都是并发、异步、解耦的，中间通过 channel 串联起来，十分优雅。在各个 chan 没有消息的时候，<code>range</code>操作是阻塞着的，但因为 goroutine 是异步的，所以不会影响到其他的 goroutine，go 的 runtime 会帮你做好各个执行流的调度。</p>
 <p>还值得一提的是它的停止机制。<code>c.stopper()</code>利用了 chan 的一个特性：一旦 chan 被关闭，<code>range chan</code>的操作就会退出。如果我们把每个 goroutine “绑定”的 chan 都关闭了，实际上就解除了<code>range chan</code>的阻塞和循环状态，相当于关闭了对应的 goroutine。</p>
-
-<pre><code class="language-go">// range c.out 的三种状态
-for m := range c.out{			// 1. c.out 为空：阻塞
-	...				// 2. 从 c.out 读到 m：执行大括号里的逻辑
-}					
-// 其他代码			
-	...				// 3. c.out 被关闭，继续执行下面的代码，直到该函数结束
-</code></pre>
-
-<p>所以<code>c.stopper()</code>一旦接受到 stop 的指令，就会把所有相关的 <code>chan</code>（<code>c.in</code><code>c.out</code>)关闭，则<code>c.read()</code><code>c.manager()</code><code>c.writer()</code>等<code>goroutine</code>也就都执行完毕了，从而达到回收<code>chan</code>和<code>goroutine</code>资源的目的。</p>
-
-<h3 id="c-manager-做了什么">- c.manager() 做了什么</h3>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// range c.out 的三种状态
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">m</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">out</span>{			<span style="color:#75715e">// 1. c.out 为空：阻塞
+</span><span style="color:#75715e"></span>	<span style="color:#f92672">...</span>				<span style="color:#75715e">// 2. 从 c.out 读到 m：执行大括号里的逻辑
+</span><span style="color:#75715e"></span>}					
+<span style="color:#75715e">// 其他代码			
+</span><span style="color:#75715e"></span>	<span style="color:#f92672">...</span>				<span style="color:#75715e">// 3. c.out 被关闭，继续执行下面的代码，直到该函数结束
+</span></code></pre></div><p>所以<code>c.stopper()</code>一旦接受到 stop 的指令，就会把所有相关的 <code>chan</code>（<code>c.in``c.out</code>)关闭，则<code>c.read()``c.manager()``c.writer()</code>等<code>goroutine</code>也就都执行完毕了，从而达到回收<code>chan</code>和<code>goroutine</code>资源的目的。</p>
+<h3 id="--cmanager-做了什么">- c.manager() 做了什么</h3>
 <p>两件事：</p>
-
 <ol>
 <li>和客户端维持心跳</li>
 <li>注册<code>tunnel</code></li>
 </ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Control</span>) <span style="color:#a6e22e">manager</span>() {
+	<span style="color:#f92672">...</span>
+	<span style="color:#75715e">// 实例化一个计时器，每10秒发送一次消息到 reap.C
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">reap</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">NewTicker</span>(<span style="color:#a6e22e">connReapInterval</span>)
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">reap</span>.<span style="color:#a6e22e">Stop</span>()
 
-<pre><code class="language-go">func (c *Control) manager() {
-	...
-	// 实例化一个计时器，每10秒发送一次消息到 reap.C
-	reap := time.NewTicker(connReapInterval)
-	defer reap.Stop()
-
-	for {
-		select {
-		// 每10秒 reap.C 就会有内容到达，这里检查客户端发送过来的心跳包，如果大于30秒，就启动停止流程
-		case &lt;-reap.C:
-			if time.Since(c.lastPing) &gt; pingTimeoutInterval {
-				c.conn.Info(&quot;Lost heartbeat&quot;)
-				c.shutdown.Begin()
+	<span style="color:#66d9ef">for</span> {
+		<span style="color:#66d9ef">select</span> {
+		<span style="color:#75715e">// 每10秒 reap.C 就会有内容到达，这里检查客户端发送过来的心跳包，如果大于30秒，就启动停止流程
+</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">case</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">reap</span>.<span style="color:#a6e22e">C</span>:
+			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">lastPing</span>) &gt; <span style="color:#a6e22e">pingTimeoutInterval</span> {
+				<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Info</span>(<span style="color:#e6db74">&#34;Lost heartbeat&#34;</span>)
+				<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">shutdown</span>.<span style="color:#a6e22e">Begin</span>()
 			}
-		// 从 c.in 读取消息
-		case mRaw, ok := &lt;-c.in:
-			// c.in 若被关闭，ok 的值是 false，直接结束该函数（gorotine）
-			if !ok {
-				return
+		<span style="color:#75715e">// 从 c.in 读取消息
+</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">mRaw</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">in</span>:
+			<span style="color:#75715e">// c.in 若被关闭，ok 的值是 false，直接结束该函数（gorotine）
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">ok</span> {
+				<span style="color:#66d9ef">return</span>
 			}
-			// 根据控制消息的类型，作对应操作
-			switch m := mRaw.(type) {
-			// 收到来自客户端的 tunnel 信息，注册 tunnel
-			case *msg.ReqTunnel:
-				c.registerTunnel(m)
-			// 发送心跳包（报告当前时间）
-			case *msg.Ping:
-				c.lastPing = time.Now()
-				c.out &lt;- &amp;msg.Pong{}
+			<span style="color:#75715e">// 根据控制消息的类型，作对应操作
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">m</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">mRaw</span>.(<span style="color:#66d9ef">type</span>) {
+			<span style="color:#75715e">// 收到来自客户端的 tunnel 信息，注册 tunnel
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">case</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">ReqTunnel</span>:
+				<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">registerTunnel</span>(<span style="color:#a6e22e">m</span>)
+			<span style="color:#75715e">// 发送心跳包（报告当前时间）
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">case</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">Ping</span>:
+				<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">lastPing</span> = <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
+				<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">out</span> <span style="color:#f92672">&lt;-</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">Pong</span>{}
 			}
 		}
 	}
 }
 
-</code></pre>
-
-<p>go 标准库里的计时器也是很典型的 channel 的应用。</p>
-
-<h3 id="registertunnel-做了什么">- registerTunnel() 做了什么</h3>
-
+</code></pre></div><p>go 标准库里的计时器也是很典型的 channel 的应用。</p>
+<h3 id="--registertunnel-做了什么">- registerTunnel() 做了什么</h3>
 <p>在<code>registerTunnel()</code>里，会检查<code>tunnel</code>的类型，做出不同的处理：</p>
-
 <ol>
 <li>如果是 TCP 类型，则监听客户端指定的<code>公网侧端口</code>；如果指定端口号为0，会随机分配一个。每个<code>TCP tunnel</code>都会分配一个唯一的端口，也就是说我们会通过端口号来区分 TCP 类型的<code>tunnel</code>。</li>
 <li>如果是 HTTP/HTTPS 类型，则是共用端口（一般是80和443）。通过不同的 URL 来区分<code>tunnel</code>，URL 可能是自己指定的域名、当前服务器域名的指定子域名，或者当前服务器域名的随机子域名。</li>
 </ol>
-
 <p>处理完<code>tunnel</code>，就将<code>tunnel</code>都注册到<code>tunnelRegistry</code>中。并向客户端报告注册成功。</p>
-
-<p>至此，注册阶段就完毕了。此时服务端的状态是：
-1. 通过客户端的主动连接，知道了客户端的存在，为它注册了一系列资源；
-2. 向客户端请求了一条代理连接；
-3. 获知了客户端想要代理的服务信息（<code>tunnel</code>）；
-4. 通过心跳包与客户端保持了联络，保证<code>控制连接</code>不断。</p>
-
+<p>至此，注册阶段就完毕了。此时服务端的状态是：</p>
+<ol>
+<li>通过客户端的主动连接，知道了客户端的存在，为它注册了一系列资源；</li>
+<li>向客户端请求了一条代理连接；</li>
+<li>获知了客户端想要代理的服务信息（<code>tunnel</code>）；</li>
+<li>通过心跳包与客户端保持了联络，保证<code>控制连接</code>不断。</li>
+</ol>
 <h3 id="建立代理连接阶段">建立代理连接阶段</h3>
-
 <p>从上述<code>注册阶段</code>提到<code>tunnelListener()</code>会<code>控制连接</code>里的消息对连接进行分流，当从控制连接收到<code>*msg.RegProxy</code>时，将进入<code>NewProxy(tunnelConn, m)</code>方法注册一条新的<code>代理连接</code>,这条连接会被存进对应的<code>control</code>实例所拥有的一个 channel 里：<code>c.proxies &lt;- conn</code>。当需要进行转发和代理的时候，这个 channel 就会被消费。</p>
-
 <h3 id="转发阶段">转发阶段</h3>
-
 <p>真正的转发过程就比较简单了。服务端从<code>公网侧端口</code>得到用户主动发起的公网连接（<code>pubConn</code>），会调用 tunnel 的<code>HandlePublicConnection</code>方法，从 control 的<code>proxies</code> channel 里得到一条<code>代理连接</code>（如果 channel 为空，则再走一次<code>建立代理连接阶段</code>，让客户端再次发起一个代理连接），接着通过代理连接通知客户端：准备开始转发数据，然后用一个<code>conn.Join(publicConn, proxyConn)</code>方法，交换公网连接和代理连接的数据。这样，用户发送的数据就会被转发给客户端，客户端转发给真正的内网服务；从客户端发送过来的数据，也反过来转发给用户。</p>
-
 <p><code>conn.Join()</code>的代码如下，客户端的转发也调用了此方法：</p>
-
 <pre><code>func Join(c Conn, c2 Conn) (int64, int64) {
 	var wait sync.WaitGroup
 
@@ -368,72 +319,59 @@ for m := range c.out{			// 1. c.out 为空：阻塞
 	wait.Wait()
 	return fromBytes, toBytes
 }
-</code></pre>
-
-<p>可以看到，最终是在两个 goroutine 里调用官方库函数<code>io.Copy</code>来异步地复制数据。</p>
-
+</code></pre><p>可以看到，最终是在两个 goroutine 里调用官方库函数<code>io.Copy</code>来异步地复制数据。</p>
 <h2 id="客户端代码">客户端代码</h2>
-
 <p>客户端的代码就比较简单一点。客户端采用 MVC 的架构，因为客户端除了与服务端、内网服务进行交互，还有与用户交互的界面。这里主要是 terminal 和 web。与用户交互的部分我不想详细介绍，主要讲一讲与服务端相关的部分。</p>
-
 <p>客户端也是创建一个<code>ClientModel</code>对象实例来和服务端进行交互，在<code>ClientModel</code>的<code>control()</code>方法中，客户端向服务端的<code>tunnelAddr</code>端口建立连接，发送认证消息注册自己，再发送用户指定的<code>tunnel</code>信息，同时创建一个 goroutine 用来维持心跳，保持此条控制连接不断开。这里对应服务端的<code>注册阶段</code>。</p>
-
 <p>如果服务端要求建立代理，客户端就向<code>tunnelAddr</code>端口新建一条代理连接（<code>proxyConn</code>）。并在此代理连接中等待服务端通知代理开始的信号，一旦接受到信号，就向对应的内网服务建立连接（<code>localConn</code>），作出请求。和服务端<code>转发阶段</code>类似，这里会调用<code>conn.Join(localConn, remoteConn)</code>交换两条连接的数据。用户向服务端的请求，就在这里被转发到内网服务，内网服务的响应，也在这里原路返回。</p>
-
-<pre><code class="language-go">func (c *ClientModel) proxy() {
-	...
-	// 建立代理连接
-	if c.proxyUrl == &quot;&quot; {
-		remoteConn, err = conn.Dial(c.serverAddr, &quot;pxy&quot;, c.tlsConfig)
-	} else {
-		remoteConn, err = conn.DialHttpProxy(c.proxyUrl, c.serverAddr, &quot;pxy&quot;, c.tlsConfig)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ClientModel</span>) <span style="color:#a6e22e">proxy</span>() {
+	<span style="color:#f92672">...</span>
+	<span style="color:#75715e">// 建立代理连接
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">proxyUrl</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;&#34;</span> {
+		<span style="color:#a6e22e">remoteConn</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Dial</span>(<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">serverAddr</span>, <span style="color:#e6db74">&#34;pxy&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">tlsConfig</span>)
+	} <span style="color:#66d9ef">else</span> {
+		<span style="color:#a6e22e">remoteConn</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">DialHttpProxy</span>(<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">proxyUrl</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">serverAddr</span>, <span style="color:#e6db74">&#34;pxy&#34;</span>, <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">tlsConfig</span>)
 	}
-	...
+	<span style="color:#f92672">...</span>
 
-	// 向服务端注册代理连接
-	err = msg.WriteMsg(remoteConn, &amp;msg.RegProxy{ClientId: c.id})
-	...
+	<span style="color:#75715e">// 向服务端注册代理连接
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">WriteMsg</span>(<span style="color:#a6e22e">remoteConn</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">RegProxy</span>{<span style="color:#a6e22e">ClientId</span>: <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">id</span>})
+	<span style="color:#f92672">...</span>
 	
-	// 从代理连接中收到服务端开始代理的通知
-	var startPxy msg.StartProxy
-	if err = msg.ReadMsgInto(remoteConn, &amp;startPxy); err != nil {
-		remoteConn.Error(&quot;Server failed to write StartProxy: %v&quot;, err)
-		return
+	<span style="color:#75715e">// 从代理连接中收到服务端开始代理的通知
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">startPxy</span> <span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">StartProxy</span>
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">msg</span>.<span style="color:#a6e22e">ReadMsgInto</span>(<span style="color:#a6e22e">remoteConn</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">startPxy</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">remoteConn</span>.<span style="color:#a6e22e">Error</span>(<span style="color:#e6db74">&#34;Server failed to write StartProxy: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+		<span style="color:#66d9ef">return</span>
 	}
 
-	// 通过 URL 找到对应的 tunnel，以及相应的内网服务
-	tunnel, ok := c.tunnels[startPxy.Url]
+	<span style="color:#75715e">// 通过 URL 找到对应的 tunnel，以及相应的内网服务
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">tunnel</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">tunnels</span>[<span style="color:#a6e22e">startPxy</span>.<span style="color:#a6e22e">Url</span>]
 
-	// 向内网服务发起连接
-	start := time.Now()
-	localConn, err := conn.Dial(tunnel.LocalAddr, &quot;prv&quot;, nil)
-	...
+	<span style="color:#75715e">// 向内网服务发起连接
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">start</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
+	<span style="color:#a6e22e">localConn</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Dial</span>(<span style="color:#a6e22e">tunnel</span>.<span style="color:#a6e22e">LocalAddr</span>, <span style="color:#e6db74">&#34;prv&#34;</span>, <span style="color:#66d9ef">nil</span>)
+	<span style="color:#f92672">...</span>
 	
-	m.connTimer.Time(func() {
-		...
-		// 内网连接和代理连接交换数据
-		bytesIn, bytesOut := conn.Join(localConn, remoteConn)
-		...
+	<span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">connTimer</span>.<span style="color:#a6e22e">Time</span>(<span style="color:#66d9ef">func</span>() {
+		<span style="color:#f92672">...</span>
+		<span style="color:#75715e">// 内网连接和代理连接交换数据
+</span><span style="color:#75715e"></span>		<span style="color:#a6e22e">bytesIn</span>, <span style="color:#a6e22e">bytesOut</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">conn</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">localConn</span>, <span style="color:#a6e22e">remoteConn</span>)
+		<span style="color:#f92672">...</span>
 	})
 }
-</code></pre>
-
-<h2 id="总结">总结</h2>
-
+</code></pre></div><h2 id="总结">总结</h2>
 <p>首先必须一提的就是 goroutine 和 channel，如上文提到的通过 channel 来传递消息和停止 goroutine，都是比较巧妙的用法，</p>
-
 <p>在 ngrok 中，另一个被大量用到的用法就是<code>type-switch</code>了。往往我们从 chan 里拿到的数据结构，是一个空接口<code>interface{}</code>，我们不确定它的类型，需要通过<code>类型断言</code>来得到它的类型。在网络编程中，经常会用到这个。</p>
-
 <p>如果对网络编程有兴趣，或者对 go 有兴趣，不妨读一读这套代码。作为一个用于入门的小项目，难度不会过高，又有比较符合 go 风格的代码以快速学习，同时也可以熟悉一下 TCP 编程。用 go 进行网络编程有两个好处，一个是标准库一般足够用，网络相关的开发，使用官方标准库就足以应付大部分场景，另一个是并发的学习曲线低。</p>
-<div class="footnotes">
-
-<hr />
-
+<section class="footnotes" role="doc-endnotes">
+<hr>
 <ol>
-<li id="fn:1">ngrok 和 frp 这一类穿透，有两个缺点：1. 一直需要中间服务器；2. 转发很耗费流量。实现内网穿透还可以有其他方式：P2P、探测端口等方法，也有其利弊，本文就暂不讨论了。
- <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+<li id="fn:1" role="doc-endnote">
+<p>ngrok 和 frp 这一类穿透，有两个缺点：1. 一直需要中间服务器；2. 转发很耗费流量。实现内网穿透还可以有其他方式：P2P、探测端口等方法，也有其利弊，本文就暂不讨论了。 <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
 </ol>
-</div>
+</section>
 
   </div>
 </div>

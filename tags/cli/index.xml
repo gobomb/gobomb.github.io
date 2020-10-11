@@ -1,16 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Cli on Present Day, Present Time</title>
+    <title>cli on Present Day, Present Time</title>
     <link>https://gobomb.github.io/tags/cli/</link>
-    <description>Recent content in Cli on Present Day, Present Time</description>
+    <description>Recent content in cli on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Sep 2018 16:22:20 +0800</lastBuildDate>
-    
-	<atom:link href="https://gobomb.github.io/tags/cli/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 09 Sep 2018 16:22:20 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/tags/cli/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Arch Linux 安装记录</title>
       <link>https://gobomb.github.io/post/install-arch-linux/</link>
@@ -22,17 +18,15 @@
 Arch 官方 Wiki 做得真是很好，基本上遇到问题耐心读一读 Wiki 就能够解决。用来学习 Linux 相关知识也特别有用。
 整个安装过程的大体步骤
  制作安装介质 从安装介质启动 分区和挂载磁盘 下载安装基本包到系统分区中 从安装介质切换到系统 完成基本的设置，并安装引导  分区和安装引导的部分是比较容易出错的，但大部分情况都可以从 Arch Wiki 中找到答案。
-安装准备  下载 ArchLinux iso 文件
+安装准备   下载 ArchLinux iso 文件
 https://www.archlinux.org/download/
- 制作安装介质
- 在 Mac 下安装pv （用来查看dd的进度）
+  制作安装介质
+  在 Mac 下安装pv （用来查看dd的进度）
 brew install pv
- 找到 U 盘对应的设备
+  找到 U 盘对应的设备
 diskutil list
 我这里是/dev/disk2
- 查看 U 盘挂载的目录
-df -h
- 解除挂载</description>
+  查看 U 盘挂载的目录</description>
     </item>
     
     <item>
@@ -41,25 +35,23 @@ df -h
       <pubDate>Sun, 18 Mar 2018 14:02:01 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/cheatsheet/</guid>
-      <description>Linux  安装 deb 文件：
+      <description>Linux   安装 deb 文件：
 sudo dpkg -i [name].deb
 sudo apt-get install -f （修复依赖关系）
- linux 查找文件
-find [path] -name &amp;quot;*.log&amp;quot;
- ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关闭之
- 调用自己定义的编辑器来编辑当前命令行:
+  linux 查找文件
+find [path] -name &amp;quot;*.log&amp;quot; 
+  ubuntu（桌面版） 在终端输入xkill，鼠标变成x，点击 GUI 程序，可强制关闭之
+  调用自己定义的编辑器来编辑当前命令行:
 ctrl-x ctrl-e
 设置自己的默认编辑器：
 export EDITOR=vi
- shell 脚本报错：... /bin/sh^M: bad interpreter: No such file or directory
+  shell 脚本报错：... /bin/sh^M: bad interpreter: No such file or directory
 解决：
 vim [name.sh]
 :set ff 查看文件格式，若看到输出fileformat=dos，可:set ff=unix修改为 unix 格式
- 本地文件传输到远程机器
+  本地文件传输到远程机器
 scp -P [port] /path/to/source [user]@[ip]:/path/to/target
- 不挂断地运行命令
-nohup [command] [arg..] [&amp;amp;]
-例如：nohup hugo server --buildDrafts &amp;gt;&amp;gt; hugo.</description>
+  不挂断地运行命令</description>
     </item>
     
   </channel>

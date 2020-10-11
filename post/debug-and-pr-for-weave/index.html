@@ -7,26 +7,14 @@
         
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
-        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
 
         <title>给 WeaveNet 社区提 PR</title>
 
         <link rel="stylesheet" href="/css/stylesheet.css">
     </head>
     <body>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-112443219-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-
       <div class="container-fluid">
         <nav class="navbar navbar-expand-md navbar-light">
 
@@ -40,6 +28,7 @@ if (!doNotTrack) {
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link " href="/post/">Posts</a>
               <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
               
               <a class="nav-item nav-link " href="/about/">About</a>
@@ -55,30 +44,33 @@ if (!doNotTrack) {
         </section>
 
 
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
 <div class="blog-post">
   <h1>给 WeaveNet 社区提 PR</h1>
   <div class="blog-post-subheader">
     <time>16 Aug 2020</time>
   </div>
   <div class="blog-post-content">
-    
-
-<p>任职的公司 K8s 集群网络插件用的是 <a href="https://www.weave.works/oss/net/">WeaveNet</a>。WeaveNet 是一套基于 VXLAN 的容器网络方案。我们还用了 weave-npc 作为 K8s NetworkPolicy 的实现。从 2.6.0 版本开始，weave 存在一个很严重的 bug，会导致新创建的 pod 所有的网络流量被丢弃，在我们开发、测试、生产环境 K8s 集群里有很大的概率被触发。本文主要记录如何定位到该 bug 以及如何修复，给 weave 上游提 Pull Request 并被接受的过程。</p>
-
-<h1 id="现象及复现">现象及复现</h1>
-
+    <p>任职的公司 K8s 集群网络插件用的是 <a href="https://www.weave.works/oss/net/">WeaveNet</a>。WeaveNet 是一套基于 VXLAN 的容器网络方案。我们还用了 weave-npc 作为 K8s NetworkPolicy 的实现。从 2.6.0 版本开始，weave 存在一个很严重的 bug，会导致新创建的 pod 所有的网络流量被丢弃，在我们开发、测试、生产环境 K8s 集群里有很大的概率被触发。本文主要记录如何定位到该 bug 以及如何修复，给 weave 上游提 Pull Request 并被接受的过程。</p>
+<h2 id="现象及复现">现象及复现</h2>
 <p>K8s 集群使用 weave-kube 和 weave-npc 2.6.0～2.6.5 版本。创建一个 namespace，在此 namespace 下创建 2 到 3 个 deploymnet，同时每个 deployment 创建一个 networkpolicy，允许网络流量的进出。在这种配置下，该 deployment 关联的 pod 是能够访问到 networkpolicy 放行的 IP 的。</p>
-
 <p>在一切部署完成后，删除该 namespace <code>kubectl delete namespace [ns name]</code> 。重复此操作 n 次，会发现，新创建的 pod 的所有网络访问都不通了，包括 networkpolicy 所允许的。</p>
-
 <p>weave-kube 和 weave-npc 都是作为 daemonset 部署的。查看 pod 所在 node 上的 weave-npc 的日志，可以看到大量的 pod 对应的流量被 block 的日志。</p>
-
 <p>在 weave 的 github 仓库，我提了<a href="https://github.com/weaveworks/weave/issues/3836">issue</a> 描述了现象和详细的复现方法。</p>
-
-<h1 id="定位问题过程">定位问题过程</h1>
-
+<h2 id="定位问题过程">定位问题过程</h2>
 <p>检查 weave-npc 的日志，发现在 weave-npc 在处理 pod 删除事件的时候，有 panic 字样，且打出了完整的调用栈信息：</p>
-
 <pre><code>DEBU: 2020/07/28 09:58:33.806374 EVENT DeletePod {&quot;metadata&quot;:{&quot;creationTimestamp&quot;:&quot;2020-07-28T09:57:35Z&quot;,&quot;deletionGracePeriodSeconds&quot;:0,&quot;deletionTimestamp&quot;:&quot;2020-07-28T09:58:33Z&quot;,&quot;generateName&quot;:&quot;bp-s1-569648b84-&quot;,&quot;labels&quot;:{&quot;App&quot;:&quot;f2f83717edc2c4009874aa423409ecd08&quot;,&quot;Blueprint&quot;:&quot;bbp-s1&quot;,&quot;Service&quot;:&quot;bp-s1&quot;,&quot;app&quot;:&quot;bp-s1&quot;,&quot;flowid&quot;:&quot;47&quot;,&quot;pod-template-hash&quot;:&quot;569648b84&quot;,&quot;version&quot;:&quot;v1&quot;},&quot;name&quot;:&quot;bp-s1-569648b84-jltfv&quot;,&quot;namespace&quot;:&quot;f2f83717edc2c4009874aa423409ecd08&quot;,&quot;resourceVersion&quot;:&quot;11867380&quot;,&quot;selfLink&quot;:&quot;/api/v1/namespaces/f2f83717edc2c4009874aa423409ecd08/pods/bp-s1-569648b84-jltfv&quot;,&quot;uid&quot;:&quot;f990ffe2-227f-4b3e-a1e5-e0f7d59e7c49&quot;},&quot;spec&quot;:{&quot;affinity&quot;:{},&quot;containers&quot;:[{&quot;image&quot;:&quot;harbor.cloud2go.cn/cloudtogo/network-multitool&quot;,&quot;imagePullPolicy&quot;:&quot;Always&quot;,&quot;name&quot;:&quot;bp-s1&quot;,&quot;ports&quot;:[{&quot;containerPort&quot;:80,&quot;name&quot;:&quot;p80&quot;,&quot;protocol&quot;:&quot;TCP&quot;}],&quot;readinessProbe&quot;:{&quot;failureThreshold&quot;:3,&quot;initialDelaySeconds&quot;:1,&quot;periodSeconds&quot;:5,&quot;successThreshold&quot;:1,&quot;tcpSocket&quot;:{&quot;port&quot;:80},&quot;timeoutSeconds&quot;:1},&quot;terminationMessagePath&quot;:&quot;/dev/termination-log&quot;,&quot;terminationMessagePolicy&quot;:&quot;FallbackToLogsOnError&quot;}],&quot;dnsConfig&quot;:{&quot;options&quot;:[{&quot;name&quot;:&quot;ndots&quot;,&quot;value&quot;:&quot;1&quot;}]},&quot;dnsPolicy&quot;:&quot;ClusterFirst&quot;,&quot;nodeName&quot;:&quot;n1.ha.env.lab.io&quot;,&quot;restartPolicy&quot;:&quot;Always&quot;,&quot;schedulerName&quot;:&quot;default-scheduler&quot;,&quot;securityContext&quot;:{},&quot;serviceAccount&quot;:&quot;default&quot;,&quot;serviceAccountName&quot;:&quot;default&quot;,&quot;terminationGracePeriodSeconds&quot;:0},&quot;status&quot;:{&quot;conditions&quot;:[{&quot;lastProbeTime&quot;:null,&quot;lastTransitionTime&quot;:&quot;2020-07-28T09:57:35Z&quot;,&quot;status&quot;:&quot;True&quot;,&quot;type&quot;:&quot;Initialized&quot;},{&quot;lastProbeTime&quot;:null,&quot;lastTransitionTime&quot;:&quot;2020-07-28T09:57:38Z&quot;,&quot;status&quot;:&quot;True&quot;,&quot;type&quot;:&quot;Ready&quot;},{&quot;lastProbeTime&quot;:null,&quot;lastTransitionTime&quot;:&quot;2020-07-28T09:57:38Z&quot;,&quot;status&quot;:&quot;True&quot;,&quot;type&quot;:&quot;ContainersReady&quot;},{&quot;lastProbeTime&quot;:null,&quot;lastTransitionTime&quot;:&quot;2020-07-28T09:57:35Z&quot;,&quot;status&quot;:&quot;True&quot;,&quot;type&quot;:&quot;PodScheduled&quot;}],&quot;hostIP&quot;:&quot;10.10.13.46&quot;,&quot;phase&quot;:&quot;Running&quot;,&quot;podIP&quot;:&quot;10.20.128.40&quot;,&quot;qosClass&quot;:&quot;BestEffort&quot;,&quot;startTime&quot;:&quot;2020-07-28T09:57:35Z&quot;}}
 INFO: 2020/07/28 09:58:33.806394 deleting entry 10.20.128.40 from weave-hkFEnqOYZ~#jp*[N$?})[#4t3 of f990ffe2-227f-4b3e-a1e5-e0f7d59e7c49
 INFO: 2020/07/28 09:58:33.806403 deleting entry 10.20.128.40 from weave-e$G8cjWOPOD!AV1BHcQc@]W7T of f990ffe2-227f-4b3e-a1e5-e0f7d59e7c49
@@ -105,72 +97,51 @@ ERROR: logging before flag.Parse: E0728 09:58:33.807381    7656 runtime.go:66] O
 /go/src/github.com/weaveworks/weave/vendor/k8s.io/apimachinery/pkg/util/wait/wait.go:88
 /go/src/github.com/weaveworks/weave/vendor/k8s.io/client-go/tools/cache/controller.go:124
 /usr/local/go/src/runtime/asm_amd64.s:1357
-</code></pre>
-
-<p>通过调用栈信息，我们可以去检查 weave-npc 的源码，确定错误的根源。从 panic 的信息看： <code>runtime error: invalid memory address or nil pointer dereference</code> ，是典型的空指针错误。</p>
-
+</code></pre><p>通过调用栈信息，我们可以去检查 weave-npc 的源码，确定错误的根源。从 panic 的信息看： <code>runtime error: invalid memory address or nil pointer dereference</code> ，是典型的空指针错误。</p>
 <p>在分析了 weave-npc 的代码后，我发现这是一个并发情况下，顺序不一致的问题。</p>
-
 <p>weave-npc 的原理是：使用了 K8s 官方的 go 客户端库 client-go 实现，作为一个 controller 运行在 K8s 中（和 K8s 其他的 controller 一样），建立对 namespace、pod、networkpolicy 这几个对象的 informer，通过关注并响应 ns、pod、netpol 对象的增删改事件作出对应的操作，即修改 iptables 规则，把 pod ip 加到规则关联的 ipset 之中，来达到对 pod 或者 service 的访问控制。默认情况下，所有的网络流量都是会被 drop 的，只有 netpol 显式放行，流量才可以通过。也就是白名单。</p>
-
 <p>namespace、pod、networkpolicy 这几个对象的 informer，分别是作为三个 goroutine 启动的，也就是说，是并发的。绑定在 namespace 和 pod 对象上的 handler，有可能修改同一个数据结构。在这个场景下，namespace handler 和 pod handler 都持有 namespace 对象的指针。用户删除 namespace 时，默认情况下，K8s 会保证该 namespace 下的所有资源被删除，才删除 namespace 对象本身。weave-npc 也是基于这个假设来设计的。</p>
-
-<p>但是，K8s 虽然会保证<code>对象</code>的删除顺序，但不保证<code>删除事件</code>的顺序。因为网络的问题，两个不同对象的<code>删除事件</code> 到达的顺序，有可能被打乱，kube-apiserver 和 weave-npc 毕竟是两个 node 上的两个进程，这里有个同步的问题。另外，namespace informer 和 pod informer 之间也是并发的，他们对 namespace event 和 pod event 的<code>消费速度</code>也不一样。即使事件按照顺序到达客户端（weave-npc），客户端也未必会严格按照<code>事件到达顺序</code>来消费事件（即触发 handler）。</p>
-
+<p>但是，K8s 虽然会保证<code>对象</code>的删除顺序，但不保证<code>删除事件</code>的顺序。因为网络的问题，两个不同对象的删除事件 到达的顺序，有可能被打乱，kube-apiserver 和 weave-npc 毕竟是两个 node 上的两个进程，这里有个同步的问题。另外，namespace informer 和 pod informer 之间也是并发的，他们对 namespace event 和 pod event 的<code>消费速度</code>也不一样。即使事件按照顺序到达客户端（weave-npc），客户端也未必会严格按照<code>事件到达顺序</code>来消费事件（即触发 handler）。</p>
 <p>于是，本应该先执行 pod delete handler（引用了 namespace 指针）再执行 namespace delete handler（将 namespace 指针置为 nil），有很大概率（毕竟集群中存在大量删除操作，规模越大越频繁）变成，先执行 namespace delete handler（将 namespace 指针置为 nil），再执行 pod delete handler（引用了空指针，引发 panic）。</p>
-
 <p>所以，解决方法就是避免对空指针的引用。阅读了源码之后，发现 namespace 对象指针并没有使用的必要，需要使用的数据是 namespace 的 UID 和 Labels，我把 UID 和 Labels 的值给复制出来，不再使用 namespace 指针，从而避免了 panic 发生的可能。</p>
-
-<p>我给 weave 社区提交了 <a href="https://github.com/weaveworks/weave/pull/3833">Pull Request</a> ，并且被愉快地接受了。最新发布的 2.7.0 已经包含了这个 fix。</p>
-
+<p>我给 weave 社区提交了 <a href="https://github.com/weaveworks/weave/pull/3833">Pull Request</a> ，并且被愉快地接受了。最新发布的 <a href="https://github.com/weaveworks/weave/releases/v2.7.0">2.7.0</a> 已经包含了这个 fix。</p>
 <p>在这里，还有一个令人困惑的点：显然程序 panic 了，但 panic 之后，程序应该退出，然后由外部的进程管理工具重启程序或者容器（在这个环境下，就是由 K8s 负责拉起容器）。weave-npc 除了在日志打印调用栈以外，并没有如预期退出重启，仍然以错误的状态运行，从而使后续的新 pod 的网络不正常。</p>
-
 <p>我怀疑是 client-go 的问题。panic 发生在 weave-npc 注册给 informer 的事件处理 handler 里。handler 的调用发生在 client-go 的库代码里，显然这个 panic 应该是在某一步被 recover 或者阻塞了，从上述的调用栈日志，也可以看出 panic 一步步循着调用栈往上传递，中间经过大量的 client-go 的代码。</p>
-
 <p>在 client-go 的代码中，我发现了问题所在，panic 会被 defer 函数中的代码阻塞：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// code in k8s.io/client-go/tools/cache/controller.go
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">controller</span>) <span style="color:#a6e22e">Run</span>(<span style="color:#a6e22e">stopCh</span> <span style="color:#f92672">&lt;-</span><span style="color:#66d9ef">chan</span> <span style="color:#66d9ef">struct</span>{}) {
+    <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">utilruntime</span>.<span style="color:#a6e22e">HandleCrash</span>()
+    <span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>() {
+        <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">stopCh</span>
+        <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">Queue</span>.<span style="color:#a6e22e">Close</span>()
+    }()
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewReflector</span>(
+        <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">ListerWatcher</span>,
+        <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">ObjectType</span>,
+        <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">Queue</span>,
+        <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">FullResyncPeriod</span>,
+    )
+    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">ShouldResync</span> = <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">ShouldResync</span>
+    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">clock</span> = <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">clock</span>
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">WatchErrorHandler</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">watchErrorHandler</span> = <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">WatchErrorHandler</span>
+    }
 
-<pre><code>// code in k8s.io/client-go/tools/cache/controller.go
-func (c *controller) Run(stopCh &lt;-chan struct{}) {
-	defer utilruntime.HandleCrash()
-	go func() {
-		&lt;-stopCh
-		c.config.Queue.Close()
-	}()
-	r := NewReflector(
-		c.config.ListerWatcher,
-		c.config.ObjectType,
-		c.config.Queue,
-		c.config.FullResyncPeriod,
-	)
-	r.ShouldResync = c.config.ShouldResync
-	r.clock = c.clock
-	if c.config.WatchErrorHandler != nil {
-		r.watchErrorHandler = c.config.WatchErrorHandler
-	}
+    <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">reflectorMutex</span>.<span style="color:#a6e22e">Lock</span>()
+    <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">reflector</span> = <span style="color:#a6e22e">r</span>
+    <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">reflectorMutex</span>.<span style="color:#a6e22e">Unlock</span>()
 
-	c.reflectorMutex.Lock()
-	c.reflector = r
-	c.reflectorMutex.Unlock()
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">wg</span> <span style="color:#a6e22e">wait</span>.<span style="color:#a6e22e">Group</span>
+    <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">Wait</span>()                                 <span style="color:#75715e">// &lt;-- 2. panic传递出来后， defer 会被调用，且会被 wg.Wati() 阻塞
+</span><span style="color:#75715e"></span>
+    <span style="color:#a6e22e">wg</span>.<span style="color:#a6e22e">StartWithChannel</span>(<span style="color:#a6e22e">stopCh</span>, <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">Run</span>)
 
-	var wg wait.Group
-	defer wg.Wait()                                 // &lt;-- 2. panic传递出来后， defer 会被调用，且会被 wg.Wati() 阻塞
-
-	wg.StartWithChannel(stopCh, r.Run)
-
-	wait.Until(c.processLoop, time.Second, stopCh)  // &lt;-- 1. weave-npc的事件处理代码会在 c.processLoop 被调用，panic 也会从此传递出来
-}
-</code></pre>
-
-<p>weave-npc 会调用以上函数来启动 informer，这个函数主要是启动对 kube-apiserver 数据和事件的同步（<code>r.Run</code>），同时启动一个循环，在事件到来的时候调用已经注册好的 handler 方法（<code>c.processLoop</code>）。</p>
-
+    <span style="color:#a6e22e">wait</span>.<span style="color:#a6e22e">Until</span>(<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">processLoop</span>, <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>, <span style="color:#a6e22e">stopCh</span>)  <span style="color:#75715e">// &lt;-- 1. weave-npc的事件处理代码会在 c.processLoop 被调用，panic 也会从此传递出来
+</span><span style="color:#75715e"></span>}
+</code></pre></div><p>weave-npc 会调用以上函数来启动 informer，这个函数主要是启动对 kube-apiserver 数据和事件的同步（<code>r.Run</code>），同时启动一个循环，在事件到来的时候调用已经注册好的 handler 方法（<code>c.processLoop</code>）。</p>
 <p>这里用了一些技巧来保证不同 goroutine 的顺序：r.Run 是一个新的 goroutine，通过用 wait.Group 来让它只依赖于 stopCh，只有在 stopCh 有消息，r.Run 才会结束。但是这里没有考虑到 panic 的情况。按照 go 的设计，panic 发生后，会在当前的 goroutine 层层往上传递，并且执行 defer 函数，直到顶层，结束整个进程。假如 defer 函数中有 recover，则 panic 可以被捕获处理。这里 <code>defer wg.Wait()</code> 在 panic 的情况会被调用，但因为 stopCh 没有收到消息，会导致永远阻塞，panic 也无法再继续向上传递，结束进程了。从 weave-npc 的角度看，就是这个 informer 已经不正常了，c.processLoop 不再响应 pod 事件，iptables / ipset 不再被更新，新 pod 网络因此受到了影响（不再有机会把 pod ip 加到白名单中）。而此时如果重启 weave-npc 进程，一切则可恢复正常。</p>
-
 <p>我也将此现象反映给了 K8s 社区，提交了 <a href="https://github.com/kubernetes/kubernetes/issues/93641">issue</a> ，同时也提交了我的 <a href="https://github.com/kubernetes/kubernetes/pull/93646">PR</a> 。</p>
-
-<p>我的改法是在 <code>defer wg.Wait()</code>  的时候，捕获 panic 并再 panic 一次，绕过<code>wg.Wait()</code>。weave社区的哥们也看到我这个 issue，也认为这是一个隐患，他也提交了他的<a href="https://github.com/kubernetes/kubernetes/pull/93679">改动</a>： 他是取消了 defer，简单地把 <code>wg.Wait()</code> 放到函数最后。看起来他的改法更加优雅一些，我也不再调整我的修改了。估计官方会接受他的改法。</p>
-
-<h1 id="总结">总结</h1>
-
+<h2 id="总结">总结</h2>
 <ol>
 <li>在分布式的环境下，要充分考虑并发、顺序可能带来的问题。在 K8s 这种最终一致性的系统，更加要谨慎一些。</li>
 <li>要深刻理解 go 中 panic、recover、defer 机制的原理，对这几个特性有可能遇到的坑要更敏感些。</li>
