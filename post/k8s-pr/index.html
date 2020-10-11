@@ -63,7 +63,7 @@ if (!doNotTrack) {
     <time>12 Oct 2020</time>
   </div>
   <div class="blog-post-content">
-    <p>之前在解决 weave 的问题时，顺便也发现了 K8s client-go 代码中存在的<a href="https://github.com/kubernetes/kubernetes/issues/93641">问题</a> ，并提交了 <a href="https://github.com/kubernetes/kubernetes/pull/93646">PR</a> ，九月份的时候终于被 merge 进 1.20 的 release，并 cherry pick 回 1.17～1.19（不过公司使用的环境是 1.16，社区不再提供官方的补丁……）</p>
+    <p>之前在解决 weave 的<a href="https://gobomb.github.io/post/debug-and-pr-for-weave/">问题</a>时，顺便也发现了 K8s client-go 代码中存在的<a href="https://github.com/kubernetes/kubernetes/issues/93641">问题</a> ，并提交了 <a href="https://github.com/kubernetes/kubernetes/pull/93646">PR</a> ，九月份的时候终于被 merge 进 1.20 的 release，并 cherry pick 回 1.17～1.19（不过公司使用的环境是 1.16，社区不再提供官方的补丁……）</p>
 <p>weave 因为依赖的这个库的 bug，掩盖了本应该很快发现的 bug，从而导致很多诡异的现象，我觉得这个库应用这么广泛，应该有不少开发者也受影响了才对。而且我和同事在其他项目的使用过程中，也发现过类似的现象（Process 被阻塞，不能正确处理新的事件）。但一开始在 k8s 的 issues 翻了很久，都找到没有类似的问题，实在是违反直觉。</p>
 <p>后来仔细看了下 client-go 源码，也找到了合理的解释。informer 有两种用法，一种是使用 client-go/tools/cache/controller.go 中提供的 controller（可以说是低级别的 informer），一种是 client-go/tools/cache/shared_informer.go 中的 SharedInformer 或者 SharedIndexInformer，也就是 SharedInformerFactory 返回的 informer。 SharedIndexInformer 封装的层次更高，大部分项目都是用的后者，刚好避开了普通 informer 存在的 bug。而我们的部分项目，以及 weave-npc 都是用的 controller/低级别informer。</p>
 <p>具体而言，bug 就是刚好发生在 controller/低级别informer 和 SharedIndexInformer 对 Contorller 接口方法 Run() 的不同实现上面。它们对 ResourceEventHandler 接口的处理方式或者说 Process 的实现是不同的，而 ResourceEventHandler 的实现就是用户业务代码发生 panic 的地方。</p>
