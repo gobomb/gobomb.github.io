@@ -66,7 +66,7 @@ if (!doNotTrack) {
     <p>我们可以通过 list 和 watch 的机制向 k8s 的 apiserver 同步 k8s 资源对象和对象的变化。client-go 是官方提供的 apiserver go 客户端库，封装了对
 k8s 对象的操作，实现了一个 apiserver 的缓存。这篇笔记主要在 interface 的层面介绍一下 cache 包的结构。interface 构成不同业务逻辑的边界，调用往往都通过 interface 中的方法来进行，作为调用方只需要关心抽象行为，而不用关心具体实现。通过学习 client-go 的代码，也可以了解 interface 的最佳实践。从 interface 入手，可以快速了解整套代码的骨架。</p>
 <p>client-go 实现了一个缓存，定期同步和 apiserver / etcd 中的数据，并且提供了一组响应资源变化的回调函数。作为库的用户只要实现回调函数，处理自己关心的资源对象（如Pod、Deployment、自己实现的 CR 等等），而不需要关心和 apiserver 具体的交互逻辑（list and watch）。相当于一个编程框架，让开发者专注于自己的业务逻辑而不是重复实现通用的轮子。</p>
-<p>以下通过几个重要的概念来介绍 client-go cache 包（位于 [kubernetes/staging/src/k8s.io/client-go/tools/cache/] (<a href="https://github.com/kubernetes/kubernetes/tree/master/staging/src/k8s.io/client-go/tools/cache">https://github.com/kubernetes/kubernetes/tree/master/staging/src/k8s.io/client-go/tools/cache</a>) 基于 <code>1c5be7dd5046fba8733f44618fd28fbb79e7db07</code> ）的机制，名词后面的括号说明这个名词是interface还是struct：</p>
+<p>以下通过几个重要的概念来介绍 client-go cache 包（位于 <a href="https://github.com/kubernetes/kubernetes/tree/master/staging/src/k8s.io/client-go/tools/cache">kubernetes/staging/src/k8s.io/client-go/tools/cache/</a> 基于 <code>1c5be7dd5046fba8733f44618fd28fbb79e7db07</code> ）的机制，名词后面的括号说明这个名词是interface还是struct：</p>
 <ol>
 <li>
 <p>ClientSet（struct）：封装了 k8s 所有资源对象的获取方式，实现了每一种对象的 list 和 watch 接口，可以通过 http 跟 apiserver 交互。实现了 ListerWatcher 接口。</p>
