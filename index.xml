@@ -334,24 +334,5 @@ hugo 是用 Golang 写的静态网站生成器。支持 Markdown 语法。 另�
   hugo new about.md  皮肤我用的是 rockrock：  cd themes git clone https://github.com/chingli/rockrock 在本地运行   在站点根目录下运行： hugo server --theme=rockrock --buildDrafts   在浏览器访问： http://localhost:1313   这里修改 Markdown 文件可以动态更新，很方便。   在 GitHub 上部署 1 在 GitHub 建一个 Repository，命名为 sidddhartha.</description>
     </item>
     
-    <item>
-      <title></title>
-      <link>https://gobomb.github.io/about/</link>
-      <pubDate>Tue, 31 Oct 2017 14:37:01 +0800</pubDate>
-      
-      <guid>https://gobomb.github.io/about/</guid>
-      <description>Contact  GitHub: gobomb
-E-mail: bombcoder at outlook.com
-欢迎发邮件交流。文章若有错误也希望不吝赐教。
-Tech Stack  Program Language: Go / Shell / C
-Editor: Vim / Goland
-Ops: Docker / Kubernetes
-OS: macOS / Ubuntu / Arch
-Links  ckyOL&amp;rsquo;s b10g | 技术、宅圈 https://blog.ckyol.moe/
-UZPENG https://uzpeng.github.io/
-Hertz http://leewaiho.com/
-muzi https://blog.502.li/</description>
-    </item>
-    
   </channel>
 </rss>
