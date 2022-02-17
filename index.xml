@@ -6,7 +6,19 @@
     <description>Recent content on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 01 Feb 2022 04:09:11 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 17 Feb 2022 20:00:57 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>sharedInformer 如何实现注册多组 ResourceEventHandler</title>
+      <link>https://gobomb.github.io/post/how-sharedinformer-register-multi-resource-event-handler/</link>
+      <pubDate>Thu, 17 Feb 2022 20:00:57 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/how-sharedinformer-register-multi-resource-event-handler/</guid>
+      <description>client-go 的 cache 包缓存对象数据的流向是：kube-apiserver-&amp;gt; reflector -&amp;gt; DeltaFIFO -&amp;gt; infomer 里的 Indexer，同时 call 用户实现的 ResourceEventHandler：
+ reflector从apiserver list全量数据，并watch 后续数据的更新，会定期进行一次全量 list，防止本地缓存与服务端不一致 reflector 会将 obj 写到 DeltaFIFO 中 DeltaFIFO 可以定时（设置了resyncPeriod的话）从 Indexer 取 key，重新入队，防止一旦 obj 在 handler 里计算失败，得不到重试的机会 controller 的 processLoop 循环调用 Pop 和 Process 函数， Pop 从 DeltaFIFO 取 Obj ，Process 更新 Indexer，并触发 ResourceEventHandler  普通 Informer 对同一种对象只能注册一组 ResourceEventHandler，要实现多组 ResourceEventHandler，就需要多创建 Informer，数据是一样的，会造成内存上的浪费。所以 sharedInformer 的引入，支持了针对同一类对象的 ResourceEventHandler 注册到一个 informer 上，实现数据的复用。
+本文主要从源码上，分析一下这个多组 ResourceEventHandler 的注册是怎么实现的，数据是怎样做分发的。
+为了实现 sharedindexinformer 挂载多组 handler，相对普通 informer，有两点不同：一是重写了Process方法，用HandleDeltas方法替代；二是引入两个新的结构：sharedProcessor、processorListener，用于做数据分发。</description>
+    </item>
+    
     <item>
       <title>告别哲学</title>
       <link>https://gobomb.github.io/post/say-goodbye-to-philosophy/</link>

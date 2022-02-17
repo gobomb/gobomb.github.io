@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
+
+        <title>sharedInformer 如何实现注册多组 ResourceEventHandler</title>
+
+        <link rel="stylesheet" href="/css/stylesheet.css">
+    </head>
+    <body>
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-md navbar-light">
+
+          
+          <span class="navbar-brand mb-0 h1"></span>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation" name="button">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link " href="/post/">Posts</a>
+              <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
+              
+              <a class="nav-item nav-link " href="/about/">About</a>
+            </div>
+          </div>
+        </nav>
+
+        <section id="page-title">
+          <h1><a href="/">Present Day, Present Time</a></h1>
+          <span id="author-name">
+            <h6><a href="/about/">gobomb</a></h6>
+          </span>
+        </section>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+<div class="blog-post">
+  <h1>sharedInformer 如何实现注册多组 ResourceEventHandler</h1>
+  <div class="blog-post-subheader">
+    <time>17 Feb 2022</time>
+  </div>
+  <div class="blog-post-content">
+    <p>client-go 的 cache 包缓存对象数据的流向是：kube-apiserver-&gt; reflector -&gt; DeltaFIFO -&gt; infomer 里的 Indexer，同时 call 用户实现的 ResourceEventHandler：</p>
+<ol>
+<li>reflector从apiserver list全量数据，并watch 后续数据的更新，会定期进行一次全量 list，防止本地缓存与服务端不一致</li>
+<li>reflector 会将 obj 写到 DeltaFIFO 中</li>
+<li>DeltaFIFO 可以定时（设置了resyncPeriod的话）从 Indexer 取 key，重新入队，防止一旦 obj 在 handler  里计算失败，得不到重试的机会</li>
+<li>controller 的 processLoop 循环调用 Pop 和 Process 函数， Pop 从 DeltaFIFO 取 Obj ，Process 更新 Indexer，并触发 ResourceEventHandler</li>
+</ol>
+<p>普通 Informer 对同一种对象只能注册一组 ResourceEventHandler，要实现多组 ResourceEventHandler，就需要多创建 Informer，数据是一样的，会造成内存上的浪费。所以 sharedInformer 的引入，支持了针对同一类对象的 ResourceEventHandler 注册到一个 informer 上，实现数据的复用。</p>
+<p>本文主要从源码上，分析一下这个多组 ResourceEventHandler 的注册是怎么实现的，数据是怎样做分发的。</p>
+<p>为了实现 sharedindexinformer 挂载多组 handler，相对普通 informer，有两点不同：一是重写了Process方法，用HandleDeltas方法替代；二是引入两个新的结构：sharedProcessor、processorListener，用于做数据分发。</p>
+<p>processorListener 持有两个同步 channel（addCh、nextCh） 一个环形队列，和一个 ResourceEventHandler。是ResourceEventHandler的进一步包装。</p>
+<p>sharedProcessor 持有一个 processorListener 切片。用户通过调用 AddEventHandler，将自己实现的ResourceEventHandler注册到processorListener中，并 append 到sharedProcessor中的切片中，同时通过两个goroutine启动各个processorListener的run()和pop()。</p>
+<p>sharedIndexInformer实现了 ResourceEventHandler，并持有一个 sharedProcessor。</p>
+<p>sharedProcessor 的 HandleDeltas 就是注册给 Controller 的 Process 函数（在启动的时候会被 processLoop 循环线程调用，用于消费 DeltaFIFO 出队的 Obj），HandleDeltas最终会调用 sharedIndexInformer 实现的默认 ResourceEventHandler。</p>
+<p>sharedIndexInformer 会在三组回调函数中调用 sharedProcessor.distribute。</p>
+<p>sharedProcessor.distribute 遍历 processorListener 列表，调用每个 processorListener 的 add 方法。</p>
+<p>这里类似观察者模式。DeltaFIFO 出队的 Obj是 Observer关心的事件，processorListener是一个个Observer，注册到 sharedProcessor。sharedProcessor负责在事件到达时，回调Observer的方法，这里就是 add。</p>
+<p>processorListener的add 方法把对象写入 addCh。</p>
+<p>pop()  goroutine 从 addCh 中读 Obj，写 Obj 到 nextCh，并用环形队列做缓冲协调两个channel的收发速率
+run() goroutine 从 nextCh 读出 Obj，调用 processorListener 自身的、也就是用户实现、注册的 ResourceEventHandler</p>
+<p>为啥 processorListener 需要两个同步 channel、一个环形队列、两个 goroutine 才能消费 Obj呢？因为接收和消费的速率不一致，中间就需要缓冲，不然消费速率太慢会阻塞接收。</p>
+<p>pop() 函数值得一提，这种写法我第一次见到：用 nil channel 来控制 for-select 中某个 case的开启和关闭。</p>
+<p>pendingNotifications是一个环形队列，用来做缓冲。代码注释里用1.2.3.4来说明每个语句执行的顺序。</p>
+<pre><code>func (p *processorListener) pop() {
+	defer utilruntime.HandleCrash()
+	// 通过close(p.nextCh)来关闭 run 线程
+	defer close(p.nextCh) 
+
+	var nextCh chan&lt;- interface{}
+	var notification interface{}
+	for {
+		select {
+		// 0. 当 nextCh 为nil时，写到 nil channel 会阻塞，所以不会被 select到
+		// 4.2（4.1和4.2会随机执行到一个） notification 发送成功
+		case nextCh &lt;- notification:
+			var ok bool
+			// 5 更新notification为缓冲队列里的一个，等待下次 select 到这个 case 就可以发送了
+			notification, ok = p.pendingNotifications.ReadOne()
+			if !ok { 
+				// 6 在环形缓冲区中读不到数据，都发送完了，把nextCh置为nil
+				// 相当于关闭这个 case
+				nextCh = nil 
+			}
+		// 0.1 p.addCh开始有消息到达，一开始会命中这个case
+		case notificationToAdd, ok := &lt;-p.addCh:
+			// 如果ok==false，说 addCh被关闭，直接返回
+			if !ok {
+				return
+			}
+			// 1. 一开始 notification是nil，nextCh也是nil，必然会先走到这里，环形队列也是空的
+			// 6.缓冲区没有数据了， nextCh也只为 nil（case1 被关闭），重新回到1
+			if notification == nil { 
+				// 2. 直接设置 notification ，不需要发到缓冲区，直接发到nextCh
+				// 跟异步 channel  通知 goroutine 队列出队的实现模式有点类似
+				notification = notificationToAdd
+				// 3. 启动第一个case，允许发送
+				nextCh = p.nextCh
+			} else { 
+			     // 4.1（4.1和4.2会随机执行到一个） notification 不为空，说明第一个 case 可用，已经有notification要发送了，但因为 for-select的随机选择 select 到这个 case
+			     // 就将新的 notificationToAdd 写到环形队列里缓冲起来
+				p.pendingNotifications.WriteOne(notificationToAdd)
+			}
+		}
+	}
+}
+
+</code></pre><p>这里乍一看两个case都操作了 nextCh 、notification 这两个变量，似乎应该加锁。其实是因为两个case总是交替执行，不会有竞争。类似一个单线程轮询器。</p>
+<p>通过关闭某个 channel，来通知读该 channel 的 goroutine 结束，这也算是常见的模式了。</p>
+<p>整个流程总结一下就是：</p>
+<ol>
+<li>DeltaFIFO 出队会先调用 sharedIndexInformer 的默认 ResourceEventHandler，在这里再调用 sharedProcessor 的 distribute 方法进行 Obj 的分发</li>
+<li>obj 会被发到 sharedProcessor 里注册的每个 processorListener 的 addCh 中</li>
+<li>processorListener 的 pop 线程消费addCh，同时用环形队列做缓冲，然后转发到nextCh 中</li>
+<li>processorListener 的 run 线程消费 nextCh ，最终调用用户实现的ResourceEventHandler，把 Obj 发到用户函数做处理</li>
+</ol>
+
+  </div>
+</div>
+
+      <footer>
+        <hr>
+        <small>
+          &copy; 2022 gobomb.
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> using the <a href="https://github.com/arjunkrishnababu96/basics" target="_blank">Basics</a> theme.
+        </small>
+      </footer>
+    </div> 
+
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  </body>
+</html>
+
