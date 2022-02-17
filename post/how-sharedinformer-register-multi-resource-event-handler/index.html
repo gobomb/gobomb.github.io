@@ -71,7 +71,7 @@ if (!doNotTrack) {
 <li>controller 的 processLoop 循环调用 Pop 和 Process 函数， Pop 从 DeltaFIFO 取 Obj ，Process 更新 Indexer，并触发 ResourceEventHandler</li>
 </ol>
 <p>普通 Informer 对同一种对象只能注册一组 ResourceEventHandler，要实现多组 ResourceEventHandler，就需要多创建 Informer，数据是一样的，会造成内存上的浪费。所以 sharedInformer 的引入，支持了针对同一类对象的 ResourceEventHandler 注册到一个 informer 上，实现数据的复用。</p>
-<p>本文主要从源码上，分析一下这个多组 ResourceEventHandler 的注册是怎么实现的，数据是怎样做分发的。</p>
+<p>本文主要从源码的层面，分析一下这个多组 ResourceEventHandler 的注册是怎么实现的，数据是怎样做分发的。</p>
 <p>为了实现 sharedindexinformer 挂载多组 handler，相对普通 informer，有两点不同：一是重写了Process方法，用HandleDeltas方法替代；二是引入两个新的结构：sharedProcessor、processorListener，用于做数据分发。</p>
 <p>processorListener 持有两个同步 channel（addCh、nextCh） 一个环形队列，和一个 ResourceEventHandler。是ResourceEventHandler的进一步包装。</p>
 <p>sharedProcessor 持有一个 processorListener 切片。用户通过调用 AddEventHandler，将自己实现的ResourceEventHandler注册到processorListener中，并 append 到sharedProcessor中的切片中，同时通过两个goroutine启动各个processorListener的run()和pop()。</p>
@@ -86,50 +86,51 @@ run() goroutine 从 nextCh 读出 Obj，调用 processorListener 自身的、也
 <p>为啥 processorListener 需要两个同步 channel、一个环形队列、两个 goroutine 才能消费 Obj呢？因为接收和消费的速率不一致，中间就需要缓冲，不然消费速率太慢会阻塞接收。</p>
 <p>pop() 函数值得一提，这种写法我第一次见到：用 nil channel 来控制 for-select 中某个 case的开启和关闭。</p>
 <p>pendingNotifications是一个环形队列，用来做缓冲。代码注释里用1.2.3.4来说明每个语句执行的顺序。</p>
-<pre><code>func (p *processorListener) pop() {
-	defer utilruntime.HandleCrash()
-	// 通过close(p.nextCh)来关闭 run 线程
-	defer close(p.nextCh) 
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">processorListener</span>) <span style="color:#a6e22e">pop</span>() {
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">utilruntime</span>.<span style="color:#a6e22e">HandleCrash</span>()
+	<span style="color:#75715e">// 7. 通过close(p.nextCh)来关闭 run 线程
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">defer</span> close(<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">nextCh</span>) 
 
-	var nextCh chan&lt;- interface{}
-	var notification interface{}
-	for {
-		select {
-		// 0. 当 nextCh 为nil时，写到 nil channel 会阻塞，所以不会被 select到
-		// 4.2（4.1和4.2会随机执行到一个） notification 发送成功
-		case nextCh &lt;- notification:
-			var ok bool
-			// 5 更新notification为缓冲队列里的一个，等待下次 select 到这个 case 就可以发送了
-			notification, ok = p.pendingNotifications.ReadOne()
-			if !ok { 
-				// 6 在环形缓冲区中读不到数据，都发送完了，把nextCh置为nil
-				// 相当于关闭这个 case
-				nextCh = nil 
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nextCh</span> <span style="color:#66d9ef">chan</span><span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">interface</span>{}
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">notification</span> <span style="color:#66d9ef">interface</span>{}
+	<span style="color:#66d9ef">for</span> {
+		<span style="color:#66d9ef">select</span> {
+		<span style="color:#75715e">// 0. 当 nextCh 为nil时，写到 nil channel 会阻塞，所以不会被 select到
+</span><span style="color:#75715e"></span>		<span style="color:#75715e">// 4.2（4.1和4.2会随机执行到一个） notification 发送成功
+</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">nextCh</span> <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">notification</span>:
+			<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ok</span> <span style="color:#66d9ef">bool</span>
+			<span style="color:#75715e">// 5 更新notification为缓冲队列里的一个，等待下次 select 到这个 case 就可以发送了
+</span><span style="color:#75715e"></span>			<span style="color:#a6e22e">notification</span>, <span style="color:#a6e22e">ok</span> = <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">pendingNotifications</span>.<span style="color:#a6e22e">ReadOne</span>()
+			<span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">ok</span> { 
+				<span style="color:#75715e">// 6 在环形缓冲区中读不到数据，都发送完了，把nextCh置为nil
+</span><span style="color:#75715e"></span>				<span style="color:#75715e">// 相当于关闭这个 case
+</span><span style="color:#75715e"></span>				<span style="color:#a6e22e">nextCh</span> = <span style="color:#66d9ef">nil</span> 
 			}
-		// 0.1 p.addCh开始有消息到达，一开始会命中这个case
-		case notificationToAdd, ok := &lt;-p.addCh:
-			// 如果ok==false，说 addCh被关闭，直接返回
-			if !ok {
-				return
+		<span style="color:#75715e">// 0 p.addCh开始有消息到达，一开始会命中这个case
+</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">notificationToAdd</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">addCh</span>:
+			<span style="color:#75715e">// 如果ok==false，说明 addCh被关闭，直接返回
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">ok</span> {
+				<span style="color:#66d9ef">return</span>
 			}
-			// 1. 一开始 notification是nil，nextCh也是nil，必然会先走到这里，环形队列也是空的
-			// 6.缓冲区没有数据了， nextCh也只为 nil（case1 被关闭），重新回到1
-			if notification == nil { 
-				// 2. 直接设置 notification ，不需要发到缓冲区，直接发到nextCh
-				// 跟异步 channel  通知 goroutine 队列出队的实现模式有点类似
-				notification = notificationToAdd
-				// 3. 启动第一个case，允许发送
-				nextCh = p.nextCh
-			} else { 
-			     // 4.1（4.1和4.2会随机执行到一个） notification 不为空，说明第一个 case 可用，已经有notification要发送了，但因为 for-select的随机选择 select 到这个 case
-			     // 就将新的 notificationToAdd 写到环形队列里缓冲起来
-				p.pendingNotifications.WriteOne(notificationToAdd)
+			<span style="color:#75715e">// 1. 一开始 notification是nil，nextCh也是nil，必然会先走到这里，环形队列也是空的
+</span><span style="color:#75715e"></span>			<span style="color:#75715e">// 6. 缓冲区没有数据了， nextCh也只为 nil（case1 被关闭），重新回到1
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">notification</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> { 
+				<span style="color:#75715e">// 2. 直接设置 notification ，不需要发到缓冲区，直接发到nextCh
+</span><span style="color:#75715e"></span>				<span style="color:#75715e">// 	  跟异步 channel  通知 goroutine 队列出队的实现模式有点类似
+</span><span style="color:#75715e"></span>				<span style="color:#a6e22e">notification</span> = <span style="color:#a6e22e">notificationToAdd</span>
+				<span style="color:#75715e">// 3. 启动第一个case，允许发送
+</span><span style="color:#75715e"></span>				<span style="color:#a6e22e">nextCh</span> = <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">nextCh</span>
+			} <span style="color:#66d9ef">else</span> { 
+			     <span style="color:#75715e">// 4.1（4.1和4.2会随机执行到一个） notification 不为空，说明第一个 case 可用，
+</span><span style="color:#75715e"></span>				 <span style="color:#75715e">//     已经有notification要发送了，但因为 for-select的随机选择 select 到这个 case
+</span><span style="color:#75715e"></span>			     <span style="color:#75715e">//     就将新的 notificationToAdd 写到环形队列里缓冲起来
+</span><span style="color:#75715e"></span>				<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">pendingNotifications</span>.<span style="color:#a6e22e">WriteOne</span>(<span style="color:#a6e22e">notificationToAdd</span>)
 			}
 		}
 	}
 }
 
-</code></pre><p>这里乍一看两个case都操作了 nextCh 、notification 这两个变量，似乎应该加锁。其实是因为两个case总是交替执行，不会有竞争。类似一个单线程轮询器。</p>
+</code></pre></div><p>这里乍一看两个case都操作了 nextCh 、notification 这两个变量，似乎应该加锁。其实是因为两个case总是交替执行，不会有竞争。类似一个单线程轮询器。</p>
 <p>通过关闭某个 channel，来通知读该 channel 的 goroutine 结束，这也算是常见的模式了。</p>
 <p>整个流程总结一下就是：</p>
 <ol>
