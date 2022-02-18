@@ -6,7 +6,27 @@
     <description>Recent content on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 17 Feb 2022 20:00:57 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 19 Feb 2022 01:42:09 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Informer Resync 做了什么</title>
+      <link>https://gobomb.github.io/post/whats-resync-in-informer/</link>
+      <pubDate>Sat, 19 Feb 2022 01:42:09 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/whats-resync-in-informer/</guid>
+      <description>resync 不是 re-list。
+  resync 是重放 informer 中的 obj 到 DeltaFIFO 队列中，触发 handler 再次处理 obj。
+目的是防止有些 handler 处理失败了而缺乏重试的机会。特别是，需要修改外部系统的状态的时候，需要做一些补偿的时候。
+比如说，根据 networkpolicy刷新 node 上的 iptables。
+iptables 有可能会被其他进程或者管理员意外修改，有 resync 的话，才有机会定期修正。
+这也说明，回调函数的实现需要保证幂等性。对于 OnUpdate 函数而言，有可能会拿到完全一样的两个 Obj，实现 OnUpdate 时要考虑到。
+  re-list 是指 reflector 重新调用 kube-apiserver 全量同步所有 obj。但目前(v1.20)没有显式配置 re-list 周期的参数。
+官方开发者似乎觉得不需要 re-list，目前的方式已经足够可靠
+list 的时机一般是在程序第一次启动，或者 watch 有错误，才会 re-list。
+具体什么时候会发生 re-list？这里有篇博客可以参考
+  如何配置 resync 的周期？
+func NewSharedIndexInformer(lw ListerWatcher, exampleObject runtime.Object, defaultEventHandlerResyncPeriod time.Duration, indexers Indexers)</description>
+    </item>
+    
     <item>
       <title>sharedInformer 如何实现注册多组 ResourceEventHandler</title>
       <link>https://gobomb.github.io/post/how-sharedinformer-register-multi-resource-event-handler/</link>
