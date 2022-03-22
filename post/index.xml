@@ -6,7 +6,32 @@
     <description>Recent content in Posts on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 19 Feb 2022 01:42:09 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 22 Mar 2022 22:46:11 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Basic Paxos 总结</title>
+      <link>https://gobomb.github.io/post/basic-paxos/</link>
+      <pubDate>Tue, 22 Mar 2022 22:46:11 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/basic-paxos/</guid>
+      <description>Paxos 解决什么问题？
+对于一个多节点的分布式系统，客户端写入一个值，得到ok的返回之后，希望这个值是不变的、持久化的。而且期待不管从哪个节点读，都是一致的。
+复制解决什么问题？
+高可用性：冗余数据，防止单点故障
+降低延迟：把数据复制到不同的地理位置，方便客户端更快地读取
+伸缩性：提高机器副本从而提高吞吐量
+几种复制方式 1 主从异步复制 主节点收到客户端的写请求，把数据落盘，然后响应客户端ok，再把数据复制到其他节点。
+问题：响应ok的时刻，从节点总是落后于主节点的，加入主节点当机，客户端的写入就丢失了，因为从节点没来得及写入副本。
+2 主从同步复制 主节点收到客户端的写请求，把数据落盘，把数据复制到其他节点，得到从节点的响应后，再响应客户端ok。
+问题：主节点会阻塞在从节点的处理上，一方面性能会下降，需要等待网络以及从节点的写盘，另一方面，当从节点当机，主节点就不可用了。
+3 主从半同步复制 主节点收到客户端的写请求，把数据复制到足够多的机器上，而不是全部，得到部分从节点的确定后，再响应客户端ok。
+问题：有可能从库没有完整的数据
+4 多数派读/写 每条数据写入到半数以上的节点上，读也是要读半数以上的节点。
+假设有3个节点 node-1,node-2,node-3，客户端需要写入到至少2个节点才算成功。
+多数派读/写的问题 1 两次写入到不同的2个节点，其中有一个节点会被覆盖 比如
+// 对 node-1, node-2 都写入了a=x node-1，a=x;node-2,a=x;node-3,null // 第二次对node-2, node-3写入了a=y node-1，a=x;node-2,a=y;node-3,a=y // 读 node-1，node-2 ,从 node-1 得到 a=x，从 node-2 得到 a=y，无法确定哪条数据是对的。 解决：使用全局时间戳，写入的时候对每个数据设置一个全局递增的时间戳或者版本号。已更新的时间戳或更大的版本号为准，也就是 最后写入胜利（LWW）。
+node-1 , a=null , v0; node-2 , a=null, v0; node-3 , a=null , v0; // 对 node-1, node-2 都写入了a=x node-1 , a=x , v1; node-2 , a=x , v1; node-3 , a=null , v0; // 第二次对node-2, node-3写入了a=y node-1 , a=x , v1; node-2 , a=y , v2; node-3 , a=y , v2; // 读 node-1，node-2 ,从 node-1 得到 a=x，v1 从 node-2 得到 a=y，v2。v2&amp;gt;v1，所以 a=y 是正确的 2 单个客户端写的原子性难以保证 因为客户端需要写多个节点，有可能写的过程中客户端崩溃，没有写入超过半数，系统里的数据会产生不一致。</description>
+    </item>
+    
     <item>
       <title>Informer Resync 做了什么</title>
       <link>https://gobomb.github.io/post/whats-resync-in-informer/</link>
