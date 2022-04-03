@@ -15,14 +15,14 @@
       <guid>https://gobomb.github.io/post/golang-mutex/</guid>
       <description>有两种模式：正常模式和饥饿模式。正常模式会先自旋再通过信号量排队等待；饥饿模式会严格按照先入先出的顺序。
   为什么需要有两种模式？golang的锁是通过自旋+信号量的方式实现的。g获取锁需要先自旋一定次数，再放到信号量等待。当锁释放，会唤醒信号量队头的g。这个g会和新来的g产生竞争，新来的g处于自旋状态，更容易抢到锁，队列中的g会被饿死。性能虽高，但是公平性低。所以引入了饥饿模式解决饥饿问题。
-  数据结构：由 state 和 sema 组成，零值可用。零值表示解锁状态。
+  为什么后来者有优势？
+ 后来者在cpu上自旋，更有优势 被唤醒的g每次只有一个，自旋的有很多    数据结构：由 state 和 sema 组成，零值可用。零值表示解锁状态。
 sema表示信号量
 state低三位，locked表示是否加锁，woken表示是否有g唤醒，starving表示是否进入饥饿模式。这3位以外的位表示有多少g在排队
   加/解锁首先会进入 fastpath，原子操作改变 state。如果没有成功再进入 slowpath
 // 加锁 if atomic.CompareAndSwapInt32(&amp;amp;m.state, 0, mutexLocked) { // 直接对释放的锁加锁成功 return } m.lockSlow() // 解锁 new := atomic.AddInt32(&amp;amp;m.state, -mutexLocked) // new等于0意味着没有g在排队 if new != 0 { m.unlockSlow(new) }   lockSlow   先进入自旋，然后判断是否进入饥饿模式，把g放到信号量中等待
   进入自旋：
- woken置为1 ，防止唤醒太多g do_spin()自旋，调用30次 PAUSE 指令    g进入自旋的条件：
- 处于正常模式 运行在多 CPU 的机器上； 当前 Goroutine 为了获取该锁进入自旋的次数小于四次； 当前机器上至少存在一个正在运行的处理器 P 并且处理的运行队列为空；    退出自旋后做什么：保存旧state为old，根据 state 的值，原子操作设置新的state</description>
+ woken置为1 ，防止唤醒太多g do_spin()自旋，调用30次 PAUSE 指令    g进入自旋的条件：</description>
     </item>
     
     <item>
