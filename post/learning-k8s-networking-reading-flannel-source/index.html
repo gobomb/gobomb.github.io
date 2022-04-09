@@ -278,9 +278,9 @@ vethbe310cc8@if3 # 连接容器网卡和cni0的veth设备
 <pre><code>[root@node02 ~]# brctl show
 bridge name	bridge id		STP enabled	interfaces
 cni0		8000.569a2f1ad085	no		veth95375d8f
-                                        vethb7b823f5
-                                        vethbe310cc8
-                                        vethce9ecc40
+                                                        vethb7b823f5
+                                                        vethbe310cc8
+                                                        vethce9ecc40
 docker0		8000.024210860cd5	no
 </code></pre><p>从上面的结果可以看到，cni0 上桥接了四个 veth，每个 veth 的另一端都是一个 pod 网卡。</p>
 </li>
