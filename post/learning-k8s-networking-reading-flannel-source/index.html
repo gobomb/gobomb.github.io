@@ -309,11 +309,9 @@ Address                  HWtype  HWaddress           Flags Mask            Iface
 <p>在  flannel.1 的 fdb 中，通过 mac 地址 86:fa:ee:23:17:92 找到这个包改发往哪个（二层）接口，这里的接口是 node 上的外部网卡 ens192 的 ip 10.10.13.62。</p>
 <p>原始 IP 分组（<code>10.244.2.48 -&gt; 10.244.4.2</code>）所在的 MAC 帧（本机 VTEP MAC -&gt; 对端 VTEP MAC），会被 VTEP 封装成 UDP 数据报（源 IP 地址是发送端主机外部网卡的 IP 10.10.13.63，目的 IP 地址是接收端主机外部网卡的 IP 10.10.13.62，目的端口是 VxLAN 的监听端口 4789）。</p>
 <p>封装的时候会在 UDP 中加入 VxLAN 的控制信息，比如 VNI。这里 VNI 是 1. flannel.1 命名中的 1 就指示了 VNI 号。同一个 VNI 号的属于同一个网络。</p>
-<pre><code>[root@node02 ~]# bridge fdb
-...
+<pre><code>[root@node02 ~]# bridge fdb show dev flannel.1
 86:fa:ee:23:17:92 dev flannel.1 dst 10.10.13.62 self permanent
 9e:14:c6:42:2e:bf dev flannel.1 dst 10.10.13.61 self permanent
-...
 </code></pre></li>
 <li>
 <p>封装完毕后会从外部网卡发送出去。将 MAC 帧从 UDP 数据报中拆出来，并检查 VNI 号。如果是同一个 VNI 的，往协议层上层走。</p>

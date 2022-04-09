@@ -6,7 +6,23 @@
     <description>Recent content on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 04 Apr 2022 22:33:49 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 09 Apr 2022 16:59:44 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Weave 和 Flannel 的区别</title>
+      <link>https://gobomb.github.io/post/weave-and-flannel/</link>
+      <pubDate>Sat, 09 Apr 2022 16:59:44 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/weave-and-flannel/</guid>
+      <description>这篇文章主要讨论 weave 和 flannel 各自怎么使用 vxlan 实现跨主机网络的情况。从网络设备、主机路由、IP管理、CNI实现、容器路由、vxlan发现几个角度来比较。
+1. weave 有哪些网络设备 一个 bridge ，通常命名为 weave，会配一个 IP。用于挂载和容器成对的 veth。
+一个 ovs 设备，命名为 datapath，没有配 IP。
+一个 vtep 设备 vxlan-6784，负责封包和拆包，没有配 IP。
+bridge 和 ovs 设备之间用一对 veth 连起来： vethwe-datapath 和 vethwe-bridge。
+主机路由和网段划分 只有一条路由，所有 pod 是一个子网，不区分 node，IPAM 由weave 主机分配， weave cni 会调用 weave 服务获取 IP。
+# 在 node 上执行 ip route 10.32.0.0/12 dev weave proto kernel scope link src 10.32.0.1 10.32.0.0/12 是该集群的 pod CIDR。
+CNI 阶段 kubelet 调用 weave-plugin 这个 cni 插件，通过 weave client 从 weave daemon 获取 ip（ip分配由weave管理），并在容器内配置网卡和 IP，并将网卡对应的 veth 连接到 weave bridge 上。</description>
+    </item>
+    
     <item>
       <title>Golang Sync Map</title>
       <link>https://gobomb.github.io/post/golang-sync-map/</link>
