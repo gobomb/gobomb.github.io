@@ -8,12 +8,12 @@
     <language>en-us</language>
     <lastBuildDate>Sat, 09 Apr 2022 16:59:44 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Weave 和 Flannel 的区别</title>
+      <title>Weave/Flannel/Calico 的转发流程</title>
       <link>https://gobomb.github.io/post/weave-and-flannel/</link>
       <pubDate>Sat, 09 Apr 2022 16:59:44 +0800</pubDate>
       
       <guid>https://gobomb.github.io/post/weave-and-flannel/</guid>
-      <description>这篇文章主要讨论 weave 和 flannel 各自怎么使用 vxlan 实现跨主机网络的情况。从网络设备、主机路由、IP管理、CNI实现、容器路由、vxlan发现几个角度来比较。
+      <description>这篇文章主要讨论 weave 和 flannel 各自怎么使用 vxlan 实现跨主机网络的情况。从网络设备、主机路由、IP管理、CNI实现、容器路由、vxlan发现几个角度来比较。最后再简单介绍一下 calico 的转发流程。
 1. weave 有哪些网络设备 一个 bridge ，通常命名为 weave，会配一个 IP。用于挂载和容器成对的 veth。
 一个 ovs 设备，命名为 datapath，没有配 IP。
 一个 vtep 设备 vxlan-6784，负责封包和拆包，没有配 IP。

@@ -10,7 +10,7 @@
         <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
 
-        <title>Weave 和 Flannel 的区别</title>
+        <title>Weave/Flannel/Calico 的转发流程</title>
 
         <link rel="stylesheet" href="/css/stylesheet.css">
     </head>
@@ -58,12 +58,12 @@ if (!doNotTrack) {
 
 
 <div class="blog-post">
-  <h1>Weave 和 Flannel 的区别</h1>
+  <h1>Weave/Flannel/Calico 的转发流程</h1>
   <div class="blog-post-subheader">
     <time>09 Apr 2022</time>
   </div>
   <div class="blog-post-content">
-    <p>这篇文章主要讨论 weave 和 flannel 各自怎么使用 vxlan 实现跨主机网络的情况。从网络设备、主机路由、IP管理、CNI实现、容器路由、vxlan发现几个角度来比较。</p>
+    <p>这篇文章主要讨论 weave 和 flannel 各自怎么使用 vxlan 实现跨主机网络的情况。从网络设备、主机路由、IP管理、CNI实现、容器路由、vxlan发现几个角度来比较。最后再简单介绍一下 calico 的转发流程。</p>
 <h2 id="1-weave">1. weave</h2>
 <h3 id="有哪些网络设备">有哪些网络设备</h3>
 <p>一个 bridge ，通常命名为 weave，会配一个 IP。用于挂载和容器成对的 veth。</p>
@@ -152,15 +152,47 @@ bridge 的网卡收到，也就是本机的 pod 都能收到，并相应 arp，�
 </ol>
 <h2 id="3-weave-和-flannel-的区别">3. weave 和 flannel 的区别</h2>
 <ol>
-<li>IPAM：weave是自己管理和分配，是一个大子网，不区分 node；flannel 是由 kube-controller-manager （分配 node 子网）和 ipam cni 分配（分配 pod ip）。</li>
+<li>IPAM：weave是自己管理和分配，是一个大子网，不区分 node；flannel 是由 kube-controller-manager （分配 node 子网）和 host-local cni 分配（分配 pod ip）。</li>
 <li>arp：weave：pod 的 arp 是可以广播到全网的，相当于是overlay的二层网络；flannel：arp只有本机的pod能获得，不能跨主机。</li>
 <li>容器内路由：weave只要是pod cidr 都直接广播 arp；flannel只有目的地址是本机 cidr 才会直接 arp，否则就发往 cni0，继续路由。</li>
 <li>主机路由：weave 不区分node 网段，只要是 pod cidr就发往 weave bridge ；flannel 会维护到每个node 的单独的路由。</li>
 <li>vtep 的互相发现：weave 是通过 ovs 实现的；flannel是静态设置 arp、fdb和路由实现的。</li>
-<li>cni 插件实现：weave 自己实现了 pod 网卡准备和 IPAM； flannel 主要还是用了标准的 bridge 和 ipam cni 插件。</li>
+<li>cni 插件实现：weave 自己实现了 pod 网卡准备和 IPAM； flannel 主要还是用了标准的 bridge 和 host-local cni 插件。</li>
 <li>路由信息的交换：weave 是通过 tcp 和 gossip 协议来交换信息；flannel 依赖了 k8s 的 API 和 node 对象（信息写在 metadata.annotaion 中）。</li>
 </ol>
-<h2 id="4-ref">4. Ref</h2>
+<h2 id="4-calico">4. calico</h2>
+<h3 id="有哪些网络设备-2">有哪些网络设备</h3>
+<p>不同于 weave 和 flannel，calico 不会设置一个 bridge，不会把 veth 挂到 brigde 下。</p>
+<p>每个 veth 的 mac 地址都是 <code>ee:ee:ee:ee:ee:ee</code>，没有 IP 地址，一般用 <code>cali*</code>命名。</p>
+<h3 id="主机路由和网段划分-2">主机路由和网段划分</h3>
+<ol>
+<li>每个本机容器会有一条路由，指定路由到哪一个 veth</li>
+<li>对于其他的node，各自至少有一条掩码为 24 的路由</li>
+</ol>
+<h3 id="cni-阶段-2">CNI 阶段</h3>
+<p>calico 的 cni 实现比较复杂：</p>
+<ol>
+<li>会使用 calico 和 k8s 的客户端，获取和更新 workload 的各种信息</li>
+<li>创建容器网络 (<a href="https://github.com/projectcalico/calico/blob/36fef94f8601a4e20d830df44ba8310df62ba63c/cni-plugin/pkg/dataplane/dataplane.go#L34">Dataplane.DoNetworking</a>)</li>
+</ol>
+<h3 id="跨主机网络通信过程如何区分目的-pod-在本机还是跨主机-2">跨主机网络通信过程（如何区分目的 pod 在本机还是跨主机）</h3>
+<ol>
+<li>先看容器内路由</li>
+</ol>
+<pre><code>default via 169.254.1.1 dev eth0
+169.254.1.1 dev eth0 scope link
+</code></pre><p>calico 容器内的默认网关 IP 都是 <code>169.254.1.1</code>。</p>
+<ol start="2">
+<li>为了把数据包发送到网关 <code>169.254.1.1</code>， 需要广播 arp 请求，获得对应的 mac 地址</li>
+</ol>
+<p>在所在 node 上 tcpdump 抓包</p>
+<pre><code>14:36:40.000190 ARP, Request who-has 169.254.1.1 tell 10.144.189.72, length 28
+14:36:40.000239 ARP, Reply 169.254.1.1 is-at ee:ee:ee:ee:ee:ee, length 28
+</code></pre><p>因为开启了 proxy_arp，node 上的 veth（容器 eth0 的对端）会用自己的 mac 地址响应 arp 广播。</p>
+<ol start="3">
+<li>数据包通过 veth 到达 node，再查 node 上的路由表进行路由（转发到其他 veth，或者转发到其他 node）</li>
+</ol>
+<h2 id="5-ref">5. Ref</h2>
 <p><a href="https://gobomb.github.io/post/learning-k8s-networking-reading-flannel-source/">Kubernetes 网络学习：阅读 Flannel 源码</a></p>
 <p><a href="https://github.com/weaveworks/weave/blob/master/docs">weave docs</a></p>
 <p><a href="http://manpages.ubuntu.com/manpages/bionic/man8/ovs-dpctl.8.html">ovs-dpctl - administer Open vSwitch datapaths</a></p>
