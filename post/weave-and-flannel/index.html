@@ -69,13 +69,13 @@ if (!doNotTrack) {
 <p>一个 bridge ，通常命名为 weave，会配一个 IP。用于挂载和容器成对的 veth。</p>
 <p>一个 ovs 设备，命名为 datapath，没有配 IP。</p>
 <p>一个 vtep 设备 vxlan-6784，负责封包和拆包，没有配 IP。</p>
-<p>bridge 和 ovs 设备之间用一对 veth 连起来： vethwe-datapath 和  vethwe-bridge。</p>
+<p>bridge 和 ovs 设备之间用一对 veth 连起来： vethwe-datapath 和 vethwe-bridge。</p>
 <h3 id="主机路由和网段划分">主机路由和网段划分</h3>
 <p>只有一条路由，所有 pod 是一个子网，不区分 node，IPAM 由weave 主机分配， weave cni 会调用 weave 服务获取 IP。</p>
 <pre><code># 在 node 上执行 ip route 
 10.32.0.0/12 dev weave  proto kernel  scope link  src 10.32.0.1
-</code></pre><p>10.32.0.0/12 是该集群的 pod CIDR。</p>
-<h3 id="cni-阶段">CNI 阶段</h3>
+10.32.0.0/12 是该集群的 pod CIDR。
+</code></pre><h3 id="cni-阶段">CNI 阶段</h3>
 <p>kubelet 调用 weave-plugin 这个 cni 插件，通过 weave client 从 weave daemon 获取 ip（ip分配由weave管理），并在容器内配置网卡和 IP，并将网卡对应的 veth 连接到 weave bridge 上。</p>
 <h3 id="跨主机网络通信过程如何区分目的-pod-在本机还是跨主机">跨主机网络通信过程（如何区分目的 pod 在本机还是跨主机）</h3>
 <p>对于 src pod 内，需要发送三层分组时，首先查看路由表，然后通过 arp 寻找下一跳 IP 对应的 Mac 地址</p>
@@ -92,7 +92,7 @@ default via 10.46.0.0 dev eth0
 </li>
 </ol>
 <p>src pod 得到 dst mac 地址，直接封装二层包发送数据。</p>
-<p>在对端的 weave bridge 能抓到 arp 广播和响，非查询本机 pod 的 arp 也可以收到。</p>
+<p>在对端的 weave bridge 能抓到 arp 广播和响应，非查询本机 pod 的 arp 也可以收到。</p>
 <pre><code># tcpdump -i weave arp
 07:12:39.036901 ARP, Request who-has 10.40.0.9 tell 10.46.0.8, length 28
 07:12:39.036923 ARP, Reply 10.40.0.9 is-at 8e:c5:12:0f:52:78, length 28
@@ -126,8 +126,8 @@ system@datapath:
 10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink
 # 本机 pod 的路由，直接发到 cni0
 10.244.2.0/24 dev cni0  proto kernel  scope link  src 10.244.2.1
-</code></pre><p>10.244.0.0/16 是集群的 pod CIDR。从 pode CIDR 划分三个子网，10.244.0.0/24,10.244.1.0/24,10.244.2.0/24.</p>
-<p>一般 10.244.0.0 是flannel.1 的 IP，10.244.0.1 是 cni0 的 IP。</p>
+10.244.0.0/16 是集群的 pod CIDR。从 pode CIDR 划分三个子网，10.244.0.0/24,10.244.1.0/24,10.244.2.0/24.
+</code></pre><p>一般 10.244.0.0 是flannel.1 的 IP，10.244.0.1 是 cni0 的 IP。</p>
 <h3 id="cni-阶段-1">CNI 阶段</h3>
 <p>flannel使用一个flannel的cni插件（由kubelet调用），读 <code>/run/flannel/subnet.env</code>（flanneld 会把本机子网写在这里） ，获取本机的子网，并调用 bridge cni插件来配置网卡（创建network ns，创建veth pair，把veth pair 加到 cni bridge)，调用 host-local cni 插件来从本机子网中分配 pod ip</p>
 <h3 id="跨主机网络通信过程如何区分目的-pod-在本机还是跨主机-1">跨主机网络通信过程（如何区分目的 pod 在本机还是跨主机）</h3>
@@ -139,15 +139,14 @@ default via 10.244.2.1 dev eth0
 </code></pre><p>这里就做出了区分，路由是最长前缀匹配，所以会先看目的地址是否是本机。因为本机pod都是一个子网，所以从 CIDR 就可以方便地区分出来。</p>
 <ol>
 <li>
-<p>如果目的地址是本机，直接发送 arp 广播，源IP写的是src pod IP，要查询的地址是 dst pod IP 。这个 arp 广播会被所有通过veth pair连接到 cni0
-bridge 的网卡收到，也就是本机的 pod 都能收到，并相应 arp，告知 mac，继续往后的通信流程。</p>
+<p>如果目的地址是本机，直接发送 arp 广播，源IP写的是src pod IP，要查询的地址是 dst pod IP 。这个 arp 广播会被所有通过veth pair连接到 cni0 bridge 的网卡收到，也就是本机的 pod 都能收到，并相应 arp，告知 mac，继续往后的通信流程。</p>
 </li>
 <li>
 <p>如果目的地址不是本机，但属于 pod cidr 范围，会发送到 cni0 bridge 上。（也会 arp，但查询的是 10.244.2.1 的 IP，即 cni0 的 IP）</p>
 <p>2.1 IP 包到达 cni0 bridge，会查 node 路由表，根据 CIDR 决定下一跳 IP 和端口。下一跳是目的 pod 所在 node 的 flannel.1 的IP，发送的出口是本机的 flannel.1</p>
 <p>2.2 知道对端 vtep IP，但是不知道 mac，需要广播 arp。不过 flanneld 在这里做了手脚，直接在 arp 缓存里添加永久的 arp 记录，因为 flanneld 通过 kube-apiserver 交换信息，知道全局的路由拓扑。这时的二层包，src mac是本机 flannel.1 的 mac，dst mac是对端 flannel.1 的mac。vtep 把这个 mac封装成vxlan udp 包。</p>
 <p>2.3 接下来需要发送 udp 了，但是还不知道对端的 node ip在哪里，因为每个 node 只有一个物理网卡，或者说外部网卡，只有通过物理网卡的真实 IP 或者 mac 才能发送。这时会去查 flannel.1 的 fdb（fdb 存的是，发往某个mac的帧，应该从哪个端口出去），这里也是 flanneld 提前设置好的。通过对端 flannel.1. 的 mac 地址得到对端的 node ip。</p>
-<p>2.4 最终发送出去的 udp 包，src ip是本机物理网卡 ip，dst ip是对端主机物理网卡 ip， dst port 是6784，由内核监听的vxlan端口。udp 包里封装的 mac帧，src mac是本机 vtep mac，dst mac是对端 vtep mac。mac 帧的负荷，src ip 是src pod ip，dst ip是dst pod ip。（可以通过 <code>tcpdump -i [node物理网卡]</code> 看到）</p>
+<p>2.4 最终发送出去的 udp 包，src ip是本机物理网卡 ip，dst ip是对端主机物理网卡 ip， dst port 是6784，由内核监听的vxlan端口。udp 包里封装的 mac帧，src mac是本机 vtep mac，dst mac是对端 vtep mac。mac 帧的负荷，src ip 是src pod ip，dst ip是dst pod ip。（可以通过<code>tcpdump -i [node物理网卡]</code>看到）</p>
 </li>
 </ol>
 <h2 id="3-weave-和-flannel-的区别">3. weave 和 flannel 的区别</h2>
@@ -183,9 +182,9 @@ bridge 的网卡收到，也就是本机的 pod 都能收到，并相应 arp，�
 169.254.1.1 dev eth0 scope link
 </code></pre><p>calico 容器内的默认网关 IP 都是 <code>169.254.1.1</code>。</p>
 <ol start="2">
-<li>为了把数据包发送到网关 <code>169.254.1.1</code>， 需要广播 arp 请求，获得对应的 mac 地址</li>
+<li>为了把数据包发送到网关 <code>169.254.1.1</code>， 需要广播 arp 请求，获得对应的 mac 地址
+在所在 node 上 tcpdump 抓包</li>
 </ol>
-<p>在所在 node 上 tcpdump 抓包</p>
 <pre><code>14:36:40.000190 ARP, Request who-has 169.254.1.1 tell 10.144.189.72, length 28
 14:36:40.000239 ARP, Reply 169.254.1.1 is-at ee:ee:ee:ee:ee:ee, length 28
 </code></pre><p>因为开启了 proxy_arp，node 上的 veth（容器 eth0 的对端）会用自己的 mac 地址响应 arp 广播。</p>
@@ -204,7 +203,7 @@ bridge 的网卡收到，也就是本机的 pod 都能收到，并相应 arp，�
       <footer>
         <hr>
         <small>
-          &copy; 2022 gobomb.
+          &copy; 2023 gobomb.
           Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> using the <a href="https://github.com/arjunkrishnababu96/basics" target="_blank">Basics</a> theme.
         </small>
       </footer>
