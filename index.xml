@@ -60,7 +60,8 @@
 一个 vtep 设备 vxlan-6784，负责封包和拆包，没有配 IP。
 bridge 和 ovs 设备之间用一对 veth 连起来： vethwe-datapath 和 vethwe-bridge。
 主机路由和网段划分 只有一条路由，所有 pod 是一个子网，不区分 node，IPAM 由weave 主机分配， weave cni 会调用 weave 服务获取 IP。
-# 在 node 上执行 ip route 10.32.0.0/12 dev weave proto kernel scope link src 10.32.0.1 10.32.0.0/12 是该集群的 pod CIDR。 CNI 阶段 kubelet 调用 weave-plugin 这个 cni 插件，通过 weave client 从 weave daemon 获取 ip（ip分配由weave管理），并在容器内配置网卡和 IP，并将网卡对应的 veth 连接到 weave bridge 上。</description>
+# 在 node 上执行 ip route 10.32.0.0/12 dev weave proto kernel scope link src 10.32.0.1 10.32.0.0/12 是该集群的 pod CIDR。
+CNI 阶段 kubelet 调用 weave-plugin 这个 cni 插件，通过 weave client 从 weave daemon 获取 ip（ip分配由weave管理），并在容器内配置网卡和 IP，并将网卡对应的 veth 连接到 weave bridge 上。</description>
     </item>
     
     <item>

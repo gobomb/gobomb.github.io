@@ -74,8 +74,8 @@ if (!doNotTrack) {
 <p>只有一条路由，所有 pod 是一个子网，不区分 node，IPAM 由weave 主机分配， weave cni 会调用 weave 服务获取 IP。</p>
 <pre><code># 在 node 上执行 ip route 
 10.32.0.0/12 dev weave  proto kernel  scope link  src 10.32.0.1
-10.32.0.0/12 是该集群的 pod CIDR。
-</code></pre><h3 id="cni-阶段">CNI 阶段</h3>
+</code></pre><p>10.32.0.0/12 是该集群的 pod CIDR。</p>
+<h3 id="cni-阶段">CNI 阶段</h3>
 <p>kubelet 调用 weave-plugin 这个 cni 插件，通过 weave client 从 weave daemon 获取 ip（ip分配由weave管理），并在容器内配置网卡和 IP，并将网卡对应的 veth 连接到 weave bridge 上。</p>
 <h3 id="跨主机网络通信过程如何区分目的-pod-在本机还是跨主机">跨主机网络通信过程（如何区分目的 pod 在本机还是跨主机）</h3>
 <p>对于 src pod 内，需要发送三层分组时，首先查看路由表，然后通过 arp 寻找下一跳 IP 对应的 Mac 地址</p>
@@ -126,8 +126,8 @@ system@datapath:
 10.244.1.0/24 via 10.244.1.0 dev flannel.1 onlink
 # 本机 pod 的路由，直接发到 cni0
 10.244.2.0/24 dev cni0  proto kernel  scope link  src 10.244.2.1
-10.244.0.0/16 是集群的 pod CIDR。从 pode CIDR 划分三个子网，10.244.0.0/24,10.244.1.0/24,10.244.2.0/24.
-</code></pre><p>一般 10.244.0.0 是flannel.1 的 IP，10.244.0.1 是 cni0 的 IP。</p>
+</code></pre><p>10.244.0.0/16 是集群的 pod CIDR。从 pode CIDR 划分三个子网，10.244.0.0/24,10.244.1.0/24,10.244.2.0/24.</p>
+<p>一般 10.244.0.0 是flannel.1 的 IP，10.244.0.1 是 cni0 的 IP。</p>
 <h3 id="cni-阶段-1">CNI 阶段</h3>
 <p>flannel使用一个flannel的cni插件（由kubelet调用），读 <code>/run/flannel/subnet.env</code>（flanneld 会把本机子网写在这里） ，获取本机的子网，并调用 bridge cni插件来配置网卡（创建network ns，创建veth pair，把veth pair 加到 cni bridge)，调用 host-local cni 插件来从本机子网中分配 pod ip</p>
 <h3 id="跨主机网络通信过程如何区分目的-pod-在本机还是跨主机-1">跨主机网络通信过程（如何区分目的 pod 在本机还是跨主机）</h3>
@@ -182,13 +182,13 @@ default via 10.244.2.1 dev eth0
 169.254.1.1 dev eth0 scope link
 </code></pre><p>calico 容器内的默认网关 IP 都是 <code>169.254.1.1</code>。</p>
 <ol start="2">
-<li>为了把数据包发送到网关 <code>169.254.1.1</code>， 需要广播 arp 请求，获得对应的 mac 地址
-在所在 node 上 tcpdump 抓包</li>
+<li>为了把数据包发送到网关 <code>169.254.1.1</code>， 需要广播 arp 请求，获得对应的 mac 地址</li>
 </ol>
+<p>在所在 node 上 tcpdump 抓包</p>
 <pre><code>14:36:40.000190 ARP, Request who-has 169.254.1.1 tell 10.144.189.72, length 28
 14:36:40.000239 ARP, Reply 169.254.1.1 is-at ee:ee:ee:ee:ee:ee, length 28
 </code></pre><p>因为开启了 proxy_arp，node 上的 veth（容器 eth0 的对端）会用自己的 mac 地址响应 arp 广播。</p>
-<ol start="3">
+<ol>
 <li>数据包通过 veth 到达 node，再查 node 上的路由表进行路由（转发到其他 veth，或者转发到其他 node）</li>
 </ol>
 <h2 id="5-ref">5. Ref</h2>
