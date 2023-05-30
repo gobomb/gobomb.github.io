@@ -6,7 +6,21 @@
     <description>Recent content on Present Day, Present Time</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 13 Feb 2023 01:40:02 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 29 May 2023 23:03:01 +0800</lastBuildDate><atom:link href="https://gobomb.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello World 也会有 bug？</title>
+      <link>https://gobomb.github.io/post/hello-world-debug/</link>
+      <pubDate>Mon, 29 May 2023 23:03:01 +0800</pubDate>
+      
+      <guid>https://gobomb.github.io/post/hello-world-debug/</guid>
+      <description>引言 前阵子一个朋友发我一篇文章，大意是说很多语言的经典程序——打印“hello world”——也是会出bug的。
+文中举了一个C的例子：
+/* Hello World in C, Ansi-style */ #include &amp;lt;stdio.h&amp;gt;#include &amp;lt;stdlib.h&amp;gt; int main(void) { puts(&amp;#34;Hello World!&amp;#34;); return EXIT_SUCCESS; } 编译运行后，却不会报错：
+$ gcc hello.c -o hello $ ./hello &amp;gt; /dev/full $ echo $? 0 通过 strace 追踪系统调用，是能看到 write 返回错误的：
+$ strace -etrace=write ./hello &amp;gt; /dev/full write(1, &amp;#34;Hello World!\n&amp;#34;, 13) = -1 ENOSPC (No space left on device) +++ exited with 0 +++ 但是上面的 C 程序并没有把错误返回出来。
+作者罗列了几个主流的语言，打印函数没有报错的：C、C++、Python 2、Java 等，有报错的 Rust、 Python 3、Bash、C# 等。</description>
+    </item>
+    
     <item>
       <title>2022 年终总结</title>
       <link>https://gobomb.github.io/post/2022-summary/</link>

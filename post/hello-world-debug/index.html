@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu|Ubuntu+Mono" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
+
+        <title>Hello World 也会有 bug？</title>
+
+        <link rel="stylesheet" href="/css/stylesheet.css">
+    </head>
+    <body>
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-md navbar-light">
+
+          
+          <span class="navbar-brand mb-0 h1"></span>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation" name="button">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-item nav-link " href="/">Home</a>
+              <a class="nav-item nav-link " href="/post/">Posts</a>
+              <a class="nav-item nav-link" href="https://github.com/gobomb" target="_blank">GitHub</a>
+              
+              <a class="nav-item nav-link " href="/about/">About</a>
+            </div>
+          </div>
+        </nav>
+
+        <section id="page-title">
+          <h1><a href="/">Present Day, Present Time</a></h1>
+          <span id="author-name">
+            <h6><a href="/about/">gobomb</a></h6>
+          </span>
+        </section>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-112443219-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+<div class="blog-post">
+  <h1>Hello World 也会有 bug？</h1>
+  <div class="blog-post-subheader">
+    <time>29 May 2023</time>
+  </div>
+  <div class="blog-post-content">
+    <h1 id="引言">引言</h1>
+<p>前阵子一个朋友发我一篇<a href="https://blog.sunfishcode.online/bugs-in-hello-world/">文章</a>，大意是说很多语言的经典程序——打印“hello world”——也是会出bug的。</p>
+<p>文中举了一个C的例子：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">/* Hello World in C, Ansi-style */</span>
+
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">void</span>)
+{
+  puts(<span style="color:#e6db74">&#34;Hello World!&#34;</span>);
+  <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+}
+</code></pre></div><p>编译运行后，却不会报错：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ gcc hello.c -o hello
+$ ./hello &gt; /dev/full
+$ echo $?
+<span style="color:#ae81ff">0</span>
+</code></pre></div><p>通过 strace 追踪系统调用，是能看到 write 返回错误的：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ strace -etrace<span style="color:#f92672">=</span>write ./hello &gt; /dev/full
+write<span style="color:#f92672">(</span>1, <span style="color:#e6db74">&#34;Hello World!\n&#34;</span>, 13<span style="color:#f92672">)</span>          <span style="color:#f92672">=</span> -1 ENOSPC <span style="color:#f92672">(</span>No space left on device<span style="color:#f92672">)</span>
++++ exited with <span style="color:#ae81ff">0</span> +++
+</code></pre></div><p>但是上面的 C 程序并没有把错误返回出来。</p>
+<p>作者罗列了几个主流的语言，打印函数没有报错的：C、C++、Python 2、Java 等，有报错的 Rust、 Python 3、Bash、C# 等。</p>
+<p>没有列出 Go。于是我有点好奇，随手写了一个 Hello World (go1.17.2 linux/amd64)：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello world!&#34;</span>)
+}
+</code></pre></div><p>试了下，发现也没有报错：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ go build -o hello main.go
+$ ./hello &gt; /dev/full
+$ echo $?
+<span style="color:#ae81ff">0</span>
+</code></pre></div><h1 id="rust-的表现">rust 的表现</h1>
+<p>我又用 rust 试了下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>(){
+    println<span style="color:#f92672">!</span>(<span style="color:#e6db74">&#34;Hello World!&#34;</span>);
+}
+</code></pre></div><p>确实如作者所言，会把错误抛出来，而且错误还很详细:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ rustc -o hello main.rs
+$ ./hello  &gt;/dev/full
+thread <span style="color:#e6db74">&#39;main&#39;</span> panicked at <span style="color:#e6db74">&#39;failed printing to stdout: No space left on device (os error 28)&#39;</span>, library/std/src/io/stdio.rs:1008:9
+note: run with <span style="color:#e6db74">`</span>RUST_BACKTRACE<span style="color:#f92672">=</span>1<span style="color:#e6db74">`</span> environment variable to display a backtrace
+$ echo $?
+<span style="color:#ae81ff">101</span>
+</code></pre></div><p>添加环境变量还可看完整的 backtrace：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ RUST_BACKTRACE<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> ./hello  &gt;/dev/full
+thread <span style="color:#e6db74">&#39;main&#39;</span> panicked at <span style="color:#e6db74">&#39;failed printing to stdout: No space left on device (os error 28)&#39;</span>, library/std/src/io/stdio.rs:1008:9
+stack backtrace:
+   0: rust_begin_unwind
+             at ./rustc/84c898d65adf2f39a5a98507f1fe0ce10a2b8dbc/library/std/src/panicking.rs:579:5
+   1: core::panicking::panic_fmt
+             at ./rustc/84c898d65adf2f39a5a98507f1fe0ce10a2b8dbc/library/core/src/panicking.rs:64:14
+   2: std::io::stdio::print_to
+             at ./rustc/84c898d65adf2f39a5a98507f1fe0ce10a2b8dbc/library/std/src/io/stdio.rs:1008:9
+   3: std::io::stdio::_print
+             at ./rustc/84c898d65adf2f39a5a98507f1fe0ce10a2b8dbc/library/std/src/io/stdio.rs:1074:5
+   4: main::main
+   5: core::ops::function::FnOnce::call_once
+note: Some details are omitted, run with <span style="color:#e6db74">`</span>RUST_BACKTRACE<span style="color:#f92672">=</span>full<span style="color:#e6db74">`</span> <span style="color:#66d9ef">for</span> a verbose backtrace.
+</code></pre></div><p>还能进一步看详细的 backtrace。突然觉得好贴心。</p>
+<h1 id="go-的-bug">Go 的 bug</h1>
+<p>到这里，我就有点兴奋，该不会Go的实现真的有bug吧，赶紧看看源码。才点开 fmt.Println 的函数签名，我就发现了“问题”：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// Println formats using the default formats for its operands and writes to standard output.
+</span><span style="color:#75715e">// Spaces are always added between operands and a newline is appended.
+</span><span style="color:#75715e">// It returns the number of bytes written and any write error encountered.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">a</span> <span style="color:#f92672">...</span><span style="color:#66d9ef">interface</span>{}) (<span style="color:#a6e22e">n</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>) {
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">Fprintln</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>, <span style="color:#a6e22e">a</span><span style="color:#f92672">...</span>)
+}
+</code></pre></div><p>Println 是有返回值的，返回写入的字节数和可能的写错误。</p>
+<p>所以不是程序有bug，而是使用方式不对。</p>
+<p>重新实现如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">n</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello world!&#34;</span>)
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		println(<span style="color:#e6db74">&#34;got err: &#34;</span>, <span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">Error</span>())
+	}
+
+	println(<span style="color:#e6db74">&#34;written bytes: &#34;</span>, <span style="color:#a6e22e">n</span>)
+
+}
+</code></pre></div><p>编译运行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ go build -o hello2 main2.go
+$ ./hello2 &gt; /dev/full
+got err:  write /dev/stdout: no space left on device
+written bytes:  <span style="color:#ae81ff">0</span>
+</code></pre></div><p>符合预期，错误是被处理的。</p>
+<p>所以，并不是说语言本身实现有bug，而是使用语言写代码的时候，考虑得不周全。</p>
+<h1 id="c-的-bug">C 的 bug</h1>
+<p>那，回到最开头的C的例子，是不是也是使用者的问题呢？</p>
+<p>puts 是不是也有返回值呢?</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> puts(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>str)
+</code></pre></div><p>跟 go 有点像，返回了一个int类型，指示写了多少字节，那错误在哪里呢？</p>
+<p>错误可以通过<code>#include &lt;errno.h&gt;</code>，获取到全局变量<code>errno</code></p>
+<p>于是程序可以改写成：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;errno.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">void</span>)
+{
+  <span style="color:#66d9ef">int</span> n;
+  n <span style="color:#f92672">=</span> puts(<span style="color:#e6db74">&#34;Hello World!&#34;</span>);
+  <span style="color:#66d9ef">if</span>(errno<span style="color:#f92672">!=</span><span style="color:#ae81ff">0</span>){
+    <span style="color:#75715e">// 为了不干扰标准输出，把错误信息打印到标准错误了
+</span><span style="color:#75715e"></span>    fprintf(stderr,<span style="color:#e6db74">&#34;puts got err %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,n,errno);
+    <span style="color:#66d9ef">return</span> errno;
+  }
+
+  fprintf(stderr,<span style="color:#e6db74">&#34;puts %d bytes</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,n );
+}
+</code></pre></div><p>编译运行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ gcc hello2.c -o hello2
+$ ./hello2 &gt;&gt;/dev/full
+puts <span style="color:#ae81ff">13</span> bytes
+$ echo $?
+<span style="color:#ae81ff">0</span>
+</code></pre></div><p>已经尝试获取了错误，却仍然没有得到错误？问题在哪里呢？</p>
+<p>这里得考虑实现了：<strong>puts这个函数是带缓冲的。</strong></p>
+<p>翻阅《UNIX 环境高级编程》5.4 章：</p>
+<pre><code>标准I/O库提供缓冲的目的是尽可能减少使用read和write调用的次数。它也对每个I/O流自动地进行缓冲管理，从而避免了应用程序需要考虑这一点所带来的麻烦。
+
+（1）全缓冲。这种情况下，在填满标准I/O缓冲区后才进行实际的I/O操作。对于驻留在磁盘上的文件通常是由标准I/O库实施全缓冲的。在一个流上执行第一次I/O操作时，相关标准I/O函数通常调用malloc获得需使用的缓冲区。
+
+术语冲洗（flush）说明标准I/O缓冲区的写操作。缓冲区可由标准I/O例程自动冲洗（例如当填满一个缓冲区时），或者可以调用函数fflush冲洗一个流。值得引起注意的是在UNIX环境中，flush有两种意思：在标准I/O库方面，flush（冲洗）意味着将缓冲区中的内容写到磁盘上（该缓冲区可能只是局部填写的）。在终端驱动程序方面，flush（刷清）表示丢弃已存储在缓冲区中的数据。
+</code></pre>
+<p>所以puts写到缓冲里，是成功的，所以没有报错。那我们调用 fflush 进行写盘呢？</p>
+<p>第三版如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;errno.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">void</span>)
+{
+  <span style="color:#66d9ef">int</span> n;
+  n <span style="color:#f92672">=</span> puts(<span style="color:#e6db74">&#34;Hello World!&#34;</span>);
+  <span style="color:#66d9ef">if</span>(errno<span style="color:#f92672">!=</span><span style="color:#ae81ff">0</span>){
+    fprintf(stderr,<span style="color:#e6db74">&#34;puts got err %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,n,errno);
+    <span style="color:#66d9ef">return</span> errno;
+  }
+
+  fprintf(stderr,<span style="color:#e6db74">&#34;puts %d bytes</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,n );
+
+  n <span style="color:#f92672">=</span> fflush(stdout);
+  <span style="color:#66d9ef">if</span>(errno<span style="color:#f92672">!=</span><span style="color:#ae81ff">0</span>){
+    fprintf(stderr,<span style="color:#e6db74">&#34;fflush got err %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,errno);
+    <span style="color:#66d9ef">return</span> errno;
+  }
+
+  fprintf(stderr,<span style="color:#e6db74">&#34;flushed %d bytes</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,n );
+
+  <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+}
+</code></pre></div><p>编译运行：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ gcc hello3.c -o hello3
+$ ./hello3 &gt;&gt;/dev/full
+puts <span style="color:#ae81ff">13</span> bytes
+fflush got err <span style="color:#ae81ff">28</span>
+$ echo $?
+<span style="color:#ae81ff">28</span>
+</code></pre></div><p>啊哈！这个错误终于被捕获了，errno.h里显示错误定义如下：</p>
+<pre><code>#define ENOSPC 28 /* No space left on device */
+</code></pre><h1 id="总结">总结</h1>
+<p>所以，即使是打印一个 hello world，这个每个新语言的经典程序，也有可能出 bug。但准确的说不是语言本身的bug，而是语言的假设结合程序员的使用造成的。</p>
+<p>在 C 的情况下，如果不是编程老手，熟悉库函数和各种约定（新手一上来哪知道errno是藏在全局变量里的），底层操作系统知识烂熟于心（标准IO、缓冲），都没有意识到错误的发生。即便如此，深入排查和验证问题，还要3个来回。</p>
+<p>Go 同理，默认情况下，错误极易被忽略了。我想很多人都不见得会去处理 fmt.Println 返回的错误。但从函数的封装上，是屏蔽了部分底层细节了，多返回值提高了易用性，还保留了C风味。但不去处理错误，也还是调用方的责任。</p>
+<p>而 Rust 则提供了更佳严格的错误返回，把问题显示抛了出来，还提供了分级别的调用栈打印，是我意料之外的。这种丰富的错误打印，是能节省使用者不少时间的。</p>
+<p>C假设你是老手，Go也假设你是严谨的，Rust则提供了所有的细节。</p>
+<p>写出严谨的程序没有那么容易，即使是最简单的打印 hello world。尽量还是选择趁手先进的工具，以及好的排错工具。我们很难面面俱到地考虑到所有异常情况，所以良好的测试，以及完善的报错信息是很有必要的。</p>
+<h1 id="后话">后话</h1>
+<p>我搜了下这篇文章，发现了一些有意思的讨论：</p>
+<p>如 <a href="https://www.reddit.com/r/programming/comments/ta2a2z/bugs_in_hello_world/">reddit</a> 上:</p>
+<blockquote>
+<p>if you don&rsquo;t realize that the buffering is the problem, you may wonder for a while why printf() reports success. Error handling is hard.</p>
+</blockquote>
+<p>还有<a href="https://news.ycombinator.com/item?id=30611367">ycombinator</a> 也有一长串讨论。</p>
+
+  </div>
+</div>
+
+      <footer>
+        <hr>
+        <small>
+          &copy; 2023 gobomb.
+          Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> using the <a href="https://github.com/arjunkrishnababu96/basics" target="_blank">Basics</a> theme.
+        </small>
+      </footer>
+    </div> 
+
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  </body>
+</html>
+
